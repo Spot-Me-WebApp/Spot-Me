@@ -1,3 +1,10 @@
+#To start the backend server
+### cd into server directory and enter 'npm run dev'
+#To start the React app
+### cd into the client directory and enter 'npm start'
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

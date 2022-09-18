@@ -1,6 +1,6 @@
-#To start the backend server
+# To start the backend server
 ### cd into server directory and enter 'npm run dev'
-#To start the React app
+# To start the React app
 ### cd into the client directory and enter 'npm start'
 
 

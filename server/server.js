@@ -12,7 +12,6 @@ const User = require('./models/user')
 const cors = require('cors')
 const session = require('express-session')
 const passport = require('passport');
-const passportLocal = require("passport-local").Strategy;
 
 //Database Connection-------------------------------------------------------------------------------
 mongoose.connect(process.env.DB_URL, {
@@ -55,23 +54,15 @@ app.use(express.json())
 
 //Routes-----------------------------------------------------------------------------------------------
 
-app.post('/login', (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-        if (err) throw err;
-        if (!user) res.send("That User Doesn't Exist")
-        else {
-            req.login(user, err => {
-                if (err) throw err;
-                res.send("You Are Logged In!")
-                console.log(req.user)
-            })
-        }
-    })(req, res, next);
-})
+app.post('/login',
+    passport.authenticate('local', { failureRedirect: '/login', successReturnToOrRedirect: '/', failureMessage: true }),
+    function (req, res) {
+        res.send(req.body)
+    });
 
 app.post('/register', async (req, res) => {
     if (User.findOne({ username: req.body.username }).count() > 0) {
-        throw error("User already exists");
+        return res.send("User already exists");
     }
 
     const { username, password, name, dob, bio, expLevel } = req.body;

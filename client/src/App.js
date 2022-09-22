@@ -9,14 +9,11 @@ import Profile from './pages/Profile'
 export default function App() {
   return (
     <div className='App'>
-      <nav>
-        <div>
-          <Link to='/'>Home</Link>
-        </div>
-        <div>
-          <Link to='/profile/:id'>Profile</Link>
-        </div>
-      </nav>
+    <div className='navbar'>
+    <nav>
+      <Link to='/'>Home</Link> <Link to='/profile/:id'>Profile</Link> <Link>Menu</Link>
+    </nav>
+    </div>
       <Routes>
         <Route exact path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />

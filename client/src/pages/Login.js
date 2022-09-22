@@ -1,9 +1,11 @@
 import React, { useState } from "react"
+import { redirect, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 
 function Login() {
     const [loginUsername, setLoginUsername] = useState("");
     const [loginPassword, setLoginPassword] = useState("");
+    let navigate = useNavigate();
 
     const loginUser = () => {
         axios({
@@ -14,7 +16,8 @@ function Login() {
             },
             withCredentials: true,
             url: "http://localhost:3001/login"
-        }).then((res) => console.log(res))
+        }).then((response) => navigate(`/profile/${response.data._id}`))
+            .catch((err) => console.log(err))
     }
 
     return (

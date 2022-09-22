@@ -13,6 +13,7 @@ const cors = require('cors')
 const session = require('express-session')
 const passport = require('passport');
 
+
 //Database Connection-------------------------------------------------------------------------------
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -55,9 +56,9 @@ app.use(express.json())
 //Routes-----------------------------------------------------------------------------------------------
 
 app.post('/login',
-    passport.authenticate('local', { failureRedirect: '/login', successReturnToOrRedirect: '/', failureMessage: true }),
+    passport.authenticate('local', { failureRedirect: '/login', failureFlash: true, keepSessionInfo: true }),
     function (req, res) {
-        res.send(req.body)
+        res.send(req.user)
     });
 
 app.post('/register', async (req, res) => {
@@ -69,6 +70,11 @@ app.post('/register', async (req, res) => {
     const newUser = new User({ username, name, dob, bio, expLevel });
     const registeredUser = await User.register(newUser, password);
     res.send("You are logged in")
+})
+
+app.get('/getUser/:id', async (req, res) => {
+    const user = await User.findOne({ _id: req.params.id });
+    res.json(user)
 })
 //Routes---------------------------------------------------------------------------------------------------
 

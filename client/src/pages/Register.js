@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
 
 function Register() {
 
@@ -8,6 +9,7 @@ function Register() {
     const [registerName, setRegisterName] = useState("");
     const [registerDOB, setRegisterDOB] = useState("");
     const [registerBio, setRegisterBio] = useState("");
+    let navigate = useNavigate();
 
     const expLevelOptions = [
         { value: '', text: '--Choose an option--' },
@@ -32,7 +34,8 @@ function Register() {
             },
             withCredentials: true,
             url: "http://localhost:3001/register"
-        }).then((res) => console.log(res))
+        }).then((response) => navigate(`/profile/${response.data._id}`))
+            .catch((err) => console.log(err))
     }
 
 

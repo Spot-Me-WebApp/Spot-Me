@@ -11,7 +11,9 @@ const mongoose = require('mongoose')
 const User = require('./models/user')
 const cors = require('cors')
 const session = require('express-session')
+//const { createProxyMiddleware } = require('http-proxy-middleware')
 const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 
 //Database Connection-------------------------------------------------------------------------------
@@ -27,11 +29,18 @@ db.once('open', () => {
 //Database Connection---------------------------------------------------------------------------------
 
 //MIDDLEWARES--------------------------------------------------------------------------------------------------------------
-//cors lets the app accept requests from any domain(from frontend or backend)
+//cors allows the backend to accept requests from any domain (including the front end react app)
 app.use(cors({
-    origin: "http://localhost:3000",  //react app url
+    origin: 'http://localhost:3000',
     credentials: true
 }))
+
+//Requests to URLs with /api will go through proxy server first to bypass browser security issues
+// app.use('/api/*', createProxyMiddleware({
+//     target: "http://localhost:12345",
+//     changeOrigin: true
+// }))
+
 app.use(session({
     secret: 'burgers',
     resave: false,
@@ -46,11 +55,24 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-require('./passportConfig')(passport);
+//Import local strategy config
+require('./passportLocalConfig')(passport);
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/api/oauth2/redirect/google"
+},
+    function (accessToken, refreshToken, profile, cb) {
+        return cb(null, profile);
+    }
+));
+
 
 //Used to parse incoming requests
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
 //MIDDLEWARES-------------------------------------------------------------------------------------------------------------------
 
 //Routes-----------------------------------------------------------------------------------------------
@@ -76,6 +98,18 @@ app.get('/getUser/:id', async (req, res) => {
     const user = await User.findOne({ _id: req.params.id });
     res.json(user)
 })
+
+//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
+//When a user clicks the button to login with google, it will hit this route and then redirect to the route below this one
+app.get('/login/google', passport.authenticate('google'));
+
+//Processes the authentication response and logs the user in
+app.get('/oauth2/redirect/google', passport.authenticate('google', { failureRedirect: '/login', failureFlash: true, keepSessionInfo: true })),
+    function (req, res) {
+        res.send(req.user);
+    }
+//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
+
 //Routes---------------------------------------------------------------------------------------------------
 
 app.listen(process.env.PORT, () => {

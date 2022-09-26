@@ -11,6 +11,7 @@ function Register() {
     const [registerBio, setRegisterBio] = useState("");
     let navigate = useNavigate();
 
+    //For experience level
     const expLevelOptions = [
         { value: '', text: '--Choose an option--' },
         { value: 'Beginner', text: 'Beginner' },
@@ -19,9 +20,28 @@ function Register() {
     ];
 
     const [registerExpLevel, setRegisterExpLevel] = useState(expLevelOptions[0].value);
-    // const [registerMethods, setRegisterMethods] = useState("");
+    //For methods
+    const methods = ['Lifting', 'Calisthenics', 'Cardio']
+    const [checkedState, setCheckedState] = useState(
+        new Array(methods.length).fill(false)
+    );
+
+    const handleMethodChange = (position) => {
+        const updatedCheckedState = checkedState.map((item, index) =>
+            index === position ? !item : item
+        );
+        setCheckedState(updatedCheckedState);
+    }
+
     const registerUser = () => {
+        let registerMethods = [];
+        for (let i = 0; i < checkedState.length; i++) {
+            if (checkedState[i] === true) {
+                registerMethods.push(methods[i])
+            } else continue;
+        }
         axios({
+            baseURL: "http://localhost:3001",
             method: 'post',
             data: {
                 username: registerUsername,
@@ -30,25 +50,15 @@ function Register() {
                 dob: registerDOB,
                 bio: registerBio,
                 expLevel: registerExpLevel,
-                //methods: registerMethods
+                methods: registerMethods
             },
-            withCredentials: true,
-            url: "http://localhost:3001/register"
+            url: "/register"
         }).then((response) => navigate(`/profile/${response.data._id}`))
             .catch((err) => console.log(err))
     }
 
-    const authWithGoogle = () => {
-        axios({
-            url: "http://localhost:3001/login/google",
-            headers: {
-                'Access-Control-Allow-Origin': 'http://localhost:3000',
-            }
-        })
-            .then((response) => console.log(response))
-            .catch((err) => console.log(err));
-    }
-
+    //_self means to open the window in the current tab.
+    const authWithGoogle = () => window.open('http://localhost:3001/login/google', '_self')
 
 
     const handleChange = event => {
@@ -85,21 +95,22 @@ function Register() {
                 <textarea name="bio" id="bio" cols="30" rows="5" onChange={e => setRegisterBio(e.target.value)}></textarea>
             </div>
             {/* Exercise methods */}
-            {/* <div>
-                <legend>How do you like to exercise? (Select all that apply)</legend>
-                <div>
-                    <input type="checkbox" id="lifting" name="methods" value="Lifting" on />
-                    <label for="lifting">Lifting</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="calisthenics" name="methods" value="Calisthenics" />
-                    <label for="calisthenics">Calisthenics</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="cardio" name="methods" value="Cardio" />
-                    <label for="cardio">Cardio</label>
-                </div>
-            </div> */}
+            <div>
+                <div>How do you like to exercise? (Select all that apply)</div>
+                <ul>
+                    {methods.map((name, index) => {
+                        return (
+                            <div key={index}>
+                                <div>
+                                    <input type="checkbox" name={name} id={`checkbox-${index}`} value={name} checked={checkedState[index]}
+                                        onChange={() => handleMethodChange(index)} />
+                                    <label htmlFor={`checkbox-${index}`}>{name}</label>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </ul>
+            </div>
             <div>
                 <label htmlFor="expLevel">What's your experience level?</label>
                 <select name="expLevel" id="expLevel" value={registerExpLevel} onChange={handleChange}>

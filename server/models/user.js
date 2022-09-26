@@ -2,15 +2,31 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const passportLocalMongoose = require('passport-local-mongoose');
 
+
 const userSchema = new Schema({
+    //This will only exist for users who register with google or facebook. uri is a unique id associated with a user's google/facebook account
+    uri: {
+        type: String,
+        required: false,
+        unique: true
+    },
+    //This will only exist for users who register with google or facebook
+    provider: {
+        type: String,
+        required: false,
+        enum: ['google', 'facebook']
+    },
     name: {
         type: String,
-        required: true,
-        unique: false
+        required: true
+    },
+    username: {
+        type: String,
+        required: false
     },
     dob: {
         type: Date,
-        required: true,
+        required: false,
         unique: false
     },
     bio: {

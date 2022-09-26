@@ -11,9 +11,9 @@ const mongoose = require('mongoose')
 const User = require('./models/user')
 const cors = require('cors')
 const session = require('express-session')
-//const { createProxyMiddleware } = require('http-proxy-middleware')
+const flash = require('connect-flash')
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
 
 
 //Database Connection-------------------------------------------------------------------------------
@@ -30,16 +30,13 @@ db.once('open', () => {
 
 //MIDDLEWARES--------------------------------------------------------------------------------------------------------------
 //cors allows the backend to accept requests from any domain (including the front end react app)
+
 app.use(cors({
     origin: 'http://localhost:3000',
-    credentials: true
-}))
+    credentials: true,
+    optionsSuccessStatus: 200 //Some old browsers dont accept default, 204
+}));
 
-//Requests to URLs with /api will go through proxy server first to bypass browser security issues
-// app.use('/api/*', createProxyMiddleware({
-//     target: "http://localhost:12345",
-//     changeOrigin: true
-// }))
 
 app.use(session({
     secret: 'burgers',
@@ -52,46 +49,64 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }))
+app.use(flash());
+
+//Import passport local strategy and google strategy config
+require('./passportLocalConfig')(passport);
+require('./passportGoogleConfig')(passport);
 
 app.use(passport.initialize());
 app.use(passport.session());
-//Import local strategy config
-require('./passportLocalConfig')(passport);
-
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/api/oauth2/redirect/google"
-},
-    function (accessToken, refreshToken, profile, cb) {
-        return cb(null, profile);
-    }
-));
-
 
 //Used to parse incoming requests
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
+//Set response headers for CORS
+app.use((req, res, next) => {
+    res.set({
+        'Access-Control-ALlow-Headers': 'true',
+        //This is the origin of the react frontend
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
+    })
+    next();
+})
+
 //MIDDLEWARES-------------------------------------------------------------------------------------------------------------------
 
 //Routes-----------------------------------------------------------------------------------------------
-
+//For local authentication
 app.post('/login',
-    passport.authenticate('local', { failureRedirect: '/login', failureFlash: true, keepSessionInfo: true }),
+    passport.authenticate('local', { failureRedirect: 'http://localhost:3000/login', failureFlash: true, keepSessionInfo: true }),
     function (req, res) {
         res.send(req.user)
     });
-
+//For local registration
 app.post('/register', async (req, res) => {
-    if (User.findOne({ username: req.body.username }).count() > 0) {
+    const userExists = await User.findOne({ username: req.body.username }).count() > 0 ? true : false;
+    if (userExists) {
         return res.send("User already exists");
     }
-
-    const { username, password, name, dob, bio, expLevel } = req.body;
-    const newUser = new User({ username, name, dob, bio, expLevel });
+    console.log(req.body)
+    const { username, password, name, dob, bio, expLevel, methods } = req.body;
+    const newUser = new User({ username, name, dob, bio, expLevel, methods });
     const registeredUser = await User.register(newUser, password);
-    res.send("You are logged in")
+    res.send(registeredUser)
+})
+
+
+//For providing a user's missing data after authentication with google or facebook.
+app.post('/registerOauth', async (req, res) => {
+    console.log(req.body)
+    const { _id, dob, bio, expLevel, methods } = req.body;
+    const user = await User.findById(_id);
+    user.dob = dob;
+    user.bio = bio;
+    user.expLevel = expLevel;
+    user.methods = methods;
+    await user.save();
+    return res.send(user);
 })
 
 app.get('/getUser/:id', async (req, res) => {
@@ -99,15 +114,23 @@ app.get('/getUser/:id', async (req, res) => {
     res.json(user)
 })
 
+app.get('/isLoggedIn', (req, res) => {
+    if (req.user) {
+        res.json(req.user)
+    } else {
+        res.send("Couldn't get req.user")
+    }
+})
+
 //------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
 //When a user clicks the button to login with google, it will hit this route and then redirect to the route below this one
-app.get('/login/google', passport.authenticate('google'));
+app.get('/login/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 //Processes the authentication response and logs the user in
-app.get('/oauth2/redirect/google', passport.authenticate('google', { failureRedirect: '/login', failureFlash: true, keepSessionInfo: true })),
-    function (req, res) {
-        res.send(req.user);
-    }
+app.get('/oauth2/redirect/google', passport.authenticate('google', {
+    failureRedirect: 'http://localhost:3000/register',
+    successRedirect: 'http://localhost:3000/', failureMessage: true, keepSessionInfo: true
+}))
 //------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
 
 //Routes---------------------------------------------------------------------------------------------------

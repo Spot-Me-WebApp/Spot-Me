@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
 
 function Login() {
@@ -31,7 +31,8 @@ function Login() {
                 <label htmlFor="password"></label>
                 <input className="inputInfo"type="password" name="password" id="password" placeholder="Password" onChange={e => setLoginPassword(e.target.value)} />
             </div>
-            <button className='loginButton'  onClick={loginUser}>Log In</button>
+            <button className='loginButton'  onClick={loginUser}>LOG IN</button>
+            <div className="registerButton">Don't have an account? <Link to={'./register'}>SIGN UP</Link></div>
         </div>
     )
 }

@@ -42,6 +42,13 @@
     }
 }
 
+.loginBlock{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
 .navbar {
     justify-content: space-evenly;
     padding: 2rem;
@@ -51,11 +58,24 @@
     font-family: 'Quicksand'; 
 }
 
+.inputInfo{
+    padding: 15px;
+    margin: 10px;
+    border-radius: 4px;
+    width: 15%;
+}
+
+.loginButton{
+    padding: 15px;
+    width: 20%;
+    max-width: 319px;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
     background-color: #8D918D;
-    background-image: url("background.jpg");
+    background-image: url(background.jpg);
 }
 

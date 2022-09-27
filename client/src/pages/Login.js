@@ -22,16 +22,16 @@ function Login() {
 
     return (
         <div>
-            <h1>Login</h1>
-            <div>
-                <label htmlFor="username">Username</label>
-                <input type="text" id="username" name="username" onChange={e => setLoginUsername(e.target.value)} />
+            <h1>SPOT ME</h1>
+            <div className='loginBlock'>
+                <label htmlFor="username"></label>
+                <input className="inputInfo" type="text" id="username" name="username" placeholder="Username"onChange={e => setLoginUsername(e.target.value)} />
             </div>
             <div>
-                <label htmlFor="password">Password</label>
-                <input type="password" name="password" id="password" onChange={e => setLoginPassword(e.target.value)} />
+                <label htmlFor="password"></label>
+                <input className="inputInfo"type="password" name="password" id="password" placeholder="Password" onChange={e => setLoginPassword(e.target.value)} />
             </div>
-            <button onClick={loginUser}>Login</button>
+            <button className='loginButton'  onClick={loginUser}>Log In</button>
         </div>
     )
 }

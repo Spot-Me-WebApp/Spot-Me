@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, redirect } from 'react-router-dom';
 import axios from 'axios';
 
 function Home() {
@@ -52,6 +52,18 @@ function Home() {
             url: "/registerOauth"
         }).then((response) => navigate(`/profile/${response.data._id}`))
             .catch((err) => console.log(err))
+    }
+
+    const logoutUser = () => {
+        axios({
+            url: 'http://localhost:3001/logout',
+            withCredentials: true
+        }).then((response) => {
+            console.log(response);
+            if (response.data === null) {
+                navigate('/')
+            }
+        }).catch((err) => console.log(err))
     }
 
     useEffect(() => {
@@ -118,7 +130,10 @@ function Home() {
             <h1>Spot Me</h1>
             <h2>Welcome!</h2>
             {typeof userData !== "string" &&
-                <p>{`${userData.name}`}</p>
+                <div>
+                    <p>{`${userData.name}`}</p>
+                    <button onClick={logoutUser}>Logout</button>
+                </div >
             }
             {typeof userData === "string" &&
                 <div>

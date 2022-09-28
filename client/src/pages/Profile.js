@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
 
 function Profile() {
@@ -9,6 +9,7 @@ function Profile() {
     const [isLoaded, setIsLoaded] = useState(false);
     const [userData, setUserData] = useState([]);
     const { id } = useParams();
+    let navigate = useNavigate();
 
     useEffect(() => {
         async function fetchData() {
@@ -26,6 +27,18 @@ function Profile() {
         }
         fetchData()
     }, [])
+
+    const logoutUser = () => {
+        axios({
+            url: 'http://localhost:3001/logout',
+            withCredentials: true
+        }).then((response) => {
+            console.log(response);
+            if (response.data === null) {
+                navigate('/')
+            }
+        }).catch((err) => console.log(err))
+    }
 
     if (error) {
         return <div>Error: {error.message}</div>;
@@ -46,6 +59,7 @@ function Profile() {
                     </div>
                 }
                 <p>Experience Level: {userData.expLevel}</p>
+                <button onClick={logoutUser}>Logout</button>
             </div>
         )
     }

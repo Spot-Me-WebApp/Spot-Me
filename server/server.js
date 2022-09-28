@@ -51,9 +51,10 @@ app.use(session({
 }))
 app.use(flash());
 
-//Import passport local strategy and google strategy config
+//Import passport local, google, and facebook strategy config
 require('./passportLocalConfig')(passport);
 require('./passportGoogleConfig')(passport);
+require('./passportFacebookConfig')(passport);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -122,16 +123,34 @@ app.get('/isLoggedIn', (req, res) => {
     }
 })
 
+app.get('/logout', (req, res) => {
+    req.logout(err => {
+        if (err) { return res.send(err); }
+        res.json(req.user)
+    })
+})
+
 //------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
 //When a user clicks the button to login with google, it will hit this route and then redirect to the route below this one
 app.get('/login/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 //Processes the authentication response and logs the user in
 app.get('/oauth2/redirect/google', passport.authenticate('google', {
-    failureRedirect: 'http://localhost:3000/register',
+    failureRedirect: 'http://localhost:3000/login',
     successRedirect: 'http://localhost:3000/', failureMessage: true, keepSessionInfo: true
 }))
 //------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
+
+//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
+app.get('/login/facebook', passport.authenticate('facebook'));
+
+app.get('/auth/facebook/callback', passport.authenticate('facebook', {
+    failureRedirect: 'http://localhost:3000/login',
+    successRedirect: 'http://localhost:3000/', failureMessage: true, keepSessionInfo: true
+}));
+//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
+
+
 
 //Routes---------------------------------------------------------------------------------------------------
 

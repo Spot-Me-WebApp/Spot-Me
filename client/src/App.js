@@ -6,15 +6,19 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import Schedule from './pages/Schedule';
+import { NavigationContainer } from '@react-navigation/native'
+
+// Navigators
+import Main from '../../frontend/Spot-Me/navigators/Main';
 
 export default function App() {
   return (
     <div className='App'>
-    <div className='navbar'>
-    <nav>
-      <Link to='/'>Home</Link> <Link to='/profile/:id'>Profile</Link> <Link>Menu</Link>
-    </nav>
-    </div>
+      <div className='navbar'>
+        <nav>
+          <Link to='/'>Home</Link> <Link to='/profile/:id'>Profile</Link> <Link>Menu</Link>
+        </nav>
+      </div>
       <Routes>
         <Route exact path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />

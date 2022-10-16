@@ -3,7 +3,13 @@ const { Schema } = mongoose;
 const passportLocalMongoose = require('passport-local-mongoose');
 
 
+// const imageSchema = {
+//     url: String, 
+//     filename: String
+// }
+
 const userSchema = new Schema({
+
     //This will only exist for users who register with google or facebook. uri is a unique id associated with a user's google/facebook account
     uri: {
         type: String,
@@ -43,11 +49,10 @@ const userSchema = new Schema({
     methods: {
         type: [String],
         //Example for now
-        enum: ['Lifting', 'Calisthenics', 'Cardio'],
+        enum: ['Powerlifting', 'Calisthenics', 'Cardio', 'Bodybuilding', 'Olympic Lifting', 'Filming'],
         required: false,
         unique: false
-    },
-
+    }
 })
 
 //adds username and password fields to userSchema

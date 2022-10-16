@@ -32,7 +32,7 @@ db.once('open', () => {
 //cors allows the backend to accept requests from any domain (including the front end react app)
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://192.168.1.151:19000',
     credentials: true,
     optionsSuccessStatus: 200 //Some old browsers dont accept default, 204
 }));
@@ -67,8 +67,7 @@ app.use(express.json())
 app.use((req, res, next) => {
     res.set({
         'Access-Control-ALlow-Headers': 'true',
-        //This is the origin of the react frontend
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Origin': 'http://192.168.1.151:19000',
         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
     })
     next();

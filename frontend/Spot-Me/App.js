@@ -1,8 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import { React, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import axios from 'axios'
+import { SERVER_PORT } from '@env'
+
 
 import OnboardingNavigation from './navigators/OnboardingNavigation';
 import Main from './navigators/Main';
@@ -10,14 +13,46 @@ import BottomTabs from './navigators/BottomTabs';
 
 
 
+
 export default function App() {
+
+  const [userData, setUserData] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+  //Check if a user's logged in. if they are, the backend sends their data.
+  useEffect(() => {
+    async function fetchData() {
+      await axios({
+        url: `${SERVER_PORT}/isLoggedIn`,
+        withCredentials: true
+      })
+        .then((response) => {
+          console.log(response.data);
+          if (response.data) {
+            setUserData(response.data);
+          }
+          //If api sends back JSON, then the user is authenticated, else, it sends back a string meaning user isn't authenticated
+          (userData && typeof userData !== "string") ? setIsLoggedIn(true) : setIsLoggedIn(false)
+
+        })
+        .catch((error) => console.log(error));
+    }
+    fetchData();
+  }, [])
+
+
+
+  //If user logged in use BottomTabs navigation, else, use OnboardingNavigation
   return (
     <NavigationContainer>
-      <OnboardingNavigation></OnboardingNavigation>
-      {/* <BottomTabs /> */}
+      {isLoggedIn ? (
+        <BottomTabs></BottomTabs>
+      ) : (
+        <OnboardingNavigation></OnboardingNavigation>
+      )}
     </NavigationContainer>
-
-  );
+  )
 }
 
 

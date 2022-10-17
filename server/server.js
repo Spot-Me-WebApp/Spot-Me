@@ -78,7 +78,7 @@ app.use((req, res, next) => {
 //Routes-----------------------------------------------------------------------------------------------
 //For local authentication
 app.post('/login',
-    passport.authenticate('local', { failureRedirect: 'http://localhost:3000/login', failureFlash: true, keepSessionInfo: true }),
+    passport.authenticate('local', { failureFlash: true, keepSessionInfo: true }),
     function (req, res) {
         res.send(req.user)
     });

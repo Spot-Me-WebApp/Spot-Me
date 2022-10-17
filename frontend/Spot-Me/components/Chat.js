@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 
 
-export const Chat = (props) => {
+const Chat = (props) => {
 
 
     return (
         <View style={styles.container}>
-            <Text>Meet</Text>
+            <Text>Chat</Text>
 
         </View>
     )
@@ -22,4 +22,4 @@ const styles = StyleSheet.create({
     },
 });
 
-////export default Chat;
+export default Chat;

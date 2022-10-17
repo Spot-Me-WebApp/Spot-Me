@@ -1,78 +1,76 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { Icon } from "react-native-vector-icons/FontAwesome";
-import { Meet } from "../components/Meet";
-import { Schedule } from "../components/Schedule";
-import { Chat } from "../components/Chat";
-import { Profile } from "../components/Profile";
+import Meet from "../components/Meet";
+import Schedule from "../components/Schedule";
+import Chat from "../components/Chat";
+import Profile from "../components/Profile";
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabs = () => {
     return (
         <Tab.Navigator
-            tabBarOptions={{
-                showLabel: false,
-                style: {
-                    position: 'absolute',
-                    bottom: 25,
-                    left: 20,
-                    right: 20,
-                    elevation: 0,
-                    backgroundColor: '#ffffff',
-                    borderRadius: 15,
-                    height: 90,
-                    ...styles.shadow
-                }
+            initialRouteName="Profile"
+            screenOptions={{
+                "tabBarHideOnKeyboard": true,
+                "tabBarShowLabel": false,
+                "tabBarActiveTintColor": '#A09F9A',
+                "tabBarStyle": [
+                    {
+                        "display": "flex"
+                    },
+                    null
+                ]
             }}
         >
             <Tab.Screen name="Meet" component={Meet}
-            /* options={{
-                tabBarIcon: () => (
-                    <Icon
-                        name="fa-solid fa-dumbbell"
-                        style={{ position: "relative" }}
+            // options={{
+            //     tabBarIcon: () => (
+            //         <Icon
+            //             name="fa-solid fa-dumbbell"
+            //             style={{ position: "relative" }}
 
-                        size={30}
-                    />
-                )
-            }} */
+            //             size={30}
+            //         />
+            //     )
+            // }}
             />
             <Tab.Screen name="Schedule" component={Schedule}
-            /* options={{
-                tabBarIcon: () => (
-                    <Icon
-                        name="fa-solid fa-calendar-days"
-                        style={{ position: "relative" }}
+            // options={{
+            //     tabBarIcon: () => (
+            //         <Icon
+            //             name="fa-solid fa-calendar-days"
+            //             style={{ position: "relative" }}
 
-                        size={30}
-                    />
-                )
-            }}  */
+            //             size={30}
+            //         />
+            //     )
+            // }}
             />
             <Tab.Screen name="Chat" component={Chat}
-            /* options={{
-                tabBarIcon: () => (
-                    <Icon
-                        name="fa-solid fa-messages"
-                        style={{ position: "relative" }}
+            // options={{
+            //     tabBarIcon: () => (
+            //         <Icon
+            //             name="fa-solid fa-messages"
+            //             style={{ position: "relative" }}
 
-                        size={30}
-                    />
-                )
-            }}  */
+            //             size={30}
+            //         />
+            //     )
+            // }}
             />
             <Tab.Screen name="Profile" component={Profile}
-            /* options={{
-                tabBarIcon: () => (
-                    <Icon
-                        name="fa-solid fa-user"
-                        style={{ position: "relative" }}
+            // options={{
+            //     tabBarIcon: () => (
+            //         <Icon
+            //             name="fa-solid fa-user"
+            //             style={{ position: "relative" }}
 
-                        size={30}
-                    />
-                )
-            }}  */
+            //             size={30}
+            //         />
+            //     )
+            // }}
             />
 
         </Tab.Navigator>

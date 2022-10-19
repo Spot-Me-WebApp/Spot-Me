@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button } from 'react-native';
 
 import Login from './Login';
 import Register from './Registration/UsernamePassword';
+import Meet from './Meet';
 
 const LandingPage = (props) => {
 
@@ -11,6 +12,7 @@ const LandingPage = (props) => {
             <Text>Spot Me</Text>
             <Button title='Login' onPress={() => props.navigation.navigate('Login')} />
             <Button title='Sign Up' onPress={() => { props.navigation.navigate('Register') }} />
+            <Button title='MEet' onPress={() => { props.navigation.navigate('Meet') }} />
         </View>
 
     )

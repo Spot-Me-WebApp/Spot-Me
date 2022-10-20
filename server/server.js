@@ -6,7 +6,6 @@ if (process.env.NODE_ENV !== 'production') {
 //Import dependencies
 const express = require('express');
 const app = express();
-const path = require('path')
 const mongoose = require('mongoose')
 const User = require('./models/user')
 const cors = require('cors')
@@ -29,7 +28,7 @@ db.once('open', () => {
 //Database Connection---------------------------------------------------------------------------------
 
 //MIDDLEWARES--------------------------------------------------------------------------------------------------------------
-//cors allows the backend to accept requests from any domain (including the front end react app)
+//cors allows the backend to accept requests from frontend domain
 
 app.use(cors({
     origin: 'http://192.168.1.151:19000',

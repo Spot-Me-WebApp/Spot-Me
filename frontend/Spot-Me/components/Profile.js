@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, DevSettings } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
+
 
 const Profile = (props) => {
 
@@ -23,6 +24,16 @@ const Profile = (props) => {
         }
         fetchData();
     }, [])
+
+    const logoutUser = async () => {
+        await axios({
+            url: `${SERVER_PORT}/logout`,
+            withCredentials: true
+        }).then((response) => {
+            console.log(response.data)
+            DevSettings.reload()
+        }).catch((err) => console.log(err))
+    }
 
     const calculateAge = (dob) => {
         const currentDate = new Date()
@@ -61,6 +72,7 @@ const Profile = (props) => {
                             }))}
                         </View>
                     </ScrollView>
+                    <Button title="Logout" onPress={logoutUser}></Button>
                 </FormContainer>
             ) : (<Text>Profile</Text>)}
         </View>

@@ -11,9 +11,9 @@ const Login = (props) => {
     const [loginUsername, setLoginUsername] = useState('')
     const [loginPassword, setLoginPassword] = useState('')
 
-    const loginUser = () => {
+    const loginUser = async () => {
         if (loginUsername && loginPassword) {
-            axios({
+            await axios({
                 url: `${SERVER_PORT}/login`,
                 method: 'post',
                 data: {

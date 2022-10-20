@@ -12,7 +12,7 @@ const LandingPage = (props) => {
             <Text>Spot Me</Text>
             <Button title='Login' onPress={() => props.navigation.navigate('Login')} />
             <Button title='Sign Up' onPress={() => { props.navigation.navigate('Register') }} />
-            <Button title='MEet' onPress={() => { props.navigation.navigate('Meet') }} />
+            <Button title='Meet' onPress={() => { props.navigation.navigate('Meet') }} />
         </View>
 
     )

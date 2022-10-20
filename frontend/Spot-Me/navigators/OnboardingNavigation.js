@@ -14,7 +14,7 @@ const Stack = createNativeStackNavigator();
 
 function OnboardingStack() {
     return (
-        <Stack.Navigator>
+        <Stack.Navigator initialRouteName="Landing">
             <Stack.Screen
                 name="Landing"
                 component={LandingPage}

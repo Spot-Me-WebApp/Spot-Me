@@ -1,8 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { React, useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { DevSettings, Text, View } from 'react-native';
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 
@@ -10,9 +9,6 @@ import { SERVER_PORT } from '@env'
 import OnboardingNavigation from './navigators/OnboardingNavigation';
 import Main from './navigators/Main';
 import BottomTabs from './navigators/BottomTabs';
-
-
-
 
 export default function App() {
 
@@ -32,20 +28,29 @@ export default function App() {
           if (response.data) {
             setUserData(response.data);
           }
-          //If api sends back JSON, then the user is authenticated, else, it sends back a string meaning user isn't authenticated
-          (userData && typeof userData !== "string") ? setIsLoggedIn(true) : setIsLoggedIn(false)
-
         })
         .catch((error) => console.log(error));
     }
     fetchData();
   }, [])
 
+  useEffect(() => {
+    function changeLoginStatus() {
+      //If the user has logged in
+      if (!isLoggedIn && typeof userData !== "string") {
+        setIsLoggedIn(true)
+        //If user is logging out
+      } else if (isLoggedIn && typeof userData === "string") {
+        setIsLoggedIn(false)
+      }
+    }
+    changeLoginStatus()
+  }, [userData])
 
 
   //If user logged in use BottomTabs navigation, else, use OnboardingNavigation
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={DarkTheme}>
       {isLoggedIn ? (
         <BottomTabs></BottomTabs>
       ) : (

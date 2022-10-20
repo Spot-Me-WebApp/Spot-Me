@@ -5,6 +5,8 @@ import Login from './Login';
 import Register from './Registration/UsernamePassword';
 import Meet from './Meet';
 
+
+//First page a user sees when launching the app
 const LandingPage = (props) => {
 
     return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, DevSettings } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, DevSettings, ImageBackground } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
@@ -54,13 +54,14 @@ const Profile = (props) => {
     return (
         <View style={styles.container}>
             {userData ? (
+                <ImageBackground source={require('../assets/profilebackground.jpg')} resizeMode="cover">
                 <FormContainer>
-                    <Text>{userData.name}</Text>
-                    <Text>Username: {userData.username}</Text>
-                    <Text>Age: {calculateAge(userData.dob)}</Text>
-                    <Text>Bio: {userData.bio}</Text>
-                    <Text>Experience Level: {userData.expLevel}</Text>
-                    <Text>Gym Passions:</Text>
+                    <Text style={styles.text}>Hello {userData.name}</Text>
+                    <Text style={styles.text}>Username: {userData.username}</Text>
+                    <Text style={styles.text}>Age: {calculateAge(userData.dob)}</Text>
+                    <Text style={styles.text}>Bio: {userData.bio}</Text>
+                    <Text style={styles.text}>Experience Level: {userData.expLevel}</Text>
+                    <Text style={styles.text}>Gym Passions:</Text>
                     <ScrollView>
                         <View>
                             {userData.methods && (userData.methods.map(method => {
@@ -73,18 +74,22 @@ const Profile = (props) => {
                         </View>
                     </ScrollView>
                     <Button title="Logout" onPress={logoutUser}></Button>
+                    
                 </FormContainer>
+                </ImageBackground>
             ) : (<Text>Profile</Text>)}
         </View>
     )
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    text:{
+        color: 'orange',
+        fontSize: 18,
     },
 });
 

@@ -38,7 +38,7 @@ const Login = (props) => {
                     placeholder="Username" onChangeText={e => setLoginUsername(e)}>
                 </Input>
                 <Input
-                    secureTextEntry='true'
+                    secureTextEntry={true}
                     placeholder="Password" onChangeText={e => setLoginPassword(e)}>
                 </Input>
                 <Button title="Login" onPress={loginUser}></Button>

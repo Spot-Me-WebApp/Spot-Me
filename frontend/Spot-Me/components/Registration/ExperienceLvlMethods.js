@@ -1,6 +1,6 @@
 // Last step before pushing data to mongoDb
 import { React, useState } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, DevSettings } from 'react-native';
 
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
@@ -75,7 +75,25 @@ const ExperienceLvlMethods = (props) => {
                 methods: methods
             },
             withCredentials: true
-        }).then((response) => console.log(response.data))
+        }).then((response) => {
+            console.log(response.data)
+            loginUser()
+        })
+            .catch((error) => console.log(error, error.stack))
+    }
+
+    const loginUser = async () => {
+        await axios({
+            url: `${SERVER_PORT}/login`,
+            method: 'post',
+            data: {
+                username: username,
+                password: password
+            },
+            withCredentials: true
+        }).then((response) => {
+            DevSettings.reload()
+        })
             .catch((error) => console.log(error, error.stack))
     }
 

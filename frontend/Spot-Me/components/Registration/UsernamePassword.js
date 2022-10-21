@@ -40,7 +40,7 @@ const Register = (props) => {
                     placeholder="Username" onChangeText={e => setRegisterUsername(e)}>
                 </Input>
                 <Input
-                    secureTextEntry='true'
+                    secureTextEntry={true}
                     placeholder="Password" onChangeText={e => setRegisterPassword(e)}>
                 </Input>
                 <Button title="Next" onPress={goNextForm}></Button>

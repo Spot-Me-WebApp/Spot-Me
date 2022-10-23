@@ -1,6 +1,6 @@
 // Last step before pushing data to mongoDb
 import { React, useState } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, DevSettings } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, DevSettings, KeyboardAvoidingView } from 'react-native';
 
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
@@ -51,6 +51,8 @@ const METHODS = [
     },
 ]
 
+const { width } = Dimensions.get("screen")
+
 const ExperienceLvlMethods = (props) => {
 
     const [userExp, setRegisterExpLevel] = useState("");
@@ -98,28 +100,37 @@ const ExperienceLvlMethods = (props) => {
     }
 
     return (
-        <View style={{ margin: 30 }}>
-            <View style={{ width: '100%', alignItems: 'center' }}>
-                <Text style={{ fontSize: 30, paddingBottom: 20 }}>Spot Me</Text>
+        <View style={styles.container}>
+            <Text style={{ fontSize: 24, paddingBottom: 10, textAlign: 'center', fontFamily: 'Thonburi' }}>How experienced are you?</Text>
+            <View style={{ marginBottom: 15, marginTop: 7, marginHorizontal: 15 }}>
+                <SelectBox
+                    label="Select your level"
+                    options={EXP_LVL}
+                    value={userExp}
+                    onChange={onChange()}
+                    hideInputFilter={false}
+                    labelStyle={{ textAlign: 'center', fontSize: 16 }}
+                    arrowIconColor='black'
+                />
             </View>
-            <Text style={{ fontSize: 20, paddingBottom: 10 }}>User Experience</Text>
-            <SelectBox
-                label="Select your level"
-                options={EXP_LVL}
-                value={userExp}
-                onChange={onChange()}
-                hideInputFilter={false}
-            />
             <View style={{ height: 40 }} />
-            <Text style={{ fontSize: 20, paddingBottom: 10 }}>Select Your Gym Hobbies</Text>
-            <SelectBox
-                label="Select multiple passions"
-                options={METHODS}
-                selectedValues={methodsSelected}
-                onMultiSelect={onMultiChange()}
-                onTapClose={onMultiChange()}
-                isMulti
-            />
+            <Text style={{ fontSize: 24, paddingBottom: 10, textAlign: 'center', fontFamily: 'Thonburi' }}>
+                Which of the following do you enjoy?</Text>
+            <KeyboardAvoidingView style={{ marginBottom: 15, marginTop: 7, marginHorizontal: 15 }} behavior="position">
+                <SelectBox
+                    label="Select multiple passions"
+                    options={METHODS}
+                    selectedValues={methodsSelected}
+                    onMultiSelect={onMultiChange()}
+                    onTapClose={onMultiChange()}
+                    isMulti
+                    labelStyle={{ textAlign: 'center', fontSize: 16 }}
+                    arrowIconColor='black'
+                    toggleIconColor='black'
+                    searchIconColor='black'
+
+                />
+            </KeyboardAvoidingView>
             <Button title="Register" onPress={registerUser}></Button>
             <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
         </View>
@@ -136,5 +147,14 @@ const ExperienceLvlMethods = (props) => {
 
 
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'stretch',
+        justifyContent: 'center',
+    }
+})
 
 export default ExperienceLvlMethods;

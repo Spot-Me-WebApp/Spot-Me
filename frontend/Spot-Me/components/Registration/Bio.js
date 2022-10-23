@@ -1,10 +1,11 @@
 //3rd step of registration process
 
 import { React, useState } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Button, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
 
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
+import { useFonts } from 'expo-font';
 
 const { width } = Dimensions.get('window')
 
@@ -23,11 +24,20 @@ const Bio = (props) => {
 
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container} behavior="position" contentContainerStyle={{ paddingTop: 60 }}>
             <FormContainer>
-                <Text>Bio (A short description about yourself)</Text>
-                <Input placeholder="Bio" multiline={true} numberOfLines={8} style={{ textAlignVertical: 'top' }} onChangeText={e => setRegisterBio(e)}>
-                </Input>
+                <Image
+                    source={require('../../assets/Spot_Me_Logo.png')}
+                    style={styles.logo}
+                />
+                <View style={{ marginTop: 40 }}>
+                    <Text style={{ fontSize: 34, fontFamily: 'Bodoni 72' }}>Tell us about yourself.</Text>
+                </View>
+                <View style={{ borderWidth: 2, borderRadius: 10, width: width * .8, height: 180, marginTop: 20 }}>
+                    <TextInput placeholder='Bio' autoFocus={true} multiline={true} maxLength={400} numberOfLines={8}
+                        style={{ textAlignVertical: 'top', }} onChangeText={e => setRegisterBio(e)}>
+                    </TextInput>
+                </View>
                 <Button title='Next' onPress={goNextForm}></Button>
             </FormContainer>
 
@@ -36,7 +46,7 @@ const Bio = (props) => {
 
             <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
 
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -46,6 +56,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'stretch',
         justifyContent: 'center',
+    },
+    logo: {
+        width: 180,
+        height: 180,
+        color: "black",
+        marginBottom: 60,
+        position: "absolute",
+        bottom: 240,
     }
 });
 

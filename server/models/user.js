@@ -28,7 +28,8 @@ const userSchema = new Schema({
     },
     username: {
         type: String,
-        required: false
+        required: false,
+        unique: true
     },
     dob: {
         type: Date,

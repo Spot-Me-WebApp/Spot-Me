@@ -16,7 +16,7 @@ export const SocialLoginBtn = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginBottom: 8
+        marginVertical: 10
     },
     button: {
         alignItems: 'center',

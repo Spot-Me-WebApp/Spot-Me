@@ -32,8 +32,10 @@ const Login = (props) => {
     return (
         <View style={styles.container}>
             <FormContainer>
-                <SocialLoginBtn title="Login With Google" />
-                <SocialLoginBtn title="Login With Facebook" />
+                <View>
+                    <SocialLoginBtn title="Login With Google" />
+                    <SocialLoginBtn title="Login With Facebook" />
+                </View>
                 <Input
                     placeholder="Username" onChangeText={e => setLoginUsername(e)}>
                 </Input>

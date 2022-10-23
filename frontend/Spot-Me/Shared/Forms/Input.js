@@ -1,8 +1,9 @@
 // Use This With FormContainer To Grab User Input
 
 import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native'
+import { View, TextInput, StyleSheet, Dimensions } from 'react-native'
 
+const { width } = Dimensions.get("screen");
 export const Input = (props) => {
     return (
         <View style={styles.inputField}>
@@ -13,10 +14,12 @@ export const Input = (props) => {
                 value={props.value}
                 autoCorrect={props.autoCorrect}
                 onChangeText={props.onChangeText}
+                autoFocus={props.autoFocus}
                 onFocus={props.onFocus}
                 secureTextEntry={props.secureTextEntry}
                 multiline={props.multiline}
                 numberOfLines={props.numberOfLines}
+                keyboardType={props.keyboardType}
             >
             </TextInput>
         </View>
@@ -25,10 +28,11 @@ export const Input = (props) => {
 
 const styles = StyleSheet.create({
     inputField: {
-        borderWidth: 1,
+        marginTop: 20,
+        borderBottomWidth: 2,
         borderColor: 'black',
         padding: 10,
-        borderRadius: 15,
+        width: width * .75
     },
 })
 

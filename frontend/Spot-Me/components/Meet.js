@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Component } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity } from 'react-native';
 
 // For cross-device screen compatibility
 const SCREEN_HEIGHT = Dimensions.get('window').height
@@ -64,30 +64,33 @@ export default class Meet extends Component {
         })
     }
 
-    // Animation for swiping
+    
     componentWillMount(){
+
+        
+        // Animation for swiping
         this.PanResponder = PanResponder.create({
-            
-            onStartShouldSetPanResponder:(e, gestureState) =>true,
-            onPanResponderMove:(e, gestureState) => {
+
+            onStartShouldSetPanResponder:(evt, gestureState) =>true,
+            onPanResponderMove:(evt, gestureState) => {
 
                 this.position.setValue({x:gestureState.dx, y:gestureState.dy})
             },
-            onPanResponderRelease:(e, gestureState) =>{
+            onPanResponderRelease:(evt, gestureState) =>{
             
                 // Throws cards away to the right
                 // ***NEEDS TO FIND A WAY TO KEEP TRACK OF USERS SWIPED RIGHT AND LEFT****
-                if(gestureState.dx>120){
+                if(gestureState.dx > 120){
                     Animated.spring(this.position, {
-                        toValue:{x:SCREEN_WIDTH+100, y:gestureState.dy}
+                        toValue:{x:SCREEN_WIDTH + 100, y:gestureState.dy}
                     }).start(()=>{
                         this.setState({currentIndex:this.state.currentIndex+1}, ()=> {
                             this.position.setValue({ x:0, y:0})
                         })
                     })
-                } else if(gestureState.dx>-120){
+                } else if(gestureState.dx < -120){
                     Animated.spring(this.position, {
-                        toValue:{x:SCREEN_WIDTH-100, y:gestureState.dy}
+                        toValue:{x: -SCREEN_WIDTH - 100, y:gestureState.dy}
                     }).start(()=>{
                         this.setState({currentIndex:this.state.currentIndex+1}, ()=> {
                             this.position.setValue({ x:0, y:0})
@@ -115,9 +118,10 @@ export default class Meet extends Component {
 
                 // Animate current card to be able to be swiped
                 return(
+                    <TouchableOpacity>
                     <Animated.View 
                     {...this.PanResponder.panHandlers}
-                    key={item.id} style={[this.rotateAndTranslate,{height:SCREEN_HEIGHT - 200, width: SCREEN_WIDTH, padding: 10, position:'absolute'}]}>
+                    key={item.id} style={[this.rotateAndTranslate,{height:SCREEN_HEIGHT - 250, width: SCREEN_WIDTH, padding: 10, position:'absolute'}]}>
                         
                         {/* 'Spot' Text when swiped right */}
                         <Animated.View style={{opacity:this.spotOpacity, transform:[{rotate: '30deg'}],position: 'absolute', top: 50, left: 35, zIndex: 1000}}>
@@ -131,16 +135,18 @@ export default class Meet extends Component {
     
                             <Image
                             style={{flex:1,height:null, width: null, resizeMode: 'cover', borderRadius: 20}}
-                            source={item.uri}/>
+                            source={item.uri}
+                            />
     
                         </Animated.View>
+                        </TouchableOpacity>
                 )
             } else {
                 // The card after current card
                 return(
                     <Animated.View 
                     
-                    key={item.id} style={[{opacity:this.nextCardOpacity, transform: [{ scale: this.nextCardResize}], height:SCREEN_HEIGHT - 200, width: SCREEN_WIDTH, padding: 10, position:'absolute'}]}>
+                    key={item.id} style={[{opacity:this.nextCardOpacity, transform: [{ scale: this.nextCardResize}], height:SCREEN_HEIGHT - 250, width: SCREEN_WIDTH, padding: 10, position:'absolute'}]}>
     
                             <Image
                             style={{flex:1,height:null, width: null, resizeMode: 'cover', borderRadius: 20}}
@@ -155,11 +161,15 @@ export default class Meet extends Component {
 
     render() {
         return (
-            <View style={{flex:1}}>
+
+            
+            <View style={{flex:1, top: 20}}>
                 <View style={{ height: 60}}>
 
                 </View>
+               
                 <View style={{ flex: 1 }}>
+                
                     {this. renderUsers()}
                 </View>
                 <View style={{ height:60 }}>
@@ -171,3 +181,26 @@ export default class Meet extends Component {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    logo: {
+        width: 150,
+        height: 150,
+        marginBottom: 100,
+        position: 'relative',
+        bottom: 220,
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: 1
+    },
+    buttons: {
+        position: "absolute",
+        top: 310
+    }
+});

@@ -24,7 +24,7 @@ const BottomTabs = () => {
                 ]
             }}
         >
-            <Tab.Screen name="Meet" component={Meet}
+            <Tab.Screen name="Meet" component={Meet} options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: () => (
             //         <Icon
@@ -36,7 +36,7 @@ const BottomTabs = () => {
             //     )
             // }}
             />
-            <Tab.Screen name="Schedule" component={Schedule}
+            <Tab.Screen name="Schedule" component={Schedule} options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: () => (
             //         <Icon
@@ -48,7 +48,7 @@ const BottomTabs = () => {
             //     )
             // }}
             />
-            <Tab.Screen name="Chat" component={Chat}
+            <Tab.Screen name="Chat" component={Chat} options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: () => (
             //         <Icon
@@ -60,7 +60,7 @@ const BottomTabs = () => {
             //     )
             // }}
             />
-            <Tab.Screen name="Profile" component={Profile}
+            <Tab.Screen name="Profile" component={Profile} options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: () => (
             //         <Icon

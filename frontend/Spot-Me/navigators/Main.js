@@ -30,6 +30,7 @@ const Main = () => {
             <Tab.Screen
                 name="Meet"
                 component={Meet}
+                options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: ({ color }) => (
             //         <Icon
@@ -44,6 +45,7 @@ const Main = () => {
             <Tab.Screen
                 name="Schedule"
                 component={Schedule}
+                options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: ({ color }) => (
             //         <Icon
@@ -58,6 +60,7 @@ const Main = () => {
             <Tab.Screen
                 name="Chat"
                 component={Chat}
+                options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: ({ color }) => (
             //         <Icon
@@ -72,6 +75,7 @@ const Main = () => {
             <Tab.Screen
                 name="Profile"
                 component={Profile}
+                options = {{ headerShown: false}}
             // options={{
             //     tabBarIcon: ({ color }) => (
             //         <Icon

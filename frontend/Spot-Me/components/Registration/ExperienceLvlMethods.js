@@ -2,8 +2,7 @@
 import { React, useState } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, DevSettings, KeyboardAvoidingView } from 'react-native';
 
-import { FormContainer } from '../../Shared/Forms/FormContainer';
-import { Input } from '../../Shared/Forms/Input'
+import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
 import axios from 'axios'
@@ -131,8 +130,8 @@ const ExperienceLvlMethods = (props) => {
 
                 />
             </KeyboardAvoidingView>
-            <Button title="Register" onPress={registerUser}></Button>
-            <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
+            <RightArrowBtn onPress={registerUser} style={{ position: 'absolute', bottom: 40, right: 30 }} />
+            <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: 40, left: 30 }} />
         </View>
     )
 

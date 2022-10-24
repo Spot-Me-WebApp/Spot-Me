@@ -5,7 +5,8 @@ import { View, StyleSheet, Button, Image, Text, ScrollView, KeyboardAvoidingView
 import { SocialLoginBtn } from '../../Shared/Forms/Buttons/SocialLoginBtn';
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
-import { GoogleSvg, FacebookSvg } from '../../Shared/Svg';
+import { GoogleSvg, FacebookSvg, } from '../../Shared/Svg';
+import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 
@@ -57,9 +58,9 @@ const Register = (props) => {
                     secureTextEntry={true}
                     placeholder="Password" onChangeText={e => setRegisterPassword(e)}>
                 </Input>
-                <Button title="Next" onPress={goNextForm}></Button>
+                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
             </FormContainer>
-            <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
 
         </KeyboardAvoidingView>
     )
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
         color: "black",
         marginBottom: 130,
         position: "absolute",
-        bottom: 200,
+        bottom: 160,
     }
 });
 

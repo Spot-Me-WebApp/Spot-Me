@@ -2,10 +2,9 @@
 
 import { React, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Button, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
-
 import { FormContainer } from '../../Shared/Forms/FormContainer';
-import { Input } from '../../Shared/Forms/Input'
-import { useFonts } from 'expo-font';
+import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
+
 
 const { width } = Dimensions.get('window')
 
@@ -38,13 +37,14 @@ const Bio = (props) => {
                         style={{ textAlignVertical: 'top', }} onChangeText={e => setRegisterBio(e)}>
                     </TextInput>
                 </View>
-                <Button title='Next' onPress={goNextForm}></Button>
+                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
             </FormContainer>
 
 
 
 
-            <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
+
 
         </KeyboardAvoidingView>
     )

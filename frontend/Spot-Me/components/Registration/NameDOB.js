@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, Button, Dimensions, Image } from 'react-native'
 
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
-
+import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 
 const { width } = Dimensions.get('window')
@@ -46,13 +46,14 @@ const NameDOB = (props) => {
                         onChange={(event, date) => setDate(event, date)}
                     />
                 </View>
-                <Button title='Next' onPress={goNextForm}></Button>
+                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
             </FormContainer>
 
 
 
 
-            <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
+
 
         </View>
     )
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
         color: "black",
         marginBottom: 140,
         position: "absolute",
-        bottom: 220,
+        bottom: 180,
     }
 });
 

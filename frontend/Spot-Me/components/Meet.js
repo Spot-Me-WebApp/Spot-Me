@@ -8,8 +8,8 @@ const SCREEN_WIDTH = Dimensions.get('window').width
 const OtherUsers = [
     { id: "1", uri: require('../assets/1.jpg') },
     { id: "2", uri: require('../assets/2.jpg') },
-//         { id: "3", uri: require('./assets/3.jpg') },
-//         { id: "4", uri: require('./assets/4.jpg') },
+         { id: "3", uri: require('../assets/3.jpg') },
+        { id: "4", uri: require('../assets/4.jpg') },
 //          { id: "5", uri: require('./assets/5.jpg') },
 ]
 
@@ -146,7 +146,7 @@ export default class Meet extends Component {
                 return(
                     <Animated.View 
                     
-                    key={item.id} style={[{opacity:this.nextCardOpacity, transform: [{ scale: this.nextCardResize}], height:SCREEN_HEIGHT - 250, width: SCREEN_WIDTH, padding: 10, position:'absolute'}]}>
+                    key={item.id} style={[{opacity:this.nextCardOpacity, transform: [{ scale: this.nextCardResize}], height:SCREEN_HEIGHT - 252, width: SCREEN_WIDTH, padding: 10, position:'absolute'}]}>
     
                             <Image
                             style={{flex:1,height:null, width: null, resizeMode: 'cover', borderRadius: 20}}

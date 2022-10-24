@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     },
     buttons: {
         position: "absolute",
-        bottom: 40
+        top: 310
     }
 });
 

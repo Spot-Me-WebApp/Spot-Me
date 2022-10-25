@@ -3,10 +3,10 @@ const { Schema } = mongoose;
 const passportLocalMongoose = require('passport-local-mongoose');
 
 
-// const imageSchema = {
-//     url: String, 
-//     filename: String
-// }
+const imageSchema = {
+    url: String,
+    filename: String
+}
 
 const userSchema = new Schema({
 
@@ -53,7 +53,8 @@ const userSchema = new Schema({
         enum: ['Powerlifting', 'Calisthenics', 'Cardio', 'Bodybuilding', 'Olympic Lifting', 'Filming'],
         required: false,
         unique: false
-    }
+    },
+    images: [imageSchema]
 })
 
 //adds username and password fields to userSchema

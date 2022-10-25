@@ -12,7 +12,10 @@ const cors = require('cors')
 const session = require('express-session')
 const flash = require('connect-flash')
 const passport = require('passport');
-
+const multer = require('multer')
+const { storage, cloudinary } = require('./cloudinary');
+const { response } = require('express');
+const upload = multer({ storage })
 
 
 //Database Connection-------------------------------------------------------------------------------
@@ -59,8 +62,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Used to parse incoming requests
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
+app.use(express.urlencoded({ extended: true, limit: '50mb' }))
+app.use(express.json({ limit: '50mb' }))
 
 //Set response headers for CORS
 app.use((req, res, next) => {
@@ -88,8 +91,9 @@ app.post('/register', async (req, res) => {
         return res.send("User already exists");
     }
     console.log(req.body)
-    const { username, password, name, dob, bio, expLevel, methods } = req.body;
+    const { username, password, name, dob, bio, expLevel, methods, image } = req.body;
     const newUser = new User({ username, name, dob, bio, expLevel, methods });
+    newUser.images.push(image);
     const registeredUser = await User.register(newUser, password);
     res.send(registeredUser)
 })
@@ -149,6 +153,21 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', {
 //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
 
 
+//------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
+app.post('/image', async (req, res) => {
+    await cloudinary.uploader.upload(req.body.image, {
+        folder: "Spot-Me/",
+        eager: [
+            { width: 1200, height: 1200 }
+        ],
+        eager_async: true
+    })
+        .then((response) => res.json({
+            url: response.eager[0].secure_url,
+            filename: response.public_id.slice(response.public_id.indexOf('/') + 1) + '.' + response.format
+        }))
+        .catch((err) => console.log(err))
+})
 
 //Routes---------------------------------------------------------------------------------------------------
 

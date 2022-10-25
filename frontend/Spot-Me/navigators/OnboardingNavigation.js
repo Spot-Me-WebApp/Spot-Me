@@ -7,8 +7,7 @@ import NameDOB from "../components/Registration/NameDOB"
 import Bio from "../components/Registration/Bio"
 import ExperienceLvlMethods from "../components/Registration/ExperienceLvlMethods"
 import Login from "../components/Login"
-import Profile from "../components/Profile"
-import Meet from "../components/Meet"
+import Photos from "../components/Registration/Photos"
 
 const Stack = createNativeStackNavigator();
 
@@ -58,15 +57,8 @@ function OnboardingStack() {
                 }}
             />
             <Stack.Screen
-                name="Profile"
-                component={Profile}
-                options={{
-                    headerShown: false
-                }}
-            />
-            <Stack.Screen
-                name="Meet"
-                component={Meet}
+                name="Photos"
+                component={Photos}
                 options={{
                     headerShown: false
                 }}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, DevSettings, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, DevSettings, ImageBackground, Image } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
@@ -55,27 +55,32 @@ const Profile = (props) => {
         <View style={styles.container}>
             {userData ? (
                 <ImageBackground source={require('../assets/profilebackground.jpg')} resizeMode="cover">
-                <FormContainer>
-                    <Text style={styles.text}>Hello {userData.name}</Text>
-                    <Text style={styles.text}>Username: {userData.username}</Text>
-                    <Text style={styles.text}>Age: {calculateAge(userData.dob)}</Text>
-                    <Text style={styles.text}>Bio: {userData.bio}</Text>
-                    <Text style={styles.text}>Experience Level: {userData.expLevel}</Text>
-                    <Text style={styles.text}>Gym Passions:</Text>
-                    <ScrollView>
-                        <View>
-                            {userData.methods && (userData.methods.map(method => {
-                                return (
-                                    <View>
-                                        <Text>{method}</Text>
-                                    </View>
-                                )
-                            }))}
-                        </View>
-                    </ScrollView>
-                    <Button title="Logout" onPress={logoutUser}></Button>
-                    
-                </FormContainer>
+                    <FormContainer>
+                        {userData.images &&
+                            <View>
+                                <Image source={{ uri: userData.images[0].url }} style={{ height: 200, width: 200 }} />
+                            </View>
+                        }
+                        <Text style={styles.text}>Hello {userData.name}</Text>
+                        <Text style={styles.text}>Username: {userData.username}</Text>
+                        <Text style={styles.text}>Age: {calculateAge(userData.dob)}</Text>
+                        <Text style={styles.text}>Bio: {userData.bio}</Text>
+                        <Text style={styles.text}>Experience Level: {userData.expLevel}</Text>
+                        <Text style={styles.text}>Gym Passions:</Text>
+                        <ScrollView>
+                            <View>
+                                {userData.methods && (userData.methods.map(method => {
+                                    return (
+                                        <View>
+                                            <Text style={{ color: 'white' }}>{method}</Text>
+                                        </View>
+                                    )
+                                }))}
+                            </View>
+                        </ScrollView>
+                        <Button title="Logout" onPress={logoutUser}></Button>
+
+                    </FormContainer>
                 </ImageBackground>
             ) : (<Text>Profile</Text>)}
         </View>
@@ -87,8 +92,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    text:{
-        color: 'orange',
+    text: {
+        color: 'white',
         fontSize: 18,
     },
 });

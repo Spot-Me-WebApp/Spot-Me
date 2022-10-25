@@ -5,8 +5,7 @@ import { View, Text, StyleSheet, Button, Dimensions, DevSettings, KeyboardAvoidi
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
-import axios from 'axios'
-import { SERVER_PORT } from '@env'
+
 
 const EXP_LVL = [
     {
@@ -59,43 +58,13 @@ const ExperienceLvlMethods = (props) => {
 
     const { username, password, name, dob, bio } = props.route.params
 
-    const registerUser = () => {
-        const expLevel = userExp.item
-        const methods = methodsSelected.map(method => method.item)
 
-        axios({
-            url: `${SERVER_PORT}/register`,
-            method: 'post',
-            data: {
-                username: username,
-                password: password,
-                name: name,
-                dob: dob,
-                bio: bio,
-                expLevel: expLevel,
-                methods: methods
-            },
-            withCredentials: true
-        }).then((response) => {
-            console.log(response.data)
-            loginUser()
-        })
-            .catch((error) => console.log(error, error.stack))
-    }
-
-    const loginUser = async () => {
-        await axios({
-            url: `${SERVER_PORT}/login`,
-            method: 'post',
-            data: {
-                username: username,
-                password: password
-            },
-            withCredentials: true
-        }).then((response) => {
-            DevSettings.reload()
-        })
-            .catch((error) => console.log(error, error.stack))
+    const goNextForm = () => {
+        if (userExp && methodsSelected) {
+            const expLevel = userExp.item
+            const methods = methodsSelected.map(method => method.item)
+            props.navigation.navigate('Photos', { username: username, password: password, name: name, dob: dob, bio: bio, expLevel: expLevel, methods: methods })
+        }
     }
 
     return (
@@ -130,7 +99,7 @@ const ExperienceLvlMethods = (props) => {
 
                 />
             </KeyboardAvoidingView>
-            <RightArrowBtn onPress={registerUser} style={{ position: 'absolute', bottom: 40, right: 30 }} />
+            <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: 40, right: 30 }} />
             <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: 40, left: 30 }} />
         </View>
     )

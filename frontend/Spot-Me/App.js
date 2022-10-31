@@ -51,11 +51,12 @@ export default function App() {
   //If user logged in use BottomTabs navigation, else, use OnboardingNavigation
   return (
     <NavigationContainer theme={DarkTheme}>
-      {isLoggedIn ? (
+      {/* {isLoggedIn ? (
         <BottomTabs></BottomTabs>
       ) : (
         <OnboardingNavigation></OnboardingNavigation>
-      )}
+      )} */}
+      <OnboardingNavigation></OnboardingNavigation>
     </NavigationContainer>
   )
 }

@@ -156,16 +156,14 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', {
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
 app.post('/image', async (req, res) => {
     await cloudinary.uploader.upload(req.body.image, {
-        folder: "Spot-Me/",
-        eager: [
-            { width: 1200, height: 1200 }
-        ],
-        eager_async: true
+        folder: "Spot-Me/"
     })
-        .then((response) => res.json({
-            url: response.eager[0].secure_url,
-            filename: response.public_id.slice(response.public_id.indexOf('/') + 1) + '.' + response.format
-        }))
+        .then((response) =>
+            res.json({
+                url: response.secure_url,
+                filename: response.public_id.slice(response.public_id.indexOf('/') + 1) + '.' + response.format
+            })
+        )
         .catch((err) => console.log(err))
 })
 

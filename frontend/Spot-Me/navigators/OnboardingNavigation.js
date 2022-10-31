@@ -8,6 +8,7 @@ import Bio from "../components/Registration/Bio"
 import ExperienceLvlMethods from "../components/Registration/ExperienceLvlMethods"
 import Login from "../components/Login"
 import Photos from "../components/Registration/Photos"
+import ChooseGym from "../components/Registration/ChooseGym"
 
 const Stack = createNativeStackNavigator();
 
@@ -59,6 +60,13 @@ function OnboardingStack() {
             <Stack.Screen
                 name="Photos"
                 component={Photos}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <Stack.Screen
+                name="ChooseGym"
+                component={ChooseGym}
                 options={{
                     headerShown: false
                 }}

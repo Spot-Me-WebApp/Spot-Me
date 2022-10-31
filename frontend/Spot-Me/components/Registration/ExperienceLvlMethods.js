@@ -1,4 +1,4 @@
-// Last step before pushing data to mongoDb
+// Fourth step of registration process
 import { React, useState } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, DevSettings, KeyboardAvoidingView } from 'react-native';
 

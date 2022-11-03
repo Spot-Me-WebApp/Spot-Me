@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, DevSettings, ImageBackground, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, DevSettings, StatusBar, Image, SafeAreaView } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
@@ -7,7 +7,7 @@ import { FormContainer } from '../Shared/Forms/FormContainer';
 
 const Profile = (props) => {
 
-    const [userData, setUserData] = useState([]);
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -52,9 +52,9 @@ const Profile = (props) => {
     }
 
     return (
-        <View style={styles.container}>
-            {userData ? (
-                <ImageBackground source={require('../assets/profilebackground.jpg')} resizeMode="cover">
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                {userData ? (
                     <FormContainer>
                         {userData.images &&
                             <View>
@@ -67,23 +67,28 @@ const Profile = (props) => {
                         <Text style={styles.text}>Bio: {userData.bio}</Text>
                         <Text style={styles.text}>Experience Level: {userData.expLevel}</Text>
                         <Text style={styles.text}>Gym Passions:</Text>
-                        <ScrollView>
-                            <View>
-                                {userData.methods && (userData.methods.map(method => {
-                                    return (
-                                        <View>
-                                            <Text style={{ color: 'white' }}>{method}</Text>
-                                        </View>
-                                    )
-                                }))}
-                            </View>
-                        </ScrollView>
+                        {(userData.methods.map(method => {
+                            return (
+                                <View>
+                                    <Text style={{ color: 'white' }}>{method}</Text>
+                                </View>
+                            )
+                        }))}
+                        {userData.images.length > 1 &&
+                            userData.images.filter(i => i.position > 0).map(i => {
+                                return (
+                                    <View>
+                                        <Image source={{ uri: userData.images[i.position].url }} style={{ height: 200, width: 200, marginVertical: 10 }} />
+                                    </View>
+                                )
+                            })
+                        }
                         <Button title="Logout" onPress={logoutUser}></Button>
 
                     </FormContainer>
-                </ImageBackground>
-            ) : (<Text>Profile</Text>)}
-        </View>
+                ) : (<Text>Profile</Text>)}
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 const styles = StyleSheet.create({
@@ -91,6 +96,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        paddingTop: StatusBar.currentHeight
+    },
+    scrollView: {
+        backgroundColor: '#343a40',
     },
     text: {
         color: 'white',

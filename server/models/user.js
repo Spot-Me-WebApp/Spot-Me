@@ -5,7 +5,8 @@ const passportLocalMongoose = require('passport-local-mongoose');
 
 const imageSchema = {
     url: String,
-    filename: String
+    filename: String,
+    position: Number
 }
 
 const userSchema = new Schema({

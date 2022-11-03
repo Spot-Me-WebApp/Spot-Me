@@ -15,29 +15,29 @@ const { height, width } = Dimensions.get("screen")
 
 const Photos = (props) => {
     //FOR TESTING PURPOSES, CAN REMOVE LATER
-    useEffect(() => {
-        function goNext() {
-            props.navigation.navigate("ChooseGym")
-        }
-        goNext()
-    }, [])
+    // useEffect(() => {
+    //     function goNext() {
+    //         props.navigation.navigate("ChooseGym")
+    //     }
+    //     goNext()
+    // }, [])
 
-
-    const [boxes, setBoxes] = useState([false, false, false, false, false, false])
-    const changeBox = (index) => {
-        setBoxes(boxes[index] = !boxes[index])
+    let [boxes, changeBox] = useState([false, false, false, false, false, false])
+    changeBox = (index) => {
+        //replace element at boxes[index] to opposite boolean value
+        boxes.splice(index, 1, !boxes[index])
         console.log(boxes)
     }
-    const [registerProfilePics, setProfilePics] = useState([])
+    let [registerProfilePics, setProfilePics] = useState([])
     const updatePhotoArray = (uri, pos) => {
-        setProfilePics(registerProfilePics.concat({
+        setProfilePics(registerProfilePics = registerProfilePics.concat({
             uri: uri,
             position: pos
         }))
         console.log(registerProfilePics.map(p => p.position))
     }
-    const [imageUrl, setImageUrl] = useState("")
-    const [imageFilename, setImageFilename] = useState("")
+    const [uploadedImages, setUploadedImages] = useState(null)
+
     const { username, password, name, dob, bio, expLevel, methods } = props.route.params
 
     //Send inputted photos to backend
@@ -46,13 +46,13 @@ const Photos = (props) => {
             url: `${SERVER_PORT}/image`,
             method: 'post',
             data: {
-                image: registerProfilePic
+                images: registerProfilePics
             }
         })
             .then((response) => {
+                console.log(response.request._response)
                 const data = JSON.parse(response.request._response);
-                setImageUrl(data.url)
-                setImageFilename(data.filename)
+                setUploadedImages(data)
             })
             .catch((err) => console.log(err, err.stack))
     }
@@ -73,7 +73,7 @@ const Photos = (props) => {
     }
 
     const registerUser = async () => {
-        if (imageUrl && imageFilename) {
+        if (uploadedImages) {
             await axios({
                 url: `${SERVER_PORT}/register`,
                 method: 'post',
@@ -85,10 +85,7 @@ const Photos = (props) => {
                     bio: bio,
                     expLevel: expLevel,
                     methods: methods,
-                    image: {
-                        url: imageUrl,
-                        filename: imageFilename
-                    }
+                    imageData: uploadedImages
                 },
                 withCredentials: true
             }).then((response) => {
@@ -146,7 +143,7 @@ const Photos = (props) => {
                 <Text style={{ fontSize: 34, fontFamily: 'Bodoni 72' }}>Add Photos of Yourself.</Text>
             </View>
             <View style={styles.imageContainer}>
-                {boxes[0] ?
+                {registerProfilePics.some(element => element.position === 0) ?
                     (<AddImage buttonColor="transparent"
                         titleColor="#000"
                         title="+"
@@ -166,51 +163,116 @@ const Photos = (props) => {
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         onPress={() => choosePhoto(0)}
                     />)}
-                <AddImage buttonColor="transparent"
-                    titleColor="#000"
-                    title="+"
-                    buttonStyle={
-                        styles.button
-                    }
-                    textStyle={{ fontSize: 30, fontFamily: 'Bodoni 72' }}
-                    onPress={() => choosePhoto(1)} />
-                <AddImage buttonColor="transparent"
-                    titleColor="#000"
-                    title="+"
-                    buttonStyle={
-                        styles.button
-                    }
-                    textStyle={{ fontSize: 30, fontFamily: 'Bodoni 72' }}
-                    onPress={() => choosePhoto(2)} />
-                <AddImage buttonColor="transparent"
-                    titleColor="#000"
-                    title="+"
-                    buttonStyle={
-                        styles.button
-                    }
-                    textStyle={{ fontSize: 30, fontFamily: 'Bodoni 72' }}
-                    onPress={() => choosePhoto(3)} />
-                <AddImage buttonColor="transparent"
-                    titleColor="#000"
-                    title="+"
-                    buttonStyle={
-                        styles.button
-                    }
-                    textStyle={{ fontSize: 30, fontFamily: 'Bodoni 72' }}
-                    onPress={() => choosePhoto(4)} />
-                <AddImage buttonColor="transparent"
-                    titleColor="#000"
-                    title="+"
-                    buttonStyle={
-                        styles.button
-                    }
-                    textStyle={{ fontSize: 30, fontFamily: 'Bodoni 72' }}
-                    onPress={() => choosePhoto(5)} />
+
+                {registerProfilePics.some(element => element.position === 1) ?
+                    (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(1)}
+                        imageSource={registerProfilePics.find(element => element.position === 1)}
+                    />)
+                    : (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(1)}
+                    />)}
+
+                {registerProfilePics.some(element => element.position === 2) ?
+                    (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(2)}
+                        imageSource={registerProfilePics.find(element => element.position === 2)}
+                    />)
+                    : (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(2)}
+                    />)}
+
+                {registerProfilePics.some(element => element.position === 3) ?
+                    (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(3)}
+                        imageSource={registerProfilePics.find(element => element.position === 3)}
+                    />)
+                    : (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(3)}
+                    />)}
+
+                {registerProfilePics.some(element => element.position === 4) ?
+                    (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(4)}
+                        imageSource={registerProfilePics.find(element => element.position === 4)}
+                    />)
+                    : (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(4)}
+                    />)}
+
+                {registerProfilePics.some(element => element.position === 5) ?
+                    (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(5)}
+                        imageSource={registerProfilePics.find(element => element.position === 5)}
+                    />)
+                    : (<AddImage buttonColor="transparent"
+                        titleColor="#000"
+                        title="+"
+                        buttonStyle={
+                            styles.button
+                        }
+                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        onPress={() => choosePhoto(5)}
+                    />)}
             </View>
             {/* <Button title="Choose From Camera Roll" onPress={choosePhoto}></Button>
                 <Button title="Take Photo" onPress={takePhoto}></Button> */}
             {/* {registerProfilePics.length > 0 ? (<Image source={{ uri: registerProfilePics[0].uri }} style={{ height: 200, width: 200 }} />) : null} */}
-            {(imageFilename && imageUrl) && registerUser()}
+            {(uploadedImages) && registerUser()}
 
             <RightArrowBtn onPress={uploadPhoto} style={{ position: 'absolute', bottom: height * .07, right: 30 }} />
             <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: height * .07, left: 30 }} />

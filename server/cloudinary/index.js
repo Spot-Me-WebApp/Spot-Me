@@ -10,7 +10,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: 'Spot-Me',
+        folder: 'Spot-Me/',
         allowedFormats: ['jpeg', 'png', 'jpg']
     }
 });

@@ -14,7 +14,6 @@ const flash = require('connect-flash')
 const passport = require('passport');
 const multer = require('multer')
 const { storage, cloudinary } = require('./cloudinary');
-const { response } = require('express');
 const upload = multer({ storage })
 
 
@@ -91,9 +90,9 @@ app.post('/register', async (req, res) => {
         return res.send("User already exists");
     }
     console.log(req.body)
-    const { username, password, name, dob, bio, expLevel, methods, image } = req.body;
+    const { username, password, name, dob, bio, expLevel, methods, imageData } = req.body;
     const newUser = new User({ username, name, dob, bio, expLevel, methods });
-    newUser.images.push(image);
+    imageData.forEach(i => newUser.images.push(i))
     const registeredUser = await User.register(newUser, password);
     res.send(registeredUser)
 })
@@ -155,16 +154,24 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', {
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
 app.post('/image', async (req, res) => {
-    await cloudinary.uploader.upload(req.body.image, {
-        folder: "Spot-Me/"
+    const responses = [];
+    const uploadedImages = []
+    req.body.images.forEach((img) => {
+        const response = cloudinary.uploader.upload(img.uri, {
+            folder: "Spot-Me/"
+        })
+        responses.push(response);
+        //response is a promise for the individual API call.
     })
-        .then((response) =>
-            res.json({
-                url: response.secure_url,
-                filename: response.public_id.slice(response.public_id.indexOf('/') + 1) + '.' + response.format
-            })
-        )
+    await Promise.all(responses)
+        .then((response) => {
+            console.log('all promises resolved')
+            response.map((r, i) => uploadedImages.push({ url: r.secure_url, filename: r.public_id.slice(r.public_id.indexOf('/') + 1) + '.' + r.format, position: req.body.images[i].position }))
+        })
         .catch((err) => console.log(err))
+    //Promise.all turns the array of promises into one promise
+    console.log(uploadedImages)
+    res.send(uploadedImages)
 })
 
 //Routes---------------------------------------------------------------------------------------------------

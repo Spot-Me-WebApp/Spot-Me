@@ -32,7 +32,7 @@ const Profile = (props) => {
         }).then((response) => {
             console.log(response.data)
             DevSettings.reload()
-        }).catch((err) => console.log(err))
+        }).catch((err) => console.log(err, err.stack))
     }
 
     const calculateAge = (dob) => {

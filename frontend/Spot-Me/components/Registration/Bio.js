@@ -6,7 +6,7 @@ import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window')
 
 const Bio = (props) => {
 
@@ -23,26 +23,21 @@ const Bio = (props) => {
 
 
     return (
-        <KeyboardAvoidingView style={styles.container} behavior="position" contentContainerStyle={{ paddingTop: 60 }}>
-            <FormContainer>
-                <Image
-                    source={require('../../assets/Spot_Me_Logo.png')}
-                    style={styles.logo}
-                />
-                <View style={{ marginTop: 40 }}>
-                    <Text style={{ fontSize: 34, fontFamily: 'Bodoni 72' }}>Tell us about yourself.</Text>
-                </View>
-                <View style={{ borderWidth: 2, borderRadius: 10, width: width * .8, height: 180, marginTop: 20 }}>
-                    <TextInput placeholder='Bio' autoFocus={true} multiline={true} maxLength={400} numberOfLines={8}
-                        style={{ textAlignVertical: 'top', }} onChangeText={e => setRegisterBio(e)}>
-                    </TextInput>
-                </View>
-                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
-                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
-            </FormContainer>
-
-
-
+        <KeyboardAvoidingView style={styles.container} behavior="position" keyboardVerticalOffset={height * .4 * -1}>
+            <Image
+                source={require('../../assets/Spot_Me_Logo.png')}
+                style={styles.logo}
+            />
+            <View style={{ marginTop: 40 }}>
+                <Text style={{ fontSize: 34, fontFamily: 'Bodoni 72' }}>Tell us about yourself.</Text>
+            </View>
+            <View style={{ borderWidth: 2, borderRadius: 10, width: width * .8, height: 180, marginTop: 20 }}>
+                <TextInput placeholder='Bio' autoFocus={true} multiline={true} maxLength={400} numberOfLines={8}
+                    style={{ textAlignVertical: 'top', }} onChangeText={e => setRegisterBio(e)}>
+                </TextInput>
+            </View>
+            <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+            <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
 
 
 
@@ -54,7 +49,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        alignItems: 'stretch',
+        alignItems: 'center',
         justifyContent: 'center',
     },
     logo: {
@@ -63,7 +58,8 @@ const styles = StyleSheet.create({
         color: "black",
         marginBottom: 60,
         position: "absolute",
-        bottom: 240,
+        bottom: height * .3,
+        alignSelf: 'center'
     }
 });
 

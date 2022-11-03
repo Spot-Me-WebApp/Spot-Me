@@ -1,19 +1,19 @@
 //2nd step of registration process
 
 import { React, useState } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, Image, Platform, KeyboardAvoidingView } from 'react-native';
 
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
-
-const { width } = Dimensions.get('window')
+import RNDateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+const { height, width } = Dimensions.get('window')
 
 const NameDOB = (props) => {
 
     const [registerName, setRegisterName] = useState('')
-    const [registerDOB, setRegisterDOB] = useState(new Date(2008, 11, 31))
+    const [registerDOB, setRegisterDOB] = useState(null)
+    const [showPicker, setShowPicker] = useState(false)
     const setDate = (event, date) => {
         if (event.type === 'set' || event.type === 'dismissed') {
             setRegisterDOB(date)
@@ -30,32 +30,43 @@ const NameDOB = (props) => {
 
 
     return (
-        <View style={styles.container}>
-            <FormContainer>
-                <Image
-                    source={require('../../assets/Spot_Me_Logo.png')}
-                    style={styles.logo}
-                />
-                <Input
-                    placeholder="Name" onChangeText={e => setRegisterName(e)}>
-                </Input>
-                <Text style={{ marginTop: 30, fontSize: 17.5 }}>Date of Birth</Text>
-                <View style={styles.datePicker}>
-                    <RNDateTimePicker
-                        value={registerDOB} minimumDate={new Date(1930, 0, 1)} maximumDate={new Date(2008, 11, 31)} display="spinner"
-                        onChange={(event, date) => setDate(event, date)}
-                    />
+        <KeyboardAvoidingView style={styles.container} behavior='position' keyboardVerticalOffset={height * .5 * -1}>
+            <Image
+                source={require('../../assets/Spot_Me_Logo.png')}
+                style={styles.logo}
+            />
+            <Input
+                placeholder="Name" onChangeText={e => setRegisterName(e)}>
+            </Input>
+            <Text style={{ marginTop: 30, fontSize: 17.5 }}>Date of Birth</Text>
+            {(Platform.OS === 'android' && registerDOB) &&
+                <View>
+                    <Text>{registerDOB.toString().substr(registerDOB.toString().indexOf(' '), 12)}</Text>
+                    <Button title='Select Date' onPress={() => DateTimePickerAndroid.open({
+                        display: 'default', value: new Date(2008, 11, 31)
+                        , minimumDate: new Date(1930, 0, 1), maximumDate: new Date(2008, 11, 31), onChange: (event, date) => setDate(event, date)
+                    })}></Button>
                 </View>
-                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
-                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
-            </FormContainer>
+            }
+            {
+                !registerDOB &&
+                <View>
+                    {Platform.OS === 'ios' ? (<RNDateTimePicker
+                        value={new Date(2008, 11, 31)} minimumDate={new Date(1930, 0, 1)} maximumDate={new Date(2008, 11, 31)} display="spinner"
+                        onChange={(event, date) => setDate(event, date)} style={styles.datePicker}
+                    />)
+                        :
+                        (<RNDateTimePicker
+                            value={new Date(2008, 11, 31)} minimumDate={new Date(1930, 0, 1)} maximumDate={new Date(2008, 11, 31)} display="default"
+                            onChange={(event, date) => setDate(event, date)} style={styles.datePicker}
+                        />)}
 
 
-
-
-
-
-        </View>
+                </View>
+            }
+            <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+            <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
+        </KeyboardAvoidingView >
     )
 }
 
@@ -75,9 +86,9 @@ const styles = StyleSheet.create({
         width: 180,
         height: 180,
         color: "black",
-        marginBottom: 140,
+        marginBottom: 150,
         position: "absolute",
-        bottom: 180,
+        bottom: height * .55,
     }
 });
 

@@ -1,7 +1,7 @@
 //1st step of registration process
 
 import { React, useState } from 'react';
-import { View, StyleSheet, Button, Image, Text, ScrollView, KeyboardAvoidingView, Dimensions } from 'react-native';
+import { View, StyleSheet, Button, Image, Text, ScrollView, KeyboardAvoidingView, Dimensions, Platform } from 'react-native';
 import { SocialLoginBtn } from '../../Shared/Forms/Buttons/SocialLoginBtn';
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
@@ -29,37 +29,72 @@ const Register = (props) => {
     //     })
     // }
 
+    if (Platform.OS === 'android') {
+        return (
+            <KeyboardAvoidingView style={styles.container} behavior="position" keyboardVerticalOffset={-100}>
+                <Image
+                    source={require('../../assets/Spot_Me_Logo.png')}
+                    style={styles.logo}
+                />
+                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+
+                    <SocialLoginBtn title="Sign Up With Google" />
+                    {/* <FacebookSvg /> */}
+                    <SocialLoginBtn title="Sign Up With Facebook" />
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
+                    <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
+                    <View>
+                        <Text style={{ width: 50, textAlign: 'center', fontWeight: "bold" }}>OR</Text>
+                    </View>
+                    <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
+                </View>
+                <Input
+                    placeholder="Email" onChangeText={e => setRegisterUsername(e)}
+                    keyboardType="email-address">
+                </Input>
+                <Input
+                    secureTextEntry={true}
+                    placeholder="Password" onChangeText={e => setRegisterPassword(e)}>
+                </Input>
+                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: width * .7 }} />
+                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: width * .7 }} />
+
+            </KeyboardAvoidingView>
+        )
+    }
 
     return (
-        <KeyboardAvoidingView style={styles.container} behavior="position" keyboardVerticalOffset={-100}>
-            <Image
-                source={require('../../assets/Spot_Me_Logo.png')}
-                style={styles.logo}
-            />
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-
-                <SocialLoginBtn title="Sign Up With Google" />
-                {/* <FacebookSvg /> */}
-                <SocialLoginBtn title="Sign Up With Facebook" />
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
-                <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
+        <KeyboardAvoidingView style={styles.container} behavior="position">
+            <FormContainer>
+                <Image
+                    source={require('../../assets/Spot_Me_Logo.png')}
+                    style={styles.logo}
+                />
                 <View>
-                    <Text style={{ width: 50, textAlign: 'center', fontWeight: "bold" }}>OR</Text>
+                    {/* <GoogleSvg /> */}
+                    <SocialLoginBtn title="Sign Up With Google" />
+                    {/* <FacebookSvg /> */}
+                    <SocialLoginBtn title="Sign Up With Facebook" />
                 </View>
-                <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
-            </View>
-            <Input
-                placeholder="Email" onChangeText={e => setRegisterUsername(e)}
-                keyboardType="email-address">
-            </Input>
-            <Input
-                secureTextEntry={true}
-                placeholder="Password" onChangeText={e => setRegisterPassword(e)}>
-            </Input>
-            <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
-            <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
-
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
+                    <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
+                    <View>
+                        <Text style={{ width: 50, textAlign: 'center', fontWeight: "bold" }}>OR</Text>
+                    </View>
+                    <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
+                </View>
+                <Input
+                    placeholder="Email" onChangeText={e => setRegisterUsername(e)}
+                    keyboardType="email-address">
+                </Input>
+                <Input
+                    secureTextEntry={true}
+                    placeholder="Password" onChangeText={e => setRegisterPassword(e)}>
+                </Input>
+                <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
+            </FormContainer>
         </KeyboardAvoidingView>
     )
 }

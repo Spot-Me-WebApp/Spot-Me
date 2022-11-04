@@ -1,16 +1,14 @@
 //Fifth step of registration process
 import { React, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, DevSettings } from 'react-native';
-import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import axios from 'axios';
 import { SERVER_PORT } from '@env';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync } from 'expo-image-manipulator';
 import AddImage from '../../Shared/Forms/Buttons/AddImage';
-
 const { height, width } = Dimensions.get("screen")
-
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
 
 const Photos = (props) => {
@@ -37,7 +35,6 @@ const Photos = (props) => {
         console.log(registerProfilePics.map(p => p.position))
     }
     const [uploadedImages, setUploadedImages] = useState(null)
-
     const { username, password, name, dob, bio, expLevel, methods } = props.route.params
 
     //Send inputted photos to backend
@@ -121,7 +118,7 @@ const Photos = (props) => {
         if (!result.cancelled) resizePhoto(result.uri, num)
     }
 
-    const takePhoto = async () => {
+    const takePhoto = async (num) => {
         const permission = await ImagePicker.requestCameraPermissionsAsync()
         if (permission.granted) {
             const result = await ImagePicker.launchCameraAsync({
@@ -131,10 +128,31 @@ const Photos = (props) => {
                 quality: 1,
 
             })
-            if (!result.cancelled) resizePhoto(result.uri)
+            if (!result.cancelled) resizePhoto(result.uri, num)
         }
     }
     //-----------------------------------------------------------------Functions to choose image from library, or open camera-------------------------------------
+
+    const { showActionSheetWithOptions } = useActionSheet();
+    const handlePress = (choosePhoto, takePhoto, num) => {
+        const options = ["Open Camera Roll", "Take Photo", "Cancel"];
+        const cancelButtonIndex = 2
+        showActionSheetWithOptions({
+            options,
+            cancelButtonIndex
+        }, (selectedIndex) => {
+            switch (selectedIndex) {
+                case 0:
+                    choosePhoto(num)
+                    break;
+                case 1:
+                    takePhoto(num)
+                    break;
+                case cancelButtonIndex:
+                    break;
+            }
+        })
+    }
 
 
     return (
@@ -150,19 +168,21 @@ const Photos = (props) => {
                         buttonStyle={
                             styles.button
                         }
+                        disabled={true}
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(0)}
                         imageSource={registerProfilePics.find(element => element.position === 0)}
                     />)
-                    : (<AddImage buttonColor="transparent"
-                        titleColor="#000"
-                        title="+"
-                        buttonStyle={
-                            styles.button
-                        }
-                        textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(0)}
-                    />)}
+                    : (
+                        <AddImage buttonColor="transparent"
+                            titleColor="#000"
+                            title="+"
+                            buttonStyle={
+                                styles.button
+                            }
+                            onPress={() => handlePress(choosePhoto, takePhoto, 0)}
+                            textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
+                        />
+                    )}
 
                 {registerProfilePics.some(element => element.position === 1) ?
                     (<AddImage buttonColor="transparent"
@@ -172,7 +192,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(1)}
+                        disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 1)}
                     />)
                     : (<AddImage buttonColor="transparent"
@@ -182,7 +202,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(1)}
+                        onPress={() => handlePress(choosePhoto, takePhoto, 1)}
                     />)}
 
                 {registerProfilePics.some(element => element.position === 2) ?
@@ -193,7 +213,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(2)}
+                        disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 2)}
                     />)
                     : (<AddImage buttonColor="transparent"
@@ -203,7 +223,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(2)}
+                        onPress={() => handlePress(choosePhoto, takePhoto, 2)}
                     />)}
 
                 {registerProfilePics.some(element => element.position === 3) ?
@@ -214,7 +234,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(3)}
+                        disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 3)}
                     />)
                     : (<AddImage buttonColor="transparent"
@@ -224,7 +244,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(3)}
+                        onPress={() => handlePress(choosePhoto, takePhoto, 3)}
                     />)}
 
                 {registerProfilePics.some(element => element.position === 4) ?
@@ -235,7 +255,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(4)}
+                        disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 4)}
                     />)
                     : (<AddImage buttonColor="transparent"
@@ -245,7 +265,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(4)}
+                        onPress={() => handlePress(choosePhoto, takePhoto, 4)}
                     />)}
 
                 {registerProfilePics.some(element => element.position === 5) ?
@@ -256,7 +276,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(5)}
+                        disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 5)}
                     />)
                     : (<AddImage buttonColor="transparent"
@@ -266,7 +286,7 @@ const Photos = (props) => {
                             styles.button
                         }
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
-                        onPress={() => choosePhoto(5)}
+                        onPress={() => handlePress(choosePhoto, takePhoto, 5)}
                     />)}
             </View>
             {/* <Button title="Choose From Camera Roll" onPress={choosePhoto}></Button>

@@ -4,7 +4,7 @@ import { DevSettings, Text, View } from 'react-native';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
-
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import OnboardingNavigation from './navigators/OnboardingNavigation';
 import Main from './navigators/Main';
@@ -52,9 +52,13 @@ export default function App() {
   return (
     <NavigationContainer theme={DarkTheme}>
       {isLoggedIn ? (
-        <BottomTabs></BottomTabs>
+        <ActionSheetProvider>
+          <BottomTabs></BottomTabs>
+        </ActionSheetProvider>
       ) : (
-        <OnboardingNavigation></OnboardingNavigation>
+        <ActionSheetProvider>
+          <OnboardingNavigation></OnboardingNavigation>
+        </ActionSheetProvider>
       )}
     </NavigationContainer>
   )

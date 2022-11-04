@@ -1,16 +1,17 @@
 import React from 'react';
 import { View, Image, StyleSheet, Button, TouchableOpacity, Text } from 'react-native'
+import { useActionSheet } from '@expo/react-native-action-sheet';
+
 
 const AddImage = ({
     title,
-    onPress,
     buttonColor,
     titleColor,
     buttonStyle,
     textStyle,
     imageSource,
+    onPress
 }) => {
-
 
 
     return (
@@ -28,6 +29,7 @@ const AddImage = ({
                     {title}
                 </Text>
             }
+
         </TouchableOpacity>
     );
 };

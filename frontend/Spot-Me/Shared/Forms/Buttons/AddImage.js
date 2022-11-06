@@ -10,7 +10,9 @@ const AddImage = ({
     buttonStyle,
     textStyle,
     imageSource,
-    onPress
+    deleteButton,
+    onPress,
+    disabled
 }) => {
 
 
@@ -29,7 +31,7 @@ const AddImage = ({
                     {title}
                 </Text>
             }
-
+            {disabled && deleteButton}
         </TouchableOpacity>
     );
 };

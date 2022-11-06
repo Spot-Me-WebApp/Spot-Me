@@ -2,6 +2,7 @@
 import { React, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, DevSettings } from 'react-native';
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
+import { XCircleBtn } from '../../Shared/Forms/Buttons/XCircleBtn';
 import axios from 'axios';
 import { SERVER_PORT } from '@env';
 import * as ImagePicker from 'expo-image-picker';
@@ -27,14 +28,24 @@ const Photos = (props) => {
         console.log(boxes)
     }
     let [registerProfilePics, setProfilePics] = useState([])
-    const updatePhotoArray = (uri, pos) => {
-        setProfilePics(registerProfilePics = registerProfilePics.concat({
-            uri: uri,
-            position: pos
-        }))
-        console.log(registerProfilePics.map(p => p.position))
+    const updatePhotoArray = (uri, pos, deleting) => {
+        if (!deleting) {
+            setProfilePics(registerProfilePics = registerProfilePics.concat({
+                uri: uri,
+                position: pos
+            }))
+            setPhotoDeleted(!photoDeleted)
+            console.log(registerProfilePics.map(p => p.position))
+        }
+        else {
+            registerProfilePics.splice(pos, 1)
+            setPhotoDeleted(!photoDeleted)
+            setProfilePics(registerProfilePics);
+            console.log(registerProfilePics.map(p => p.position))
+        }
     }
     const [uploadedImages, setUploadedImages] = useState(null)
+    const [photoDeleted, setPhotoDeleted] = useState(false)
     const { username, password, name, dob, bio, expLevel, methods } = props.route.params
 
     //Send inputted photos to backend
@@ -47,7 +58,6 @@ const Photos = (props) => {
             }
         })
             .then((response) => {
-                console.log(response.request._response)
                 const data = JSON.parse(response.request._response);
                 setUploadedImages(data)
             })
@@ -65,7 +75,7 @@ const Photos = (props) => {
             }],
             { base64: true }
         )
-        updatePhotoArray('data:image/jpeg;base64,' + manipResult.base64, num);
+        updatePhotoArray('data:image/jpeg;base64,' + manipResult.base64, num, false);
         changeBox(num);
     }
 
@@ -103,7 +113,7 @@ const Photos = (props) => {
             },
             withCredentials: true
         }).then((response) => {
-            DevSettings.reload()
+            props.navigation.navigate("BottomTabs")
         })
             .catch((error) => console.log(error, error.stack))
     }
@@ -131,11 +141,16 @@ const Photos = (props) => {
             if (!result.cancelled) resizePhoto(result.uri, num)
         }
     }
+
+    const deletePhoto = (num) => {
+        updatePhotoArray("", num, true);
+        changeBox(num);
+    }
     //-----------------------------------------------------------------Functions to choose image from library, or open camera-------------------------------------
 
     const { showActionSheetWithOptions } = useActionSheet();
     const handlePress = (choosePhoto, takePhoto, num) => {
-        const options = ["Open Camera Roll", "Take Photo", "Cancel"];
+        const options = ["Choose From Photos", "Open Camera", "Cancel"];
         const cancelButtonIndex = 2
         showActionSheetWithOptions({
             options,
@@ -147,6 +162,25 @@ const Photos = (props) => {
                     break;
                 case 1:
                     takePhoto(num)
+                    break;
+                case cancelButtonIndex:
+                    break;
+            }
+        })
+    }
+
+    const showDeleteMenu = (deletePhoto, num) => {
+        const options = ["Delete", "Cancel"];
+        const destructiveButtonIndex = 0;
+        const cancelButtonIndex = 1;
+        showActionSheetWithOptions({
+            options,
+            cancelButtonIndex,
+            destructiveButtonIndex
+        }, (selectedIndex) => {
+            switch (selectedIndex) {
+                case destructiveButtonIndex:
+                    deletePhoto(num);
                     break;
                 case cancelButtonIndex:
                     break;
@@ -171,6 +205,7 @@ const Photos = (props) => {
                         disabled={true}
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         imageSource={registerProfilePics.find(element => element.position === 0)}
+                        deleteButton={<XCircleBtn onPress={() => showDeleteMenu(deletePhoto, 0)} style={styles.deleteButton} />}
                     />)
                     : (
                         <AddImage buttonColor="transparent"
@@ -194,6 +229,7 @@ const Photos = (props) => {
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 1)}
+                        deleteButton={<XCircleBtn onPress={() => showDeleteMenu(deletePhoto, 1)} style={styles.deleteButton} />}
                     />)
                     : (<AddImage buttonColor="transparent"
                         titleColor="#000"
@@ -215,6 +251,7 @@ const Photos = (props) => {
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 2)}
+                        deleteButton={<XCircleBtn onPress={() => showDeleteMenu(deletePhoto, 2)} style={styles.deleteButton} />}
                     />)
                     : (<AddImage buttonColor="transparent"
                         titleColor="#000"
@@ -236,6 +273,7 @@ const Photos = (props) => {
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 3)}
+                        deleteButton={<XCircleBtn onPress={() => showDeleteMenu(deletePhoto, 3)} style={styles.deleteButton} />}
                     />)
                     : (<AddImage buttonColor="transparent"
                         titleColor="#000"
@@ -257,6 +295,7 @@ const Photos = (props) => {
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 4)}
+                        deleteButton={<XCircleBtn onPress={() => showDeleteMenu(deletePhoto, 4)} style={styles.deleteButton} />}
                     />)
                     : (<AddImage buttonColor="transparent"
                         titleColor="#000"
@@ -278,6 +317,7 @@ const Photos = (props) => {
                         textStyle={{ fontSize: 34, fontFamily: 'Bodoni 72' }}
                         disabled={true}
                         imageSource={registerProfilePics.find(element => element.position === 5)}
+                        deleteButton={<XCircleBtn onPress={() => showDeleteMenu(deletePhoto, 5)} style={styles.deleteButton} />}
                     />)
                     : (<AddImage buttonColor="transparent"
                         titleColor="#000"
@@ -289,9 +329,6 @@ const Photos = (props) => {
                         onPress={() => handlePress(choosePhoto, takePhoto, 5)}
                     />)}
             </View>
-            {/* <Button title="Choose From Camera Roll" onPress={choosePhoto}></Button>
-                <Button title="Take Photo" onPress={takePhoto}></Button> */}
-            {/* {registerProfilePics.length > 0 ? (<Image source={{ uri: registerProfilePics[0].uri }} style={{ height: 200, width: 200 }} />) : null} */}
             {(uploadedImages) && registerUser()}
 
             <RightArrowBtn onPress={uploadPhoto} style={{ position: 'absolute', bottom: height * .07, right: 30 }} />
@@ -323,6 +360,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 3,
         borderStyle: 'dashed',
 
+    },
+    deleteButton: {
+        ...StyleSheet.absoluteFillObject,
+        alignSelf: 'flex-end',
+        marginTop: -10,
+        left: width * .25
     }
 });
 

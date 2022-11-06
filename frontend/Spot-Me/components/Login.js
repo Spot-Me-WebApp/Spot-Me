@@ -23,7 +23,7 @@ const Login = (props) => {
                 withCredentials: true
             }).then((response) => {
                 console.log(response.data)
-                DevSettings.reload()
+                props.navigation.navigate("BottomTabs")
             })
                 .catch((error) => console.log(error, error.stack))
         }

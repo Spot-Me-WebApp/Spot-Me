@@ -1,10 +1,11 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import { Icon } from "react-native-vector-icons/FontAwesome";
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"
 import Meet from "../components/Meet";
 import Schedule from "../components/Schedule";
 import Chat from "../components/Chat";
 import Profile from "../components/Profile";
+import EditProfile from "../components/EditProfile"
 
 const Tab = createBottomTabNavigator();
 
@@ -15,7 +16,6 @@ const BottomTabs = () => {
             screenOptions={{
                 "tabBarHideOnKeyboard": true,
                 "tabBarShowLabel": false,
-                "tabBarActiveTintColor": '#A09F9A',
                 "tabBarStyle": [
                     {
                         "display": "flex"
@@ -24,55 +24,47 @@ const BottomTabs = () => {
                 ]
             }}
         >
-            <Tab.Screen name="Meet" component={Meet} options = {{ headerShown: false}}
-            // options={{
-            //     tabBarIcon: () => (
-            //         <Icon
-            //             name="fa-solid fa-dumbbell"
-            //             style={{ position: "relative" }}
+            <Tab.Screen name="Meet" component={Meet} options={
+                {
+                    headerShown: false,
+                    tabBarIcon: (tabInfo) => (
+                        <MaterialCommunityIcons name="dumbbell" size={28} color={tabInfo.focused ? "#A09F9A" : "#7e7d77"} />
+                    )
+                }}
 
-            //             size={30}
-            //         />
-            //     )
-            // }}
             />
-            <Tab.Screen name="Schedule" component={Schedule} options = {{ headerShown: false}}
-            // options={{
-            //     tabBarIcon: () => (
-            //         <Icon
-            //             name="fa-solid fa-calendar-days"
-            //             style={{ position: "relative" }}
-
-            //             size={30}
-            //         />
-            //     )
-            // }}
+            <Tab.Screen name="Schedule" component={Schedule} options={
+                {
+                    headerShown: false,
+                    tabBarIcon: (tabInfo) => (
+                        <FontAwesome name="calendar" size={26} color={tabInfo.focused ? "#A09F9A" : "#7e7d77"} />
+                    )
+                }}
             />
-            <Tab.Screen name="Chat" component={Chat} options = {{ headerShown: false}}
-            // options={{
-            //     tabBarIcon: () => (
-            //         <Icon
-            //             name="fa-solid fa-messages"
-            //             style={{ position: "relative" }}
+            <Tab.Screen name="Chat" component={Chat} options={
+                {
+                    headerShown: false,
+                    tabBarIcon: (tabInfo) => (
+                        <Ionicons name="chatbubble-ellipses" size={32} color={tabInfo.focused ? "#A09F9A" : "#7e7d77"} />
+                    )
+                }}
 
-            //             size={30}
-            //         />
-            //     )
-            // }}
             />
-            <Tab.Screen name="Profile" component={Profile} options = {{ headerShown: false}}
-            // options={{
-            //     tabBarIcon: () => (
-            //         <Icon
-            //             name="fa-solid fa-user"
-            //             style={{ position: "relative" }}
+            <Tab.Screen name="Profile" component={Profile} options={
+                {
+                    headerShown: false,
+                    tabBarIcon: (tabInfo) => (
+                        <Ionicons name="person-circle" size={34} color={tabInfo.focused ? "#A09F9A" : "#7e7d77"} />
+                    )
+                }}
 
-            //             size={30}
-            //         />
-            //     )
-            // }}
             />
-
+            <Tab.Screen name="Edit Profile" component={EditProfile} options={
+                {
+                    headerShown: true,
+                    tabBarButton: () => null
+                }}
+            />
         </Tab.Navigator>
     );
 }

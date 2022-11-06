@@ -6,14 +6,14 @@ import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-import OnboardingNavigation from './navigators/OnboardingNavigation';
-import Main from './navigators/Main';
-import BottomTabs from './navigators/BottomTabs';
+// import OnboardingNavigation from './navigators/OnboardingNavigation';
+import RootNavigator from './navigators/RootNavigator';
+// import BottomTabs from './navigators/BottomTabs';
 
 export default function App() {
 
   const [userData, setUserData] = useState([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 
   //Check if a user's logged in. if they are, the backend sends their data.
@@ -34,32 +34,12 @@ export default function App() {
     fetchData();
   }, [])
 
-  useEffect(() => {
-    function changeLoginStatus() {
-      //If the user has logged in
-      if (!isLoggedIn && typeof userData !== "string") {
-        setIsLoggedIn(true)
-        //If user is logging out
-      } else if (isLoggedIn && typeof userData === "string") {
-        setIsLoggedIn(false)
-      }
-    }
-    changeLoginStatus()
-  }, [userData])
-
-
   //If user logged in use BottomTabs navigation, else, use OnboardingNavigation
   return (
     <NavigationContainer theme={DarkTheme}>
-      {isLoggedIn ? (
-        <ActionSheetProvider>
-          <BottomTabs></BottomTabs>
-        </ActionSheetProvider>
-      ) : (
-        <ActionSheetProvider>
-          <OnboardingNavigation></OnboardingNavigation>
-        </ActionSheetProvider>
-      )}
+      <ActionSheetProvider>
+        <RootNavigator></RootNavigator>
+      </ActionSheetProvider>
     </NavigationContainer>
   )
 }

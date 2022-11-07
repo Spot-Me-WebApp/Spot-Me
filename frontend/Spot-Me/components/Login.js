@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, DevSettings } from 'react-native';
 import { FormContainer } from '../Shared/Forms/FormContainer';
 import { Input } from '../Shared/Forms/Input'
-import { SocialLoginBtn } from '../Shared/Forms/Buttons/SocialLoginBtn';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 
@@ -33,8 +32,7 @@ const Login = (props) => {
         <View style={styles.container}>
             <FormContainer>
                 <View>
-                    <SocialLoginBtn title="Login With Google" />
-                    <SocialLoginBtn title="Login With Facebook" />
+
                 </View>
                 <Input
                     placeholder="Username" onChangeText={e => setLoginUsername(e)}>

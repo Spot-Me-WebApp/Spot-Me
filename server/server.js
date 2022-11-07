@@ -132,24 +132,20 @@ app.get('/logout', (req, res) => {
 })
 
 //------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
-//When a user clicks the button to login with google, it will hit this route and then redirect to the route below this one
-app.get('/login/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+//When a user clicks sign up with google
+app.post('/register/google', async (req, res) => {
+
+});
 
 //Processes the authentication response and logs the user in
-app.get('/oauth2/redirect/google', passport.authenticate('google', {
-    failureRedirect: 'http://localhost:3000/login',
-    successRedirect: 'http://localhost:3000/', failureMessage: true, keepSessionInfo: true
-}))
+
 //------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
 
 //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
 app.get('/login/facebook', passport.authenticate('facebook'));
 
-app.get('/auth/facebook/callback', passport.authenticate('facebook', {
-    failureRedirect: 'http://localhost:3000/login',
-    successRedirect: 'http://localhost:3000/', failureMessage: true, keepSessionInfo: true
-}));
-//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
+
+// //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
 
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------

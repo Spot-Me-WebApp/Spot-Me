@@ -1,33 +1,72 @@
 //1st step of registration process
 
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { View, StyleSheet, Button, Image, Text, ScrollView, KeyboardAvoidingView, Dimensions, Platform } from 'react-native';
-import { SocialLoginBtn } from '../../Shared/Forms/Buttons/SocialLoginBtn';
 import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
-import { GoogleSvg, FacebookSvg, } from '../../Shared/Svg';
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import axios from 'axios'
-import { SERVER_PORT } from '@env'
+import { SERVER_PORT, GOOGLE_CLIENT_ID } from '@env'
+import * as Google from 'expo-auth-session/providers/google'
+import * as WebBrowser from 'expo-web-browser'
+import { AntDesign } from '@expo/vector-icons'
 
 const { height, width } = Dimensions.get("screen")
+
+WebBrowser.maybeCompleteAuthSession();
+
 const Register = (props) => {
     const [registerUsername, setRegisterUsername] = useState("")
     const [registerPassword, setRegisterPassword] = useState("")
-
+    const [googleAccessToken, setGoogleAccessToken] = useState();
+    let [googleUserInfo, setGoogleUserInfo] = useState();
+    let [userInfoReceived, setUserInfoReceived] = useState(false);
+    const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
+        expoClientId: GOOGLE_CLIENT_ID
+    })
 
     const goNextForm = () => {
-        if (registerUsername && registerPassword) {
+        if (registerUsername && registerPassword && !googleUserInfo) {
             props.navigation.navigate('NameDOB', { username: registerUsername, password: registerPassword })
         }
     }
 
-    // const googleRegister = () => {
-    //     axios({
-    //         url: `${SERVER_PORT}/login/google`
 
-    //     })
-    // }
+    useEffect(() => {
+        if (googleResponse?.type === 'success') {
+            setGoogleAccessToken(googleResponse.authentication.accessToken)
+            getGoogleUserData()
+        }
+    }, [googleResponse])
+
+    async function getGoogleUserData() {
+        await axios.get("https://www.googleapis.com/userinfo/v2/me", {
+            headers: {
+                Authorization: `Bearer ${googleAccessToken}`
+            },
+            withCredentials: true
+        })
+            .then((response) => {
+                if (response.data) {
+                    setGoogleUserInfo(googleUserInfo = {
+                        username: response.data.email,
+                        name: response.data.given_name + ' ' + response.data.family_name,
+                        provider: "google",
+                        uri: response.data.id
+                    })
+                    setUserInfoReceived(!userInfoReceived)
+                }
+            })
+            .catch((err) => console.log(err))
+    }
+
+
+    useEffect(() => {
+        if (googleUserInfo && userInfoReceived) {
+            props.navigation.navigate("NameDOB", { username: googleUserInfo.username, name: googleUserInfo.name, uri: googleUserInfo.uri, provider: googleUserInfo.provider })
+        }
+    }, [googleUserInfo, userInfoReceived])
+
 
     if (Platform.OS === 'android') {
         return (
@@ -37,10 +76,7 @@ const Register = (props) => {
                     style={styles.logo}
                 />
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-
-                    <SocialLoginBtn title="Sign Up With Google" />
-                    {/* <FacebookSvg /> */}
-                    <SocialLoginBtn title="Sign Up With Facebook" />
+                    <Text>Sign up with: </Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
                     <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
@@ -71,11 +107,12 @@ const Register = (props) => {
                     source={require('../../assets/Spot_Me_Logo.png')}
                     style={styles.logo}
                 />
+                <View style={{ marginVertical: 20 }}>
+                    <AntDesign.Button name="google" backgroundColor="#f25c54" style={styles.socialBtn} onPress={() => googlePromptAsync({ useProxy: true })}
+                        disabled={!googleRequest}>Sign up with Google</AntDesign.Button>
+                </View>
                 <View>
-                    {/* <GoogleSvg /> */}
-                    <SocialLoginBtn title="Sign Up With Google" />
-                    {/* <FacebookSvg /> */}
-                    <SocialLoginBtn title="Sign Up With Facebook" />
+                    <AntDesign.Button name="facebook-square" style={styles.socialBtn}>Sign up with Facebook</AntDesign.Button>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
                     <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
@@ -104,7 +141,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     logo: {
         width: 180,
@@ -114,6 +151,13 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: height * .2,
         alignSelf: 'center'
+    },
+    socialBtn: {
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 4,
+        elevation: 3,
+        width: 250
     }
 });
 

@@ -13,11 +13,11 @@ const Bio = (props) => {
     const [registerBio, setRegisterBio] = useState('')
 
 
-    const { username, password, name, dob } = props.route.params
+    const { username, password, name, dob, provider, uri } = props.route.params
 
     const goNextForm = () => {
         if (registerBio) {
-            props.navigation.navigate('ExperienceLvlMethods', { username: username, password: password, name: name, dob: dob, bio: registerBio })
+            props.navigation.navigate('ExperienceLvlMethods', { username: username, password: password, name: name, dob: dob, bio: registerBio, provider: provider || undefined, uri: uri || undefined })
         }
     }
 

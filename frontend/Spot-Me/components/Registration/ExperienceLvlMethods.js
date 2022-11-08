@@ -56,14 +56,17 @@ const ExperienceLvlMethods = (props) => {
     const [userExp, setRegisterExpLevel] = useState("");
     const [methodsSelected, setRegisterMethods] = useState([]);
 
-    const { username, password, name, dob, bio } = props.route.params
+    const { username, password, name, dob, bio, provider, uri } = props.route.params
 
 
     const goNextForm = () => {
         if (userExp && methodsSelected) {
             const expLevel = userExp.item
             const methods = methodsSelected.map(method => method.item)
-            props.navigation.navigate('Photos', { username: username, password: password, name: name, dob: dob, bio: bio, expLevel: expLevel, methods: methods })
+            props.navigation.navigate('Photos', {
+                username: username, password: password, name: name, dob: dob, bio: bio, expLevel: expLevel, methods: methods,
+                provider: provider || undefined, uri: uri || undefined
+            })
         }
     }
 

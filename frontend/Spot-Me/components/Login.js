@@ -1,14 +1,75 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, DevSettings } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, Image } from 'react-native';
 import { FormContainer } from '../Shared/Forms/FormContainer';
 import { Input } from '../Shared/Forms/Input'
 import axios from 'axios'
-import { SERVER_PORT } from '@env'
+import { SERVER_PORT, GOOGLE_CLIENT_ID } from '@env'
+import { AntDesign } from '@expo/vector-icons'
+import { LeftArrowBtn, RightArrowBtn } from '../Shared/Forms/Buttons/ArrowButtons';
+import * as Google from 'expo-auth-session/providers/google'
+
+const { height, width } = Dimensions.get("screen")
 
 const Login = (props) => {
 
     const [loginUsername, setLoginUsername] = useState('')
     const [loginPassword, setLoginPassword] = useState('')
+
+    let [googleAccessToken, setGoogleToken] = useState("");
+    setGoogleToken = (str) => {
+        googleAccessToken += str;
+    }
+    let [googleUserUri, setGoogleUserUri] = useState("");
+    setGoogleUserUri = (str) => {
+        googleUserUri += str;
+    }
+
+    const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
+        expoClientId: GOOGLE_CLIENT_ID
+    })
+
+    useEffect(() => {
+        async function fetchData() {
+            if (googleResponse?.type === "success") {
+                setGoogleToken(googleResponse.authentication.accessToken)
+                await getGoogleUserData()
+
+            }
+        }
+        fetchData();
+    }, [googleResponse])
+
+    async function getGoogleUserData() {
+        if (googleAccessToken) {
+            axios.get("https://www.googleapis.com/userinfo/v2/me", {
+                headers: {
+                    Authorization: `Bearer ${googleAccessToken}`
+                },
+                withCredentials: true
+            })
+                .then((response) => {
+                    setGoogleUserUri(response.data.id)
+                    loginOauth(googleUserUri)
+                })
+                .catch((err) => console.log(err, err.message))
+        } else { console.log("no token") }
+    }
+
+    const loginOauth = async (uri) => {
+        await axios({
+            url: `${SERVER_PORT}/login/oauth`,
+            method: 'post',
+            data: {
+                uri: uri
+            },
+            withCredentials: true,
+
+        }).then((response) => {
+            console.log(response.data)
+            props.navigation.navigate("BottomTabs")
+        })
+            .catch((error) => console.log(error, error.stack))
+    }
 
     const loginUser = async () => {
         if (loginUsername && loginPassword) {
@@ -31,19 +92,37 @@ const Login = (props) => {
     return (
         <View style={styles.container}>
             <FormContainer>
+                <Image
+                    source={require('../assets/Spot_Me_Logo.png')}
+                    style={styles.logo}
+                />
+                <View style={{ marginVertical: 20 }}>
+                    <AntDesign.Button name="google" backgroundColor="#f25c54" style={styles.socialBtn} onPress={() => googlePromptAsync()}
+                        disabled={!googleRequest}>Log in with Google</AntDesign.Button>
+                </View>
                 <View>
-
+                    <AntDesign.Button name="facebook-square" style={styles.socialBtn}>Log in with Facebook</AntDesign.Button>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
+                    <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
+                    <View>
+                        <Text style={{ width: 50, textAlign: 'center', fontWeight: "bold" }}>OR</Text>
+                    </View>
+                    <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
                 </View>
                 <Input
-                    placeholder="Username" onChangeText={e => setLoginUsername(e)}>
+                    placeholder="Email" onChangeText={e => setLoginUsername(e)}
+                    keyboardType="email-address">
                 </Input>
                 <Input
                     secureTextEntry={true}
                     placeholder="Password" onChangeText={e => setLoginPassword(e)}>
                 </Input>
-                <Button title="Login" onPress={loginUser}></Button>
+                <RightArrowBtn onPress={loginUser} style={{ position: 'absolute', bottom: -120, left: 300 }} />
+                <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: -120, right: 300 }} />
             </FormContainer>
-            <Button title="Go Back" onPress={() => { props.navigation.goBack() }}></Button>
+
+
         </View>
     )
 }
@@ -55,6 +134,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    logo: {
+        width: 180,
+        height: 180,
+        color: "black",
+        marginBottom: 150,
+        position: "absolute",
+        bottom: height * .2,
+        alignSelf: 'center'
+    },
+    socialBtn: {
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 4,
+        elevation: 3,
+        width: 250
+    }
 });
 
 export default Login;

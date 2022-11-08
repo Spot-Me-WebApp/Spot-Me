@@ -83,6 +83,15 @@ app.post('/login',
     function (req, res) {
         res.send(req.user)
     });
+
+//For login through google/facebook
+app.post('/login/oauth', async (req, res) => {
+    const user = await User.findOne({ uri: req.body.uri })
+    req.login(user, (err) => {
+        if (err) { return res.send(err) }
+        res.json(req.user)
+    })
+})
 //For local registration
 app.post('/register', async (req, res) => {
     const userExists = await User.findOne({ username: req.body.username }).count() > 0 ? true : false;
@@ -90,11 +99,18 @@ app.post('/register', async (req, res) => {
         return res.send("User already exists");
     }
     console.log(req.body)
-    const { username, password, name, dob, bio, expLevel, methods, imageData } = req.body;
-    const newUser = new User({ username, name, dob, bio, expLevel, methods });
-    imageData.forEach(i => newUser.images.push(i))
-    const registeredUser = await User.register(newUser, password);
-    res.send(registeredUser)
+    const { username, password, name, dob, bio, expLevel, methods, imageData, provider, uri } = req.body;
+    if (provider && uri) {
+        const newUser = new User({ username, name, dob, bio, expLevel, methods, provider, uri });
+        imageData.forEach(i => newUser.images.push(i))
+        await newUser.save();
+        return res.send(newUser)
+    } else {
+        const newUser = new User({ username, name, dob, bio, expLevel, methods });
+        imageData.forEach(i => newUser.images.push(i))
+        const registeredUser = await User.register(newUser, password);
+        res.send(registeredUser)
+    }
 })
 
 

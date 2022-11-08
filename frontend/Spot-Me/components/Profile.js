@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Button, DevSettings, StatusBar, Ima
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const { height, width } = Dimensions.get("screen")
 
@@ -55,38 +56,64 @@ const Profile = (props) => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
+
                 {userData ? (
                     <View>
-                        {userData.images &&
-                            <View style={styles.mainPicture}>
-                                <Image source={{ uri: userData.images[0].url }} style={{ height: 115, width: 115, borderRadius: 115 / 2 }} />
-                                <View style={{ marginLeft: 20 }}>
-                                    <Text>
-                                        <Text style={styles.name}>{userData.name}  </Text>
-                                        <Text style={styles.age}>{calculateAge(userData.dob)}</Text>
-                                    </Text>
-                                    <Text style={styles.text}>{userData.expLevel}</Text>
-                                    <Text style={styles.text}>Passions:</Text>
-                                    {(userData.methods.map(method => {
-                                        return (
-                                            <View>
-                                                <Text style={{ color: 'white' }}>   {method}</Text>
-                                            </View>
-                                        )
-                                    }))}
-                                    <Button title="Edit" onPress={() => props.navigation.navigate("Edit Profile", { userData })}></Button>
+                        <View style={{
+                            paddingHorizontal: 40,
+                            backgroundColor: "#FFFFFF",
+                            height: "40%",
+                            borderBottomLeftRadius: 40,
+                            borderBottomRightRadius: 40,
+
+                        }}>
+                            <View style={{ flexDirection: "row", width: "100%", marginTop: 10 }}>
+
+                                <Ionicons.Button name="settings" size={24} color="black" backgroundColor="white" onPress={() => props.navigation.navigate("Edit Profile", { userData })}></Ionicons.Button>
+                                <View style={{
+                                    width: "90%", alignItems: "flex-end"
+                                }}>
+                                    <MaterialIcons.Button name="logout" size={24} color="black" backgroundColor="white" onPress={logoutUser}></MaterialIcons.Button>
+
                                 </View>
+
                             </View>
-                        }
-                        <View style={{ height: 1, backgroundColor: 'white', marginVertical: 10 }}>
-                            {/* Horizontal line seperating header and body */}
+                            {userData.images &&
+                                <View style={styles.mainPicture}>
+                                    <Image source={{ uri: userData.images[0].url }} style={{ alignSelf: 'center', height: 115, width: 115, borderRadius: 115 / 2 }} />
+                                    <View style={{ alignItems: 'center' }}>
+                                        <Text>
+                                            <Text style={styles.name}>{userData.name}  </Text>
+                                            <Text style={styles.age}>{calculateAge(userData.dob)}</Text>
+                                        </Text>
+                                        <Text style={styles.text}>{userData.expLevel}</Text>
+                                        <Text style={styles.text}>Passions:</Text>
+                                        {(userData.methods.map(method => {
+                                            return (
+                                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width }}>
+                                                    <Text style={{ color: 'white', padding: 10, backgroundColor: '#202020', borderRadius: 20 }}>   {method}</Text>
+                                                </View>
+                                            )
+                                        }))}
+                                        <Text style={styles.bio}>
+                                            {userData.bio}
+                                        </Text>
+
+                                    </View>
+                                </View>
+                            }
+
+                            <View style={{ marginVertical: 30 }}>
+                                {/* spacing between header and body */}
+                            </View>
+
                         </View>
-                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center' }}>
+                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width }}>
                             {userData.images.length > 1 &&
                                 userData.images.filter(i => i.position > 0).map(i => {
                                     return (
                                         <Image source={{ uri: userData.images[i.position].url }} style={{
-                                            height: 200, width: '40%', marginVertical: 10, marginHorizontal: 10
+                                            height: 200, width: '40%', marginVertical: 10, marginHorizontal: 10, borderRadius: 20
                                         }} />
                                     )
                                 })
@@ -97,10 +124,10 @@ const Profile = (props) => {
                                 {userData.bio}
                             </Text>
                         </View>
+
                         <Button title="Logout" onPress={logoutUser}></Button>
 
-                    </View>
-                ) : (<Text>Profile</Text>)}
+                    </View>) : (<Text>Profile</Text>)}
             </ScrollView>
         </SafeAreaView>
     )
@@ -117,25 +144,30 @@ const styles = StyleSheet.create({
         width
     },
     text: {
-        color: 'white',
+        color: '#202020',
+        fontFamily: 'Thonburi',
         fontSize: 18,
     },
     name: {
-        color: 'white',
+        color: '#202020',
+        fontFamily: 'Thonburi',
         fontSize: 28,
+        fontWeight: 'bold'
     },
     age: {
-        color: 'white',
+        color: '#202020',
         fontSize: 18,
+        fontFamily: 'Thonburi',
         fontWeight: '300'
     },
     bio: {
         color: 'white',
-        fontSize: 16,
+        fontFamily: 'Thonburi',
+        fontSize: 14,
     },
     mainPicture: {
         paddingTop: height * .05,
-        flexDirection: 'row'
+        flexDirection: 'column'
     }
 });
 

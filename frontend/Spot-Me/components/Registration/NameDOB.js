@@ -11,20 +11,21 @@ const { height, width } = Dimensions.get('window')
 
 const NameDOB = (props) => {
 
-    const [registerName, setRegisterName] = useState('')
+    const { username, password, name, provider, uri } = props.route.params
+
+    const [registerName, setRegisterName] = useState(name)
     const [registerDOB, setRegisterDOB] = useState(null)
-    const [showPicker, setShowPicker] = useState(false)
     const setDate = (event, date) => {
         if (event.type === 'set' || event.type === 'dismissed') {
             setRegisterDOB(date)
         }
     }
-    const { username, password } = props.route.params
+
 
     const goNextForm = () => {
         if (registerName && registerDOB) {
             const dob = registerDOB.toISOString().substring(0, 10)
-            props.navigation.navigate('Bio', { username: username, password: password, name: registerName, dob: dob })
+            props.navigation.navigate('Bio', { username: username, password: password, name: registerName, dob: dob, provider: provider || undefined, uri: uri || undefined })
         }
     }
 
@@ -40,7 +41,7 @@ const NameDOB = (props) => {
                         'center'
                 }}>
                     <Input
-                        placeholder="Name" onChangeText={e => setRegisterName(e)}>
+                        placeholder="Name" value={registerName} onChangeText={e => setRegisterName(e)}>
                     </Input>
                     <Text style={{ marginTop: 30, fontSize: 17.5 }}>Date of Birth</Text>
                     {registerDOB &&
@@ -74,7 +75,7 @@ const NameDOB = (props) => {
                     style={styles.logo}
                 />
                 <Input
-                    placeholder="Name" onChangeText={e => setRegisterName(e)}>
+                    placeholder="Name" value={registerName} onChangeText={e => setRegisterName(e)}>
                 </Input>
                 <Text style={{ marginTop: 30, fontSize: 17.5 }}>Date of Birth</Text>
                 <View style={styles.datePicker}>

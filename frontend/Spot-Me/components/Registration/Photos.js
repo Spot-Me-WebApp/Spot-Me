@@ -46,7 +46,7 @@ const Photos = (props) => {
     }
     const [uploadedImages, setUploadedImages] = useState(null)
     const [photoDeleted, setPhotoDeleted] = useState(false)
-    const { username, password, name, dob, bio, expLevel, methods } = props.route.params
+    const { username, password, name, dob, bio, expLevel, methods, provider, uri } = props.route.params
 
     //Send inputted photos to backend
     const uploadPhoto = async () => {
@@ -92,7 +92,9 @@ const Photos = (props) => {
                     bio: bio,
                     expLevel: expLevel,
                     methods: methods,
-                    imageData: uploadedImages
+                    imageData: uploadedImages,
+                    provider: provider || undefined,
+                    uri: uri || undefined
                 },
                 withCredentials: true
             }).then((response) => {
@@ -104,19 +106,35 @@ const Photos = (props) => {
     }
 
     const loginUser = async () => {
-        await axios({
-            url: `${SERVER_PORT}/login`,
-            method: 'post',
-            data: {
-                username: username,
-                password: password
-            },
-            withCredentials: true
-        }).then((response) => {
-            props.navigation.navigate("BottomTabs")
-        })
-            .catch((error) => console.log(error, error.stack))
+        if (!(provider && uri)) {
+            await axios({
+                url: `${SERVER_PORT}/login`,
+                method: 'post',
+                data: {
+                    username: username,
+                    password: password
+                },
+                withCredentials: true
+            }).then((response) => {
+                props.navigation.navigate("BottomTabs")
+            })
+                .catch((error) => console.log(error, error.stack))
+        }
+        else {
+            await axios({
+                url: `${SERVER_PORT}/login/oauth`,
+                method: 'post',
+                data: {
+                    uri: uri
+                },
+                withCredentials: true
+            }).then((response) => {
+                props.navigation.navigate("BottomTabs")
+            })
+                .catch((error) => console.log(error, error.stack))
+        }
     }
+
     //-----------------------------------------------------------------Functions to choose image from library, or open camera-------------------------------------
     const choosePhoto = async (num) => {
         const result = await ImagePicker.launchImageLibraryAsync({

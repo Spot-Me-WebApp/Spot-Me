@@ -8,65 +8,73 @@ import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowBut
 import axios from 'axios'
 import { SERVER_PORT, GOOGLE_CLIENT_ID } from '@env'
 import * as Google from 'expo-auth-session/providers/google'
-import * as WebBrowser from 'expo-web-browser'
 import { AntDesign } from '@expo/vector-icons'
 
 const { height, width } = Dimensions.get("screen")
 
-WebBrowser.maybeCompleteAuthSession();
-
 const Register = (props) => {
     const [registerUsername, setRegisterUsername] = useState("")
     const [registerPassword, setRegisterPassword] = useState("")
-    const [googleAccessToken, setGoogleAccessToken] = useState();
-    let [googleUserInfo, setGoogleUserInfo] = useState();
-    let [userInfoReceived, setUserInfoReceived] = useState(false);
+    let [googleAccessToken, setGoogleToken] = useState("");
+    setGoogleToken = (str) => {
+        googleAccessToken += str;
+    }
+    let [googleUserInfo, setGoogleUserInfo] = useState({});
+    setGoogleUserInfo = (obj) => {
+        googleUserInfo = obj;
+    }
+
     const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
         expoClientId: GOOGLE_CLIENT_ID
     })
 
     const goNextForm = () => {
-        if (registerUsername && registerPassword && !googleUserInfo) {
+        if (registerUsername && registerPassword) {
             props.navigation.navigate('NameDOB', { username: registerUsername, password: registerPassword })
         }
     }
 
 
     useEffect(() => {
-        if (googleResponse?.type === 'success') {
-            setGoogleAccessToken(googleResponse.authentication.accessToken)
-            getGoogleUserData()
+        async function fetchData() {
+            if (googleResponse?.type === "success") {
+                setGoogleToken(googleResponse.authentication.accessToken)
+                console.log(googleAccessToken || "none")
+                await getGoogleUserData()
+
+            }
         }
+        fetchData();
     }, [googleResponse])
 
     async function getGoogleUserData() {
-        await axios.get("https://www.googleapis.com/userinfo/v2/me", {
-            headers: {
-                Authorization: `Bearer ${googleAccessToken}`
-            },
-            withCredentials: true
-        })
-            .then((response) => {
-                if (response.data) {
-                    setGoogleUserInfo(googleUserInfo = {
+        if (googleAccessToken) {
+            axios.get("https://www.googleapis.com/userinfo/v2/me", {
+                headers: {
+                    Authorization: `Bearer ${googleAccessToken}`
+                },
+                withCredentials: true
+            })
+                .then((response) => {
+                    setGoogleUserInfo({
                         username: response.data.email,
-                        name: response.data.given_name + ' ' + response.data.family_name,
+                        name: response.data.name,
                         provider: "google",
                         uri: response.data.id
                     })
-                    setUserInfoReceived(!userInfoReceived)
-                }
-            })
-            .catch((err) => console.log(err))
+                    console.log(googleUserInfo)
+                    const { name, provider, uri, username } = googleUserInfo;
+                    props.navigation.navigate("NameDOB", { name, provider, uri, username })
+                })
+                .catch((err) => console.log(err, err.message))
+        } else { console.log("no token") }
     }
 
-
-    useEffect(() => {
-        if (googleUserInfo && userInfoReceived) {
-            props.navigation.navigate("NameDOB", { username: googleUserInfo.username, name: googleUserInfo.name, uri: googleUserInfo.uri, provider: googleUserInfo.provider })
-        }
-    }, [googleUserInfo, userInfoReceived])
-
+    // useEffect(() => {
+    //     if (googleUserInfo) {
+    //         console.log(googleUserInfo)
+    //     }
+    // })
 
     if (Platform.OS === 'android') {
         return (
@@ -75,8 +83,12 @@ const Register = (props) => {
                     source={require('../../assets/Spot_Me_Logo.png')}
                     style={styles.logo}
                 />
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Text>Sign up with: </Text>
+                <View style={{ marginVertical: 20 }}>
+                    <AntDesign.Button name="google" backgroundColor="#f25c54" style={styles.socialBtn} onPress={() => googlePromptAsync()}
+                        disabled={!googleRequest}>Sign up with Google</AntDesign.Button>
+                </View>
+                <View>
+                    <AntDesign.Button name="facebook-square" style={styles.socialBtn}>Sign up with Facebook</AntDesign.Button>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
                     <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
@@ -108,7 +120,7 @@ const Register = (props) => {
                     style={styles.logo}
                 />
                 <View style={{ marginVertical: 20 }}>
-                    <AntDesign.Button name="google" backgroundColor="#f25c54" style={styles.socialBtn} onPress={() => googlePromptAsync({ useProxy: true })}
+                    <AntDesign.Button name="google" backgroundColor="#f25c54" style={styles.socialBtn} onPress={() => googlePromptAsync()}
                         disabled={!googleRequest}>Sign up with Google</AntDesign.Button>
                 </View>
                 <View>

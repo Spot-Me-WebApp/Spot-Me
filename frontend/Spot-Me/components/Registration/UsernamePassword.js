@@ -6,8 +6,9 @@ import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { Input } from '../../Shared/Forms/Input'
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import axios from 'axios'
-import { SERVER_PORT, GOOGLE_CLIENT_ID } from '@env'
+import { SERVER_PORT, GOOGLE_CLIENT_ID, FACEBOOK_APP_ID } from '@env'
 import * as Google from 'expo-auth-session/providers/google'
+import * as Facebook from 'expo-auth-session/providers/facebook'
 import { AntDesign } from '@expo/vector-icons'
 
 const { height, width } = Dimensions.get("screen")
@@ -28,6 +29,21 @@ const Register = (props) => {
         expoClientId: GOOGLE_CLIENT_ID
     })
 
+    const [fbRequest, fbResponse, fbPromtAsync] = Facebook.useAuthRequest({
+        expoClientId: FACEBOOK_APP_ID,
+        redirectUri: "https://auth.expo.io/@mlukovsky2/Spot-Me"
+    })
+
+    let [fbAccessToken, setFbToken] = useState("");
+    setFbToken = (str) => {
+        fbAccessToken += str;
+    }
+
+    let [fbUserInfo, setFbUserInfo] = useState({});
+    setFbUserInfo = (obj) => {
+        fbUserInfo = obj;
+    }
+
     const goNextForm = () => {
         if (registerUsername && registerPassword) {
             props.navigation.navigate('NameDOB', { username: registerUsername, password: registerPassword })
@@ -36,7 +52,7 @@ const Register = (props) => {
 
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchGoogleData() {
             if (googleResponse?.type === "success") {
                 setGoogleToken(googleResponse.authentication.accessToken)
                 console.log(googleAccessToken || "none")
@@ -44,7 +60,7 @@ const Register = (props) => {
 
             }
         }
-        fetchData();
+        fetchGoogleData();
     }, [googleResponse])
 
     async function getGoogleUserData() {
@@ -70,11 +86,36 @@ const Register = (props) => {
         } else { console.log("no token") }
     }
 
-    // useEffect(() => {
-    //     if (googleUserInfo) {
-    //         console.log(googleUserInfo)
-    //     }
-    // })
+    useEffect(() => {
+        async function fetchFacebookData() {
+            if (fbResponse?.type === "success") {
+                setFbToken(fbResponse.authentication.accessToken)
+                await getFbUserData();
+            }
+        }
+        fetchFacebookData();
+    }, [fbResponse])
+
+    async function getFbUserData() {
+        if (fbAccessToken) {
+            axios.get(`https://graph.facebook.com/me?fields=id,name,email&access_token=${fbAccessToken}`, {
+                withCredentials: true
+            })
+                .then((response) => {
+                    setFbUserInfo({
+                        username: response.data.email,
+                        name: response.data.name,
+                        provider: "facebook",
+                        uri: response.data.id
+                    })
+                    console.log(fbUserInfo)
+                    const { name, provider, uri, username } = fbUserInfo;
+                    props.navigation.navigate("NameDOB", { name, provider, uri, username })
+                })
+                .catch((err) => console.log(err, err.message))
+        } else { console.log("no token") }
+    }
+
 
     if (Platform.OS === 'android') {
         return (
@@ -88,7 +129,7 @@ const Register = (props) => {
                         disabled={!googleRequest}>Sign up with Google</AntDesign.Button>
                 </View>
                 <View>
-                    <AntDesign.Button name="facebook-square" style={styles.socialBtn}>Sign up with Facebook</AntDesign.Button>
+                    <AntDesign.Button name="facebook-square" style={styles.socialBtn} disabled={!fbRequest} onPress={() => fbPromtAsync()}>Sign up with Facebook</AntDesign.Button>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
                     <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />
@@ -124,7 +165,7 @@ const Register = (props) => {
                         disabled={!googleRequest}>Sign up with Google</AntDesign.Button>
                 </View>
                 <View>
-                    <AntDesign.Button name="facebook-square" style={styles.socialBtn}>Sign up with Facebook</AntDesign.Button>
+                    <AntDesign.Button name="facebook-square" style={styles.socialBtn} disabled={!fbRequest} onPress={() => fbPromtAsync()}>Sign up with Facebook</AntDesign.Button>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 30 }}>
                     <View style={{ flex: 1, height: 2, backgroundColor: 'black' }} />

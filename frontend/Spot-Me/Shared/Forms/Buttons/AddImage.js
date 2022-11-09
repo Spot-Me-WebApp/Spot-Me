@@ -20,6 +20,7 @@ const AddImage = ({
         <TouchableOpacity
             style={{
                 ...styles.container,
+                ...styles.addImage,
                 ...buttonStyle,
                 backgroundColor: buttonColor || '#512DA8',
             }}
@@ -50,7 +51,6 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 50,
         backgroundColor: '#512DA8',
-        height: 48,
         alignItems: 'center',
         justifyContent: 'center',
     },

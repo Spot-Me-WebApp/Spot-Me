@@ -62,10 +62,8 @@ const Profile = (props) => {
                         <View style={{
                             paddingHorizontal: 40,
                             backgroundColor: "#FFFFFF",
-                            height: "40%",
                             borderBottomLeftRadius: 40,
-                            borderBottomRightRadius: 40,
-
+                            borderBottomRightRadius: 40
                         }}>
                             <View style={{ flexDirection: "row", width: "100%", marginTop: 10 }}>
 
@@ -79,7 +77,7 @@ const Profile = (props) => {
 
                             </View>
                             {userData.images &&
-                                <View style={styles.mainPicture}>
+                                <View style={styles.header}>
                                     <Image source={{ uri: userData.images[0].url }} style={{ alignSelf: 'center', height: 115, width: 115, borderRadius: 115 / 2 }} />
                                     <View style={{ alignItems: 'center' }}>
                                         <Text>
@@ -88,13 +86,15 @@ const Profile = (props) => {
                                         </Text>
                                         <Text style={styles.text}>{userData.expLevel}</Text>
                                         <Text style={styles.text}>Passions:</Text>
-                                        {(userData.methods.map(method => {
-                                            return (
-                                                <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width }}>
-                                                    <Text style={{ color: 'white', padding: 10, backgroundColor: '#202020', borderRadius: 20 }}>   {method}</Text>
-                                                </View>
-                                            )
-                                        }))}
+                                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width, marginTop: 10, }}>
+                                            {(userData.methods.map(method => {
+                                                return (
+                                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }}>
+                                                        <Text style={{ color: 'white', padding: 10 }}>{method}</Text>
+                                                    </View>
+                                                )
+                                            }))}
+                                        </View>
                                         <Text style={styles.bio}>
                                             {userData.bio}
                                         </Text>
@@ -102,28 +102,29 @@ const Profile = (props) => {
                                     </View>
                                 </View>
                             }
-
-                            <View style={{ marginVertical: 30 }}>
-                                {/* spacing between header and body */}
-                            </View>
-
                         </View>
-                        <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width }}>
-                            {userData.images.length > 1 &&
-                                userData.images.filter(i => i.position > 0).map(i => {
+
+                        <View style={{ marginVertical: 30 }}>
+                            {/* spacing between header and body */}
+                        </View>
+                        {userData.images.length > 1 &&
+                            <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width }}>
+
+                                {userData.images.filter(i => i.position > 0).map(i => {
                                     return (
                                         <Image source={{ uri: userData.images[i.position].url }} style={{
                                             height: 200, width: '40%', marginVertical: 10, marginHorizontal: 10, borderRadius: 20
                                         }} />
                                     )
-                                })
-                            }
-                        </View>
-                        <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
+                                })}
+
+                            </View>
+                        }
+                        {/* <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
                             <Text style={styles.bio}>
                                 {userData.bio}
                             </Text>
-                        </View>
+                        </View> */}
 
                         <Button title="Logout" onPress={logoutUser}></Button>
 
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
     name: {
         color: '#202020',
         fontFamily: 'Thonburi',
-        fontSize: 28,
+        fontSize: 26,
         fontWeight: 'bold'
     },
     age: {
@@ -161,11 +162,12 @@ const styles = StyleSheet.create({
         fontWeight: '300'
     },
     bio: {
-        color: 'white',
+        color: '#202020',
         fontFamily: 'Thonburi',
         fontSize: 14,
+        marginVertical: 10
     },
-    mainPicture: {
+    header: {
         paddingTop: height * .05,
         flexDirection: 'column'
     }

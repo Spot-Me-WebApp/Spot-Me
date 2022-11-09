@@ -1,6 +1,6 @@
 //Fifth step of registration process
 import { React, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, Image, DevSettings } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, Image } from 'react-native';
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 import { XCircleBtn } from '../../Shared/Forms/Buttons/XCircleBtn';
 import axios from 'axios';
@@ -13,13 +13,6 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 
 
 const Photos = (props) => {
-    //FOR TESTING PURPOSES, CAN REMOVE LATER
-    // useEffect(() => {
-    //     function goNext() {
-    //         props.navigation.navigate("ChooseGym")
-    //     }
-    //     goNext()
-    // }, [])
 
     let [boxes, changeBox] = useState([false, false, false, false, false, false])
     changeBox = (index) => {
@@ -38,30 +31,27 @@ const Photos = (props) => {
             console.log(registerProfilePics.map(p => p.position))
         }
         else {
-            registerProfilePics.splice(pos, 1)
+            const photoToBeDeleted = registerProfilePics.find(element => element.position === pos)
+            registerProfilePics.splice(registerProfilePics.indexOf(photoToBeDeleted), 1)
             setPhotoDeleted(!photoDeleted)
             setProfilePics(registerProfilePics);
             console.log(registerProfilePics.map(p => p.position))
         }
     }
-    const [uploadedImages, setUploadedImages] = useState(null)
+
     const [photoDeleted, setPhotoDeleted] = useState(false)
     const { username, password, name, dob, bio, expLevel, methods, provider, uri } = props.route.params
 
     //Send inputted photos to backend
-    const uploadPhoto = async () => {
-        await axios({
-            url: `${SERVER_PORT}/image`,
-            method: 'post',
-            data: {
-                images: registerProfilePics
-            }
-        })
-            .then((response) => {
-                const data = JSON.parse(response.request._response);
-                setUploadedImages(data)
+
+
+    const goNextForm = () => {
+        if (registerProfilePics.length) {
+            props.navigation.navigate('ChooseGym', {
+                username: username, password: password, name: name, dob: dob, bio: bio, expLevel: expLevel,
+                methods: methods, registerProfilePics: registerProfilePics, provider: provider || undefined, uri: uri || undefined
             })
-            .catch((err) => console.log(err, err.stack))
+        }
     }
 
     const resizePhoto = async (imageUri, num) => {
@@ -79,61 +69,7 @@ const Photos = (props) => {
         changeBox(num);
     }
 
-    const registerUser = async () => {
-        if (uploadedImages) {
-            await axios({
-                url: `${SERVER_PORT}/register`,
-                method: 'post',
-                data: {
-                    username: username,
-                    password: password,
-                    name: name,
-                    dob: dob,
-                    bio: bio,
-                    expLevel: expLevel,
-                    methods: methods,
-                    imageData: uploadedImages,
-                    provider: provider || undefined,
-                    uri: uri || undefined
-                },
-                withCredentials: true
-            }).then((response) => {
-                console.log(response.data)
-                loginUser()
-            })
-                .catch((error) => console.log(error, error.stack))
-        }
-    }
 
-    const loginUser = async () => {
-        if (!(provider && uri)) {
-            await axios({
-                url: `${SERVER_PORT}/login`,
-                method: 'post',
-                data: {
-                    username: username,
-                    password: password
-                },
-                withCredentials: true
-            }).then((response) => {
-                props.navigation.navigate("BottomTabs")
-            })
-                .catch((error) => console.log(error, error.stack))
-        }
-        else {
-            await axios({
-                url: `${SERVER_PORT}/login/oauth`,
-                method: 'post',
-                data: {
-                    uri: uri
-                },
-                withCredentials: true
-            }).then((response) => {
-                props.navigation.navigate("BottomTabs")
-            })
-                .catch((error) => console.log(error, error.stack))
-        }
-    }
 
     //-----------------------------------------------------------------Functions to choose image from library, or open camera-------------------------------------
     const choosePhoto = async (num) => {
@@ -347,9 +283,8 @@ const Photos = (props) => {
                         onPress={() => handlePress(choosePhoto, takePhoto, 5)}
                     />)}
             </View>
-            {(uploadedImages) && registerUser()}
 
-            <RightArrowBtn onPress={uploadPhoto} style={{ position: 'absolute', bottom: height * .07, right: 30 }} />
+            <RightArrowBtn onPress={goNextForm} style={{ position: 'absolute', bottom: height * .07, right: 30 }} />
             <LeftArrowBtn onPress={() => { props.navigation.goBack() }} style={{ position: 'absolute', bottom: height * .07, left: 30 }} />
         </View>
     )

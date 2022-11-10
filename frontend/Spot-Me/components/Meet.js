@@ -137,6 +137,7 @@ export default class Meet extends Component {
                             style={{flex:1,height:null, width: null, resizeMode: 'cover', borderRadius: 20}}
                             source={item.uri}
                             />
+                            
     
                         </Animated.View>
                         </TouchableOpacity>

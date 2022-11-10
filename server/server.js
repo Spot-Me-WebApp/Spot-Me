@@ -15,7 +15,23 @@ const passport = require('passport');
 const multer = require('multer')
 const { storage, cloudinary } = require('./cloudinary');
 const upload = multer({ storage })
+const http = require("http").Server(app)
 
+//Socket.IO Connection ----------------------------------------------------------------------------
+const socketIO = require('socket.io')(http, {
+    cors: {
+        origin: "<http://localhost:3000"
+    }
+});
+
+socketIO.on('connection', (socket) => {
+    console.log('user connected !');
+
+    socket.on('disconnect', () => {
+        socket.disconnect()
+        console.log('user disconnected !');
+    });
+});
 
 //Database Connection-------------------------------------------------------------------------------
 mongoose.connect(process.env.DB_URL, {
@@ -99,19 +115,22 @@ app.post('/register', async (req, res) => {
         return res.send("User already exists");
     }
     console.log(req.body)
-    const { username, password, name, dob, bio, expLevel, methods, imageData, provider, uri } = req.body;
+    const { username, password, name, dob, bio, expLevel, methods, imageData, provider, uri, gyms } = req.body;
     if (provider && uri) {
         const newUser = new User({ username, name, dob, bio, expLevel, methods, provider, uri });
         imageData.forEach(i => newUser.images.push(i))
+        gyms.forEach(g => newUser.gyms.push(g))
         await newUser.save();
         return res.send(newUser)
     } else {
         const newUser = new User({ username, name, dob, bio, expLevel, methods });
         imageData.forEach(i => newUser.images.push(i))
+        gyms.forEach(g => newUser.gyms.push(g))
         const registeredUser = await User.register(newUser, password);
         res.send(registeredUser)
     }
 })
+
 
 
 //For providing a user's missing data after authentication with google or facebook.

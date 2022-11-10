@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Image, StyleSheet, Button, TouchableOpacity, Text } from 'react-native'
-import { useActionSheet } from '@expo/react-native-action-sheet';
+import {Image, StyleSheet, TouchableOpacity, Text } from 'react-native'
 
 
 const AddImage = ({
@@ -25,7 +24,8 @@ const AddImage = ({
                 backgroundColor: buttonColor || '#512DA8',
             }}
             onPress={onPress}>
-            {imageSource ? <Image source={imageSource} style={{ width: '100%', height: '100%', aspectRatio: 0.8, }} />
+                {/* aspectRatio for Mitchell: .8 & Dennies: .66 */}
+            {imageSource ? <Image source={imageSource} style={{ width: '100%', height: '100%', aspectRatio: 0.65, borderRadius: 10}} />
                 :
                 <Text
                     style={{ ...styles.title, ...textStyle, color: titleColor || '#fff' }}>

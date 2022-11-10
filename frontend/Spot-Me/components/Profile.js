@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button, DevSettings, StatusBar, Image, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, StatusBar, Image, SafeAreaView, Dimensions } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
@@ -84,12 +84,20 @@ const Profile = (props) => {
                                             <Text style={styles.name}>{userData.name}  </Text>
                                             <Text style={styles.age}>{calculateAge(userData.dob)}</Text>
                                         </Text>
+                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                            <Image source={require('../assets/SpotMarker.png')} style={{ width: 30, height: 30 }} />
+                                            {userData.gyms.map((gym, index) => {
+                                                return (
+                                                    <Text style={{ textAlign: 'center', marginTop: 10 }}>{gym.name} <Text style={{ fontWeight: '200', fontSize: 14 }}>{gym.address}</Text></Text>
+                                                )
+                                            })}
+                                        </View>
                                         <Text style={styles.text}>{userData.expLevel}</Text>
                                         <Text style={styles.text}>Passions:</Text>
                                         <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width, marginTop: 10, }}>
-                                            {(userData.methods.map(method => {
+                                            {(userData.methods.map((method, index) => {
                                                 return (
-                                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }}>
+                                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }} key={index}>
                                                         <Text style={{ color: 'white', padding: 10 }}>{method}</Text>
                                                     </View>
                                                 )
@@ -110,21 +118,16 @@ const Profile = (props) => {
                         {userData.images.length > 1 &&
                             <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width }}>
 
-                                {userData.images.filter(i => i.position > 0).map(i => {
+                                {userData.images.filter(i => i.position > 0).map((i, index) => {
                                     return (
                                         <Image source={{ uri: userData.images[i.position].url }} style={{
                                             height: 200, width: '40%', marginVertical: 10, marginHorizontal: 10, borderRadius: 20
-                                        }} />
+                                        }} key={index} />
                                     )
                                 })}
 
                             </View>
                         }
-                        {/* <View style={{ alignSelf: 'center', justifyContent: 'center' }}>
-                            <Text style={styles.bio}>
-                                {userData.bio}
-                            </Text>
-                        </View> */}
 
                         <Button title="Logout" onPress={logoutUser}></Button>
 

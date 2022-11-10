@@ -9,6 +9,13 @@ const imageSchema = {
     position: Number
 }
 
+const gymSchema = {
+    latitude: Number,
+    longitude: Number,
+    name: String,
+    address: String
+}
+
 const userSchema = new Schema({
 
     //This will only exist for users who register with google or facebook. uri is a unique id associated with a user's google/facebook account
@@ -55,7 +62,8 @@ const userSchema = new Schema({
         required: false,
         unique: false
     },
-    images: [imageSchema]
+    images: [imageSchema],
+    gyms: [gymSchema]
 })
 
 //adds username and password fields to userSchema

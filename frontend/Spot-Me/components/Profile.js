@@ -19,6 +19,7 @@ const Profile = (props) => {
             })
                 .then((response) => {
                     if (response.data) {
+                        console.log(response.data)
                         setUserData(response.data)
                     }
                 })
@@ -88,7 +89,7 @@ const Profile = (props) => {
                                             <Image source={require('../assets/SpotMarker.png')} style={{ width: 30, height: 30 }} />
                                             {userData.gyms.map((gym, index) => {
                                                 return (
-                                                    <Text style={{ textAlign: 'center', marginTop: 10 }}>{gym.name} <Text style={{ fontWeight: '200', fontSize: 14 }}>{gym.address}</Text></Text>
+                                                    <Text key={index} style={{ textAlign: 'center', marginTop: 10 }}>{gym.name} <Text style={{ fontWeight: '200', fontSize: 14 }}>{gym.address}</Text></Text>
                                                 )
                                             })}
                                         </View>

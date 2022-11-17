@@ -11,7 +11,7 @@ const Chat = (props) => {
 
     return (
         <SafeAreaView style={styles.header}>
-            <Text style={{ fontWeight: bold, fontSize: 24, fontFamily: 'Bodoni 72'} }>Chat</Text>
+            <Text style={{ fontWeight: 'bold', fontSize: 24, fontFamily: 'Bodoni 72' }}>Chat</Text>
 
             {/* <ScrollView
             
@@ -25,9 +25,9 @@ const Chat = (props) => {
             ))}
             </View>
             </ScrollView> */}
-            
 
-            
+
+
 
 
 
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     user: {
         width: 100,
         height: 10,
-        margin: 8, 
+        margin: 8,
         borderRadius: 50,
         borderWidth: 2,
         padding: 3,

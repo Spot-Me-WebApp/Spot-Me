@@ -68,10 +68,8 @@ app.use(session({
 }))
 app.use(flash());
 
-//Import passport local, google, and facebook strategy config
+//Import passport local strategy config
 require('./passportLocalConfig')(passport);
-require('./passportGoogleConfig')(passport);
-require('./passportFacebookConfig')(passport);
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -108,7 +106,7 @@ app.post('/login/oauth', async (req, res) => {
         res.json(req.user)
     })
 })
-//For local registration
+//For user registration
 app.post('/register', async (req, res) => {
     const userExists = await User.findOne({ username: req.body.username }).count() > 0 ? true : false;
     if (userExists) {
@@ -132,22 +130,21 @@ app.post('/register', async (req, res) => {
 })
 
 
-
-//For providing a user's missing data after authentication with google or facebook.
-app.post('/registerOauth', async (req, res) => {
-    console.log(req.body)
-    const { _id, dob, bio, expLevel, methods } = req.body;
-    const user = await User.findById(_id);
-    user.dob = dob;
-    user.bio = bio;
-    user.expLevel = expLevel;
-    user.methods = methods;
-    await user.save();
-    return res.send(user);
-})
-
 app.get('/getUser/:id', async (req, res) => {
     const user = await User.findOne({ _id: req.params.id });
+    res.json(user)
+})
+
+app.put('/edituser', async (req, res) => {
+    console.log(req.body)
+    const { bio, expLevel, methods, imageData, id } = req.body;
+    const user = await User.findById(id)
+    await user.updateOne(
+        { bio: bio, expLevel: expLevel }
+    )
+    await user.updateOne({ $addToSet: { methods: methods } })
+    imageData.forEach(i => user.images.push(i))
+    await user.save();
     res.json(user)
 })
 
@@ -166,21 +163,6 @@ app.get('/logout', (req, res) => {
     })
 })
 
-//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
-//When a user clicks sign up with google
-app.post('/register/google', async (req, res) => {
-
-});
-
-//Processes the authentication response and logs the user in
-
-//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
-
-//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
-app.get('/login/facebook', passport.authenticate('facebook'));
-
-
-// //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
 
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
@@ -201,6 +183,38 @@ app.post('/image', async (req, res) => {
         })
         .catch((err) => console.log(err))
     //Promise.all turns the array of promises into one promise
+    console.log(uploadedImages)
+    res.send(uploadedImages)
+})
+
+app.put('/image', async (req, res) => {
+    const user = await User.findById(req.body.id)
+    const newImages = req.body.images.filter(i => i.isNew);
+    for (let img of user.images) {
+        const inputImg = req.body.images.find(element => element.position === img.position)
+        //if user has image with position x, and req.body.images doesn't have img with position x OR 
+        //img with position x isNew, then delete that image from cloudinary and database
+        if (!inputImg || inputImg.isNew) {
+            await cloudinary.uploader.destroy("Spot-Me/" + img.filename.substring(0, img.filename.indexOf('.')));
+            await user.updateOne({ $pull: { images: { position: img.position } } });
+            await user.save();
+        }
+    }
+    //Upload new images
+    const responses = [];
+    const uploadedImages = [];
+    newImages.forEach((img) => {
+        const response = cloudinary.uploader.upload(img.uri, {
+            folder: "Spot-Me/"
+        })
+        responses.push(response);
+    })
+    await Promise.all(responses)
+        .then((response) => {
+            console.log('all promises resolved')
+            response.map((r, i) => uploadedImages.push({ url: r.secure_url, filename: r.public_id.slice(r.public_id.indexOf('/') + 1) + '.' + r.format, position: newImages[i].position }))
+        })
+        .catch((err) => console.log(err))
     console.log(uploadedImages)
     res.send(uploadedImages)
 })

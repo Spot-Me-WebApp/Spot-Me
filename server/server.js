@@ -136,16 +136,21 @@ app.get('/getUser/:id', async (req, res) => {
 })
 
 app.put('/edituser', async (req, res) => {
-    console.log(req.body)
     const { bio, expLevel, methods, imageData, id } = req.body;
     const user = await User.findById(id)
     await user.updateOne(
         { bio: bio, expLevel: expLevel }
     )
+    //add new methods to user's methods array
     await user.updateOne({ $addToSet: { methods: methods } })
+    //deletedMethods is an array with the user's methods that are not found in the inputted methods array
+    const deletedMethods = user.methods.filter(el => !methods.includes(el))
+    await user.updateOne({ $pull: { methods: { $in: deletedMethods } } })
     imageData.forEach(i => user.images.push(i))
     await user.save();
-    res.json(user)
+    const updatedUser = await User.findById(id)
+    console.log(updatedUser)
+    res.json(updatedUser)
 })
 
 app.get('/isLoggedIn', (req, res) => {

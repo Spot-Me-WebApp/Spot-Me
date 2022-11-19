@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, StatusBar, Image, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Button, FlatList } from 'react-native'
+import { View, Text, StyleSheet, StatusBar, Image, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Button, Alert } from 'react-native'
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
 import AddImage from '../Shared/Forms/Buttons/AddImage'
@@ -9,15 +9,16 @@ import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync } from 'expo-image-manipulator';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
+import { EXP_LVL, METHODS } from '../Shared/UserDataEnums'
 
 const { height, width } = Dimensions.get("screen")
 
 const EditProfile = (props) => {
+
     const { userData } = props.route.params
     const [Bio, setBio] = useState(userData.bio)
-    const [dataSaved, setDataSaved] = useState(false)
-    const [Exp, setExp] = useState(userData.expLevel)
-    const [Methods, setMethods] = useState([])
+    const [Exp, setExp] = useState({ item: userData.expLevel, id: EXP_LVL.find(el => el.item === userData.expLevel).id })
+    const [Methods, setMethods] = useState(userData.methods.map(m => ({ item: m, id: METHODS.find(el => el.item === m).id })))
     let [boxes, changeBox] = useState(Array(userData.images.length).fill(true, 0, userData.images.length))
     changeBox = (index) => {
         //replace element at boxes[index] to opposite boolean value
@@ -47,47 +48,6 @@ const EditProfile = (props) => {
     const [photoDeleted, setPhotoDeleted] = useState(false)
     const [uploadedImages, setUploadedImages] = useState(null)
 
-    const EXP_LVL = [
-        {
-            item: 'Beginner',
-            id: 'BGN',
-        },
-        {
-            item: 'Intermediate',
-            id: 'INT',
-        },
-        {
-            item: 'Advanced',
-            id: 'ADV',
-        },
-    ]
-
-    const METHODS = [
-        {
-            item: 'Powerlifting',
-            id: 'PWR',
-        },
-        {
-            item: 'Bodybuilding',
-            id: 'BD',
-        },
-        {
-            item: 'Cardio',
-            id: 'CAR',
-        },
-        {
-            item: 'Filming',
-            id: 'FLM',
-        },
-        {
-            item: 'Calisthenics',
-            id: 'CLS',
-        },
-        {
-            item: 'Olympic Lifting',
-            id: 'OLY',
-        },
-    ]
 
     function onMultiChange() {
         return (item) => setMethods(xorBy(Methods, [item], 'id'))
@@ -184,6 +144,49 @@ const EditProfile = (props) => {
     }
     //-----------------------------------------------------------------Functions to choose image from library, or open camera-------------------------------------
 
+
+    const createSaveAlert = () => {
+        Alert.alert('Are you sure you want to save changes?', undefined, [{
+            text: 'Cancel',
+            style: 'cancel'
+        },
+        {
+            text: 'Save',
+            onPress: () => updatePhotos(),
+        }]);
+    }
+    const createDiscardAlert = () => {
+        Alert.alert('Are you sure you want to discard changes?', undefined, [{
+            text: 'Cancel',
+            style: 'cancel'
+        },
+        {
+            text: 'Discard',
+            style: 'destructive',
+            onPress: () => {
+                setBio(userData.bio);
+                setExp({ item: userData.expLevel, id: EXP_LVL.find(el => el.item === userData.expLevel).id })
+                setMethods(userData.methods.map(m => ({ item: m, id: METHODS.find(el => el.item === m).id })))
+                setProfilePics(userData.images.map(img => ({ uri: img.url, position: img.position, isNew: false })))
+                setPhotoDeleted(false)
+                setUploadedImages(null)
+                props.navigation.navigate("Profile")
+            }
+        }])
+    }
+
+    useEffect(() => {
+        const discardAlert = props.navigation.addListener('blur', () => {
+            setBio(userData.bio);
+            setExp({ item: userData.expLevel, id: EXP_LVL.find(el => el.item === userData.expLevel).id })
+            setMethods(userData.methods.map(m => ({ item: m, id: METHODS.find(el => el.item === m).id })))
+            setProfilePics(userData.images.map(img => ({ uri: img.url, position: img.position, isNew: false })))
+            setPhotoDeleted(false)
+            setUploadedImages(null)
+        })
+        return discardAlert
+    }, [props.navigation])
+
     const updatePhotos = async () => {
         await axios({
             url: `${SERVER_PORT}/image`,
@@ -216,9 +219,8 @@ const EditProfile = (props) => {
                 },
                 withCredentials: true
             }).then((response) => {
-                console.log(response.data)
-                setDataSaved(!dataSaved)
-                props.navigation.navigate("Profile")
+                const data = response.data;
+                props.navigation.navigate("Profile", { data: data })
             })
                 .catch((error) => console.log(error, error.stack))
         }
@@ -228,9 +230,11 @@ const EditProfile = (props) => {
         updateUser();
     }, [uploadedImages])
 
+
+
     return (
         <KeyboardAvoidingView behavior='padding' style={styles.container}>
-            <ScrollView style={{ backgroundColor: '#202020', flex: 1 }} >
+            <ScrollView style={{ backgroundColor: '#202020', flex: 1 }}>
                 <View style={{ alignItems: 'flex-start', flex: 1 }}>
                     <Text style={styles.name}>{userData.name}</Text>
                 </View>
@@ -370,6 +374,7 @@ const EditProfile = (props) => {
                         />)}
                 </View>
                 <View style={{ marginLeft: 25, marginTop: 15 }}></View>
+                <Text style={styles.bio}>Username: {userData.username}</Text>
                 <Text style={styles.bio}>Date of Birth: {userData.dob.substr(0, 10)}</Text>
                 <Text style={styles.bio}>Bio</Text>
                 <View style={{ borderWidth: 2, borderColor: 'gray', borderRadius: 10, width: width * .8, height: 180, alignSelf: 'center', }}>
@@ -408,8 +413,8 @@ const EditProfile = (props) => {
                         inputFilterStyle={{ color: 'white' }}
                     />
                 </View>
-                <Button title="Save" onPress={updatePhotos} />
-                <Button title="Discard" />
+                <Button title={"Save"} onPress={createSaveAlert} />
+                <Button title={"Discard"} onPress={createDiscardAlert} />
             </ScrollView>
         </KeyboardAvoidingView >
 

@@ -19,14 +19,13 @@ const Profile = (props) => {
             })
                 .then((response) => {
                     if (response.data) {
-                        console.log(response.data)
                         setUserData(response.data)
                     }
                 })
                 .catch((error) => console.log(error));
         }
         fetchData();
-    }, [])
+    }, [props.route.params])
 
     const logoutUser = async () => {
         await axios({
@@ -121,7 +120,7 @@ const Profile = (props) => {
 
                                 {userData.images.filter(i => i.position > 0).map((i, index) => {
                                     return (
-                                        <Image source={{ uri: userData.images[i.position].url }} style={{
+                                        <Image source={{ uri: i.url }} style={{
                                             height: 200, width: '40%', marginVertical: 10, marginHorizontal: 10, borderRadius: 20
                                         }} key={index} />
                                     )

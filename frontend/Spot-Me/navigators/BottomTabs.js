@@ -4,7 +4,7 @@ import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icon
 import Meet from "../components/Meet";
 import Schedule from "../components/Schedule";
 
-import Chat from "../components/Chat/Chat";
+import Chat from "../components/Chat";
 import Profile from "../components/Profile";
 import EditProfile from "../components/EditProfile"
 

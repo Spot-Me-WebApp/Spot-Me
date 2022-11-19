@@ -185,8 +185,21 @@ app.get('/logout', (req, res) => {
     })
 })
 
+//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
+//When a user clicks sign up with google
+app.post('/register/google', async (req, res) => {
+
+});
+
+//Processes the authentication response and logs the user in
+
+//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
+
+//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
+app.get('/login/facebook', passport.authenticate('facebook'));
 
 
+// //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
 
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------

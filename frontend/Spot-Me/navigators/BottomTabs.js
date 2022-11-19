@@ -3,7 +3,8 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"
 import Meet from "../components/Meet";
 import Schedule from "../components/Schedule";
-import Chat from "../components/Chat";
+
+import Chat from "../components/Chat/Chat";
 import Profile from "../components/Profile";
 import EditProfile from "../components/EditProfile"
 

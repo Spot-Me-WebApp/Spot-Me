@@ -16,8 +16,11 @@ const multer = require('multer')
 const { storage, cloudinary } = require('./cloudinary');
 const upload = multer({ storage })
 const http = require("http").Server(app)
+const PORT = 4000
+
 
 //Socket.IO Connection ----------------------------------------------------------------------------
+
 const socketIO = require('socket.io')(http, {
     cors: {
         origin: "<http://localhost:3000"
@@ -27,9 +30,23 @@ const socketIO = require('socket.io')(http, {
 socketIO.on('connection', (socket) => {
     console.log('user connected !');
 
+    socket.on("createRoom", (roomName) => {
+        socket.join(roomName);
+        
+        chatRooms.unshift({ id: generateID(), roomName, messages: [] });
+        
+        socket.emit("roomsList", chatRooms);
+    });
+
     socket.on('disconnect', () => {
         socket.disconnect()
         console.log('user disconnected !');
+    });
+});
+
+app.get("/api", (req, res) => {
+    res.json({
+        message: "Hello world",
     });
 });
 
@@ -167,6 +184,8 @@ app.get('/logout', (req, res) => {
         res.json(req.user)
     })
 })
+
+
 
 
 

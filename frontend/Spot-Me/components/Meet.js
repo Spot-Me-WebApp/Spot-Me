@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanRespond
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 // For cross-device screen compatibility
-const SCREEN_HEIGHT = Dimensions.get('window').height
+const SCREEN_HEIGHT = Dimensions.get('window').height 
 const SCREEN_WIDTH = Dimensions.get('window').width
 
 const OtherUsers = [
@@ -14,7 +14,6 @@ const OtherUsers = [
     //          { id: "5", uri: require('./assets/5.jpg') },
 ]
 
-
 export default class Meet extends Component {
 
     constructor() {
@@ -23,6 +22,8 @@ export default class Meet extends Component {
         this.state = {
             currentIndex: 0
         }
+
+        
 
 
 
@@ -122,10 +123,23 @@ export default class Meet extends Component {
                 // Animate current card to be able to be swiped
                 return (
                     <TouchableOpacity>
+                        
                         <Animated.View
                             {...this.PanResponder.panHandlers}
-                            key={item.id} style={[this.rotateAndTranslate, { height: SCREEN_HEIGHT - 250, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
+                            key={item.id} style={[this.rotateAndTranslate, { height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
 
+
+                            {/* User name and age*/}
+                            <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 75, left: 35, zIndex: 1000 }}>
+                                <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> Name </Text>
+                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> 21</Text>
+                            </Animated.View>
+                            <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
+                                    <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text>
+                                    <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Interests: </Text>
+                                </Animated.View>
+                            
+                            
                             {/* 'Spot' Text when swiped right */}
                             <Animated.View style={{ opacity: this.spotOpacity, transform: [{ rotate: '30deg' }], position: 'absolute', top: 50, left: 35, zIndex: 1000 }}>
                                 <Text style={{ borderWidth: 3, borderColor: 'green', color: 'green', fontSize: 32, fontWeight: '800', padding: 10 }}> SPOT </Text>
@@ -136,10 +150,13 @@ export default class Meet extends Component {
                                 <Text style={{ borderWidth: 3, borderColor: 'red', color: 'red', fontSize: 32, fontWeight: '800', padding: 10 }}> NOPE </Text>
                             </Animated.View>
 
+                            
                             <Image
                                 style={{ flex: 1, height: null, width: null, resizeMode: 'cover', borderRadius: 20 }}
                                 source={item.uri}
                             />
+
+                            
 
 
                         </Animated.View>
@@ -150,11 +167,21 @@ export default class Meet extends Component {
                 return (
                     <Animated.View
 
-                        key={item.id} style={[{ opacity: this.nextCardOpacity, transform: [{ scale: this.nextCardResize }], height: SCREEN_HEIGHT - 252, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
+                        key={item.id} style={[{ opacity: this.nextCardOpacity, transform: [{ scale: this.nextCardResize }], height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
 
                         <Image
                             style={{ flex: 1, height: null, width: null, resizeMode: 'cover', borderRadius: 20 }}
                             source={item.uri} />
+                            {/* User name and age*/}
+                            <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 75, left: 35, zIndex: 1000 }}>
+                                <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> Name </Text>
+                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> 21</Text>
+                            </Animated.View>
+                            <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
+                                    <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text>
+                                    <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Interests: </Text>
+                                </Animated.View>
+                            
 
                     </Animated.View>
                 )

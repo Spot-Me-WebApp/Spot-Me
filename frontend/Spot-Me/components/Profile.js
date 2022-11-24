@@ -93,7 +93,7 @@ const Profile = (props) => {
                                             })}
                                         </View>
                                         <Text style={styles.text}>{userData.expLevel}</Text>
-                                        <Text style={styles.text}>Passions:</Text>
+                                        <Text style={styles.text}>Interests:</Text>
                                         <View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', width, marginTop: 10, }}>
                                             {(userData.methods.map((method, index) => {
                                                 return (

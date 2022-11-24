@@ -203,7 +203,7 @@ export default function ChooseGym(props) {
                     onPress={(data, details = null) => {
                         // 'details' is provided when fetchDetails = true
                         console.log(data, details);
-                        setSearchInput(data.description.replaceAll(' ', '%20'))
+                        setSearchInput(data.description.split(' ').join('%20'))
                         console.log(searchInput)
                         findGymFromSearch(details.structured_formatting.main_text);
                     }}

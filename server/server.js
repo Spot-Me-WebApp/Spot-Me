@@ -16,8 +16,11 @@ const multer = require('multer')
 const { storage, cloudinary } = require('./cloudinary');
 const upload = multer({ storage })
 const http = require("http").Server(app)
+const PORT = 4000
+
 
 //Socket.IO Connection ----------------------------------------------------------------------------
+
 const socketIO = require('socket.io')(http, {
     cors: {
         origin: "<http://localhost:3000"
@@ -27,9 +30,23 @@ const socketIO = require('socket.io')(http, {
 socketIO.on('connection', (socket) => {
     console.log('user connected !');
 
+    socket.on("createRoom", (roomName) => {
+        socket.join(roomName);
+        
+        chatRooms.unshift({ id: generateID(), roomName, messages: [] });
+        
+        socket.emit("roomsList", chatRooms);
+    });
+
     socket.on('disconnect', () => {
         socket.disconnect()
         console.log('user disconnected !');
+    });
+});
+
+app.get("/api", (req, res) => {
+    res.json({
+        message: "Hello world",
     });
 });
 
@@ -168,6 +185,28 @@ app.get('/logout', (req, res) => {
     })
 })
 
+//------------------------------------------------------Match Making-------------------------------------------------------
+
+
+
+
+
+
+//------------------------------------------------------Match Making-------------------------------------------------------
+//When a user clicks sign up with google
+app.post('/register/google', async (req, res) => {
+
+});
+
+//Processes the authentication response and logs the user in
+
+//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
+
+//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
+app.get('/login/facebook', passport.authenticate('facebook'));
+
+
+// //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
 
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------

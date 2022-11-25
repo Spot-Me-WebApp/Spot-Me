@@ -17,6 +17,7 @@ const { storage, cloudinary } = require('./cloudinary');
 const upload = multer({ storage })
 const http = require("http").Server(app)
 const PORT = 4000
+const { PriorityQueue } = require('./PriorityQueue')
 
 
 //Socket.IO Connection ----------------------------------------------------------------------------
@@ -32,9 +33,9 @@ socketIO.on('connection', (socket) => {
 
     socket.on("createRoom", (roomName) => {
         socket.join(roomName);
-        
+
         chatRooms.unshift({ id: generateID(), roomName, messages: [] });
-        
+
         socket.emit("roomsList", chatRooms);
     });
 
@@ -186,28 +187,18 @@ app.get('/logout', (req, res) => {
 })
 
 //------------------------------------------------------Match Making-------------------------------------------------------
-
+app.get('/getQueue', async (req, res) => {
+    //Search database for users whose gyms are within certain distance of current user and add points for that
+    //give more points for users who are extra close
+    //add points for shared passions and experience level
+    //add users to priority queue with users having the most points getting the most priority
+})
 
 
 
 
 
 //------------------------------------------------------Match Making-------------------------------------------------------
-//When a user clicks sign up with google
-app.post('/register/google', async (req, res) => {
-
-});
-
-//Processes the authentication response and logs the user in
-
-//------------------------------------------------------GOOGLE OAUTH ROUTES-------------------------------------------------------
-
-//------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
-app.get('/login/facebook', passport.authenticate('facebook'));
-
-
-// //------------------------------------------------------FACEBOOK OAUTH ROUTES------------------------------------------------
-
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
 app.post('/image', async (req, res) => {

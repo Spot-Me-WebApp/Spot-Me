@@ -17,7 +17,8 @@ const { storage, cloudinary } = require('./cloudinary');
 const upload = multer({ storage })
 const http = require("http").Server(app)
 const PORT = 4000
-const { PriorityQueue } = require('./PriorityQueue')
+const { PriorityQueue } = require('./PriorityQueue');
+const { rmSync } = require('fs');
 
 
 //Socket.IO Connection ----------------------------------------------------------------------------
@@ -192,6 +193,40 @@ app.get('/getQueue', async (req, res) => {
     //give more points for users who are extra close
     //add points for shared passions and experience level
     //add users to priority queue with users having the most points getting the most priority
+    //***10miles is 0.1429 degrees */
+    const currentUserGyms = req.user.gyms;
+    const cardStack = new PriorityQueue();
+    let userPointsRanking = [];
+    //Find users who goes to a gym within a 10 mile radius of one of the gyms that the current user goes to 
+    for (let gym of currentUserGyms) {
+        const results = await User.find({
+            gyms: { $elemMatch: { latitude: { $gte: gym.latitude - 0.1429, $lte: gym.latitude + 0.1429 }, longitude: { $gte: gym.longitude - 0.1429, $lte: gym.longitude + 0.1429 } } }
+        })
+        //all these users initially have 0 points
+        results.forEach(res => {
+            if (!userPointsRanking.includes(res) && !res._id.equals(req.user._id)) {
+                userPointsRanking.push({ user: res, points: 0 })
+            }
+        })
+    }
+
+    for (let element of userPointsRanking) {
+        //if the user has a gym in common with the current user, add 3 points
+        if (element.user.gyms.some(el => currentUserGyms.includes(el))) {
+            element.points += 3;
+        }
+        //for each method they have in common, add 1 point
+        element.user.methods.forEach(m => {
+            if (req.user.methods.includes(m)) { element.points += 1; }
+        })
+        const ageDifference = Math.abs(req.user.dob.getFullYear() - element.user.dob.getFullYear())
+        if (ageDifference <= 4) {
+            element.points += -0.2 * ageDifference + 1;
+        }
+        if (req.user.expLevel === element.user.expLevel) { element.points += 1; }
+        cardStack.enqueue(element.user, element.points);
+    }
+    res.json(cardStack);
 })
 
 

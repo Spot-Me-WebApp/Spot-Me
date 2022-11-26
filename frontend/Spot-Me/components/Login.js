@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
 import { FormContainer } from '../Shared/Forms/FormContainer';
 import { Input } from '../Shared/Forms/Input'
@@ -8,11 +8,12 @@ import { AntDesign } from '@expo/vector-icons'
 import { LeftArrowBtn, RightArrowBtn } from '../Shared/Forms/Buttons/ArrowButtons';
 import * as Google from 'expo-auth-session/providers/google'
 import * as Facebook from 'expo-auth-session/providers/facebook'
-
+import { LoginContext, CardStackContext } from './Contexts';
 const { height, width } = Dimensions.get("screen")
 
 const Login = (props) => {
-
+    const { loggedIn, setLoggedIn } = useContext(LoginContext)
+    const { cardStack, setCardStack } = useContext(CardStackContext)
     const [loginUsername, setLoginUsername] = useState('')
     const [loginPassword, setLoginPassword] = useState('')
 
@@ -105,7 +106,8 @@ const Login = (props) => {
 
         }).then((response) => {
             console.log(response.data)
-            props.navigation.navigate("BottomTabs")
+            setLoggedIn(true)
+            getCardStack();
         })
             .catch((error) => console.log(error, error.stack))
     }
@@ -122,11 +124,23 @@ const Login = (props) => {
                 withCredentials: true
             }).then((response) => {
                 console.log(response.data)
-                props.navigation.navigate("BottomTabs")
+                setLoggedIn(true)
+                getCardStack();
             })
                 .catch((error) => console.log(error, error.stack))
         }
     }
+
+
+    async function getCardStack() {
+        await axios.get(`${SERVER_PORT}/getQueue`)
+            .then((response) => {
+                setCardStack(response.data.items)
+                props.navigation.navigate("BottomTabs")
+            })
+            .catch((err) => console.log(err))
+    }
+
 
     return (
         <View style={styles.container}>

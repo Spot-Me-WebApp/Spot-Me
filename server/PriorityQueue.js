@@ -28,7 +28,7 @@ class PriorityQueue {
         //iterate through array
         //insert element in index before the element with the smallest priority greather than the priority of qElement
         for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].priority > qElement.priority) {
+            if (this.items[i].priority <= qElement.priority) {
                 this.items.splice(i, 0, qElement);
                 contains = true;
                 break;
@@ -50,6 +50,11 @@ class PriorityQueue {
     rear() {
         if (this.isEmpty()) return "Queue is empty"
         return this.items[this.items.length - 1]
+    }
+
+    //print first n elements of queue
+    print(n) {
+        return this.items.slice(0, n);
     }
 
     //check if queue is empty

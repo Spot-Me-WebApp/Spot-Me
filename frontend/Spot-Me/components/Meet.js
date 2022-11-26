@@ -2,6 +2,7 @@ import React, { useEffect, useState, Component } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
+import { CardStackContext } from './Contexts';
 // For cross-device screen compatibility
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const SCREEN_WIDTH = Dimensions.get('window').width
@@ -67,7 +68,7 @@ export default class Meet extends Component {
         })
     }
 
-
+    static contextType = CardStackContext;
     componentWillMount() {
 
 
@@ -113,10 +114,25 @@ export default class Meet extends Component {
         })
     }
 
+    calculateAge = (dob) => {
+        const currentDate = new Date()
+        const birthday = new Date(dob)
+        switch (true) {
+            case (currentDate.getMonth() > birthday.getMonth()):
+                return (currentDate.getFullYear() - birthday.getFullYear())
+            case (currentDate.getMonth() < birthday.getMonth()):
+                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
+            default:
+                if (currentDate.getDate() >= birthday.getDate()) {
+                    return (currentDate.getFullYear() - birthday.getFullYear())
+                }
+                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
+        }
+    }
+
     // Shows users in profile cards by using key value pairs
     renderUsers = () => {
-
-        return OtherUsers.map((item, i) => {
+        return this.context.cardStack.map((item, i) => {
 
             if (i < this.state.currentIndex) {
                 return null
@@ -128,32 +144,38 @@ export default class Meet extends Component {
 
                         <Animated.View
                             {...this.PanResponder.panHandlers}
-                            key={item.id} style={[this.rotateAndTranslate, { height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
+                            key={item.element._id} style={[this.rotateAndTranslate, { height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
 
 
                             {/* User name and age*/}
                             <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 160, left: 35, zIndex: 1000 }}>
-                                <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> Name </Text>
-                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> 21</Text>
+                                <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> {item.element.name} </Text>
+                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {this.calculateAge(item.element.dob)}</Text>
                             </Animated.View>
                             <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
                                 {/* <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text> */}
-                                <Text key={3829} style={{ marginTop: 10, color: 'white' }}>Blink Fitness
-                                    <Text style={{ fontWeight: '300', fontSize: 14 }}>  3779 Nostand Ave, Brooklyn</Text></Text>
+                                {item.element.gyms.map((gym, index) => {
+                                    return (
+                                        <Text key={index} style={{ textAlign: 'flex-start', marginTop: 10, color: 'white' }}>{gym.name}
+                                            <Text style={{ fontWeight: '200', fontSize: 14 }}> {gym.address}</Text></Text>
+                                    )
+                                })}
                                 <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Interests: </Text>
-                                <Animated.View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', alignContent: 'center', alignItems: 'center', SCREEN_WIDTH, marginTop: 10, }}>
-                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }} key={0}>
-                                        <Text style={{ color: 'white', padding: 10 }}>Bodybuilding</Text>
-                                    </View>
-                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }} key={1}>
-                                        <Text style={{ color: 'white', padding: 10 }}>Powerlifting</Text>
-                                    </View>
-                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }} key={2}>
-                                        <Text style={{ color: 'white', padding: 10 }}>Cardio</Text>
-                                    </View>
-                                    <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 5 }} key={3}>
-                                        <Text style={{ color: 'white', padding: 10 }}>Film</Text>
-                                    </View>
+                                <Animated.View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', SCREEN_WIDTH, marginTop: 10, }}>
+                                    {(item.element.methods.slice(0, 6).map((method, index) => {
+                                        if (index > 4) {
+                                            return (
+                                                <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 1.5, justifyContent: 'center' }} key={index}>
+                                                    <Text style={{ color: 'white', padding: 10 }}>+ {item.element.methods.length - 5} more...</Text>
+                                                </View>
+                                            )
+                                        }
+                                        return (
+                                            <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 1.5, justifyContent: 'center' }} key={index}>
+                                                <Text style={{ color: 'white', padding: 10 }}>{method}</Text>
+                                            </View>
+                                        )
+                                    }))}
                                 </Animated.View>
                             </Animated.View>
 
@@ -171,7 +193,7 @@ export default class Meet extends Component {
 
                             <Image
                                 style={{ flex: 1, height: null, width: null, resizeMode: 'cover', borderRadius: 20 }}
-                                source={item.uri}
+                                source={{ uri: item.element.images[0].url }}
                             />
 
 
@@ -183,25 +205,49 @@ export default class Meet extends Component {
             } else {
                 // The card after current card
                 return (
-                    <Animated.View
+                    <TouchableOpacity>
+                        <Animated.View
 
-                        key={item.id} style={[{ opacity: this.nextCardOpacity, transform: [{ scale: this.nextCardResize }], height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
+                            key={item.element._id} style={[{ opacity: this.nextCardOpacity, transform: [{ scale: this.nextCardResize }], height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
 
-                        <Image
-                            style={{ flex: 1, height: null, width: null, resizeMode: 'cover', borderRadius: 20 }}
-                            source={item.uri} />
-                        {/* User name and age*/}
-                        <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 75, left: 35, zIndex: 1000 }}>
-                            <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> Name </Text>
-                            <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> 21</Text>
+                            <Image
+                                style={{ flex: 1, height: null, width: null, resizeMode: 'cover', borderRadius: 20 }}
+                                source={{ uri: item.element.images[0].url }} />
+                            {/* User name and age*/}
+                            <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 160, left: 35, zIndex: 1000 }}>
+                                <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> {item.element.name} </Text>
+                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {this.calculateAge(item.element.dob)}</Text>
+                            </Animated.View>
+                            <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
+                                {/* <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text> */}
+                                {item.element.gyms.map((gym, index) => {
+                                    return (
+                                        <Text key={index} style={{ textAlign: 'flex-start', marginTop: 10, color: 'white' }}>{gym.name}
+                                            <Text style={{ fontWeight: '200', fontSize: 14 }}> {gym.address}</Text></Text>
+                                    )
+                                })}
+                                <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Interests: </Text>
+                                <Animated.View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', SCREEN_WIDTH, marginTop: 10, }}>
+                                    {(item.element.methods.slice(0, 6).map((method, index) => {
+                                        if (index > 4) {
+                                            return (
+                                                <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 1.5, justifyContent: 'center' }} key={index}>
+                                                    <Text style={{ color: 'white', padding: 10 }}>+ {item.element.methods.length - 5} more...</Text>
+                                                </View>
+                                            )
+                                        }
+                                        return (
+                                            <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 1.5, justifyContent: 'center' }} key={index}>
+                                                <Text style={{ color: 'white', padding: 10 }}>{method}</Text>
+                                            </View>
+                                        )
+                                    }))}
+                                </Animated.View>
+                            </Animated.View>
+
+
                         </Animated.View>
-                        <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
-                            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text>
-                            <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Interests: </Text>
-                        </Animated.View>
-
-
-                    </Animated.View>
+                    </TouchableOpacity>
                 )
             }
 

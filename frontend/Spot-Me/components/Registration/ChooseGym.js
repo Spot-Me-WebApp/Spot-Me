@@ -9,7 +9,7 @@ import axios from 'axios'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { SmallXCircleBtn } from '../../Shared/Forms/Buttons/XCircleBtn';
 import Slider from '@react-native-community/slider'
-
+import { LoginContext, CardStackContext } from '../Contexts';
 const { height, width } = Dimensions.get('screen')
 export default function ChooseGym(props) {
     const [uploadedImages, setUploadedImages] = useState(null)
@@ -35,6 +35,9 @@ export default function ChooseGym(props) {
     setSearchRadius = (num) => {
         searchRadius = num
     }
+
+    const { loggedIn, setLoggedIn } = useContext(LoginContext)
+    const { cardStack, setCardStack } = useContext(CardStackContext)
 
     const { username, password, name, dob, bio, expLevel, methods, registerProfilePics, provider, uri } = props.route.params;
 
@@ -73,6 +76,17 @@ export default function ChooseGym(props) {
         }
     }
 
+    async function getCardStack() {
+        await axios.get(`${SERVER_PORT}/getQueue`)
+            .then((response) => {
+                setCardStack(response.data.items)
+                props.navigation.navigate("BottomTabs")
+            })
+            .catch((err) => console.log(err))
+    }
+    getCardStack();
+
+
     const loginUser = async () => {
         if (!(provider && uri)) {
             await axios({
@@ -84,7 +98,8 @@ export default function ChooseGym(props) {
                 },
                 withCredentials: true
             }).then((response) => {
-                props.navigation.navigate("BottomTabs")
+                setLoggedIn(true)
+                getCardStack()
             })
                 .catch((error) => console.log(error, error.stack))
         }
@@ -97,7 +112,8 @@ export default function ChooseGym(props) {
                 },
                 withCredentials: true
             }).then((response) => {
-                props.navigation.navigate("BottomTabs")
+                setLoggedIn(true)
+                getCardStack();
             })
                 .catch((error) => console.log(error, error.stack))
         }

@@ -53,6 +53,14 @@ const Profile = (props) => {
         }
     }
 
+    const getQueue = async () => {
+        await axios({
+            url: `${SERVER_PORT}/getQueue`
+        })
+            .then((response) => console.log(response.data))
+            .catch((err) => console.log(err))
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
@@ -74,7 +82,6 @@ const Profile = (props) => {
                                     <MaterialIcons.Button name="logout" size={24} color="black" backgroundColor="white" onPress={logoutUser}></MaterialIcons.Button>
 
                                 </View>
-
                             </View>
                             {userData.images &&
                                 <View style={styles.header}>
@@ -84,7 +91,7 @@ const Profile = (props) => {
                                             <Text style={styles.name}>{userData.name}  </Text>
                                             <Text style={styles.age}>{calculateAge(userData.dob)}</Text>
                                         </Text>
-                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', width, justifyContent: 'center' }}>
                                             <Image source={require('../assets/SpotMarker.png')} style={{ width: 30, height: 30 }} />
                                             {userData.gyms.map((gym, index) => {
                                                 return (

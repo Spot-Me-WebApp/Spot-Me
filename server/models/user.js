@@ -64,7 +64,19 @@ const userSchema = new Schema({
         unique: false
     },
     images: [imageSchema],
-    gyms: [gymSchema]
+    gyms: [gymSchema],
+    leftSwipes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    rightSwipes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    matches: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 })
 
 //adds username and password fields to userSchema

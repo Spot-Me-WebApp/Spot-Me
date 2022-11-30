@@ -229,7 +229,27 @@ app.get('/getQueue', async (req, res) => {
     res.json(cardStack);
 })
 
-
+app.post('/handleSwipe', async (req, res) => {
+    const { swipedUser, isRightSwipe } = req.body;
+    const currUser = await User.findById(req.user._id)
+    const swipedUserDocument = await User.findById(swipedUser._id);
+    //If you swipe right on someone who already swiped right on you, it's a match. Add each user to the other's matches array.
+    if (isRightSwipe && swipedUserDocument.rightSwipes.includes(req.user._id)) {
+        await currUser.updateOne({ $addToSet: { matches: swipedUser._id } })
+        await swipedUserDocument.updateOne({ $addToSet: { matches: req.user._id } })
+        return res.send({ matched: true })
+    }
+    //If you swipe right on someone and they haven't swiped right on you, add them to the current user's right swipes array
+    else if (isRightSwipe && !swipedUser.rightSwipes.includes(req.user._id)) {
+        await currUser.updateOne({ $addToSet: { rightSwipes: swipedUser._id } })
+        return res.send(`${swipedUser.name} added to right swipes`)
+    }
+    //If you swipe left on someone, add them to current user's left swipes array
+    else {
+        await currUser.updateOne({ $addToSet: { leftSwipes: swipedUser._id } })
+        return res.send(`${swipedUser.name} added to left swipes`)
+    }
+})
 
 
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useState, Component } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity, TouchableHighlight, Modal } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { CardStackContext } from './Contexts';
+import { RightArrowBtn } from '../Shared/Forms/Buttons/ArrowButtons';
 // For cross-device screen compatibility
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const SCREEN_WIDTH = Dimensions.get('window').width
@@ -21,7 +22,8 @@ export default class Meet extends Component {
         super()
         this.position = new Animated.ValueXY({ x: 0, y: 0 }, { useNativeDriver: true })
         this.state = {
-            currentIndex: 0
+            currentIndex: 0,
+            matchFound: false
         }
 
 
@@ -92,8 +94,11 @@ export default class Meet extends Component {
                         this.setState({ currentIndex: this.state.currentIndex + 1 }, () => {
                             this.position.setValue({ x: 0, y: 0 })
                         })
+                        this.handleSwipe(this.context.cardStack[this.state.currentIndex - 1].element, true)
                     })
-                } else if (gestureState.dx < -120) {
+                }
+                // Throws card away away to the left
+                else if (gestureState.dx < -120) {
                     Animated.spring(this.position, {
                         toValue: { x: -SCREEN_WIDTH - 100, y: gestureState.dy },
                         useNativeDriver: true
@@ -101,8 +106,11 @@ export default class Meet extends Component {
                         this.setState({ currentIndex: this.state.currentIndex + 1 }, () => {
                             this.position.setValue({ x: 0, y: 0 })
                         })
+                        this.handleSwipe(this.context.cardStack[this.state.currentIndex - 1].element, false)
                     })
-                } else {
+                }
+                //if swipe distance isn't large enough, return card to middle
+                else {
                     Animated.spring(this.position, {
                         toValue: { x: 0, y: 0 },
                         friction: 4,
@@ -112,6 +120,23 @@ export default class Meet extends Component {
             }
 
         })
+    }
+
+    handleSwipe = async (card, isRightSwipe) => {
+        await axios({
+            url: `${SERVER_PORT}/handleSwipe`,
+            method: 'post',
+            data: {
+                swipedUser: card,
+                isRightSwipe
+            }
+        })
+            .then((response) => {
+                if (response.data.matched) {
+                    this.setState({ matchFound: !this.state.matchFound })
+                }
+            })
+            .catch((err) => console.log(err))
     }
 
     calculateAge = (dob) => {
@@ -141,7 +166,20 @@ export default class Meet extends Component {
                 // Animate current card to be able to be swiped
                 return (
                     <TouchableOpacity>
-
+                        {this.state.matchFound &&
+                            <View>
+                                <Modal
+                                    animationType='slide'
+                                    visible={this.state.matchFound}
+                                    onRequestClose={() => this.setState({ matchFound: !this.state.matchFound })}
+                                >
+                                    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                        <Text>You Matched With {this.context.cardStack[i - 1].element.name}!</Text>
+                                        <Button title="Dismiss" onPress={() => this.setState({ matchFound: !this.state.matchFound })}></Button>
+                                    </View>
+                                </Modal>
+                            </View>
+                        }
                         <Animated.View
                             {...this.PanResponder.panHandlers}
                             key={item.element._id} style={[this.rotateAndTranslate, { height: SCREEN_HEIGHT * .8, width: SCREEN_WIDTH, padding: 10, position: 'absolute' }]}>
@@ -149,7 +187,9 @@ export default class Meet extends Component {
 
                             {/* User name and age*/}
                             <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 160, left: 35, zIndex: 1000 }}>
-                                <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> {item.element.name} </Text>
+                                <TouchableHighlight onPress={() => this.props.navigation.navigate("OtherProfile", { userData: item.element })} underlayColor="rgba(0,0,0,0.0)">
+                                    <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> {item.element.name} </Text>
+                                </TouchableHighlight>
                                 <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {this.calculateAge(item.element.dob)}</Text>
                             </Animated.View>
                             <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>

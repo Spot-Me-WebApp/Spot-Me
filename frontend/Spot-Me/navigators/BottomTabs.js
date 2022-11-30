@@ -7,6 +7,7 @@ import Schedule from "../components/Schedule";
 import Chat from "../components/Chat";
 import Profile from "../components/Profile";
 import EditProfile from "../components/EditProfile"
+import OtherProfile from "../components/OtherProfile";
 
 const Tab = createBottomTabNavigator();
 
@@ -63,6 +64,12 @@ const BottomTabs = () => {
             <Tab.Screen name="Edit Profile" component={EditProfile} options={
                 {
                     headerShown: true,
+                    tabBarButton: () => null
+                }}
+            />
+            <Tab.Screen name="OtherProfile" component={OtherProfile} options={
+                {
+                    headerShown: false,
                     tabBarButton: () => null
                 }}
             />

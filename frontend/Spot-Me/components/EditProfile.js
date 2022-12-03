@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { View, Text, StyleSheet, StatusBar, Image, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Button, Alert } from 'react-native'
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
@@ -8,14 +8,21 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync } from 'expo-image-manipulator';
 import axios from 'axios'
-import { SERVER_PORT } from '@env'
+import { SERVER_PORT, PLACES_API_KEY } from '@env'
 import { EXP_LVL, METHODS } from '../Shared/UserDataEnums'
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { SmallXCircleBtn } from '../Shared/Forms/Buttons/XCircleBtn';
+import { UserDataContext, CardStackContext } from './Contexts'
 
 const { height, width } = Dimensions.get("screen")
 
 const EditProfile = (props) => {
-
-    const { userData } = props.route.params
+    const { userData, setUserData } = useContext(UserDataContext)
+    let { cardStack, setCardStack } = useContext(CardStackContext)
+    setCardStack = (arr) => {
+        cardStack.length = 0;
+        cardStack = arr;
+    }
     const [Bio, setBio] = useState(userData.bio)
     const [Exp, setExp] = useState({ item: userData.expLevel, id: EXP_LVL.find(el => el.item === userData.expLevel).id })
     const [Methods, setMethods] = useState(userData.methods.map(m => ({ item: m, id: METHODS.find(el => el.item === m).id })))
@@ -48,6 +55,17 @@ const EditProfile = (props) => {
     const [photoDeleted, setPhotoDeleted] = useState(false)
     const [uploadedImages, setUploadedImages] = useState(null)
 
+    const [gymsFound, setGymsFound] = useState(false)
+    let [selectedGyms, setSelectedGyms] = useState(userData.gyms)
+    setSelectedGyms = (element) => {
+        selectedGyms.push(element)
+        setGymsFound(!gymsFound)
+        console.log(selectedGyms)
+    }
+    let [searchInput, setSearchInput] = useState('')
+    setSearchInput = (str) => {
+        searchInput += str;
+    }
 
     function onMultiChange() {
         return (item) => setMethods(xorBy(Methods, [item], 'id'))
@@ -170,6 +188,7 @@ const EditProfile = (props) => {
                 setProfilePics(userData.images.map(img => ({ uri: img.url, position: img.position, isNew: false })))
                 setPhotoDeleted(false)
                 setUploadedImages(null)
+                selectedGyms = userData.gyms;
                 props.navigation.navigate("Profile")
             }
         }])
@@ -183,6 +202,7 @@ const EditProfile = (props) => {
             setProfilePics(userData.images.map(img => ({ uri: img.url, position: img.position, isNew: false })))
             setPhotoDeleted(false)
             setUploadedImages(null)
+            selectedGyms = userData.gyms;
         })
         return discardAlert
     }, [props.navigation])
@@ -215,26 +235,59 @@ const EditProfile = (props) => {
                     expLevel: expLevel,
                     methods: methods,
                     imageData: uploadedImages,
-                    id: userData._id
+                    id: userData._id,
+                    gyms: selectedGyms
                 },
                 withCredentials: true
             }).then((response) => {
-                const data = response.data;
-                props.navigation.navigate("Profile", { data: data })
+                setUserData(response.data)
+                getCardStack();
+
             })
                 .catch((error) => console.log(error, error.stack))
         }
+    }
+
+    async function getCardStack() {
+        await axios.get(`${SERVER_PORT}/getQueue`)
+            .then((response) => {
+                setCardStack(response.data.items)
+                console.log(cardStack)
+                props.navigation.navigate("Profile")
+            })
+            .catch((err) => console.log(err))
     }
 
     useEffect(() => {
         updateUser();
     }, [uploadedImages])
 
+    async function findGymFromSearch(gymName) {
+        if (searchInput.length) {
+            await axios.get(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${searchInput}&inputtype=textquery&fields=geometry,formatted_address&key=${PLACES_API_KEY}`)
+                .then((response) => {
+                    console.log(response.data.candidates)
+                    setSelectedGyms({
+                        latitude: response.data.candidates[0].geometry.location.lat,
+                        longitude: response.data.candidates[0].geometry.location.lng,
+                        name: gymName,
+                        address: response.data.candidates[0].formatted_address.split(',', 2).join(',')
+                    })
+                })
+                .catch((err) => console.log(err))
+        }
+    }
+
+    const deleteSelectedGym = (index) => {
+        selectedGyms.splice(index, 1);
+        setGymsFound(!gymsFound);
+        console.log(selectedGyms);
+    }
 
 
     return (
         <KeyboardAvoidingView behavior='padding' style={styles.container}>
-            <ScrollView style={{ backgroundColor: '#202020', flex: 1 }}>
+            <ScrollView style={{ backgroundColor: '#202020', flex: 1 }} horizontal={false} keyboardShouldPersistTaps='handled'>
                 <View style={{ alignItems: 'flex-start', flex: 1 }}>
                     <Text style={styles.name}>{userData.name}</Text>
                 </View>
@@ -381,6 +434,40 @@ const EditProfile = (props) => {
                     <TextInput placeholder='Bio' autoFocus={false} multiline={true} maxLength={400} numberOfLines={8}
                         style={{ textAlignVertical: 'top', color: 'white' }} onChangeText={e => setBio(e)} value={Bio}>
                     </TextInput>
+                </View>
+                <Text style={{ color: 'white', fontSize: 16, textAlign: 'center', marginTop: 15 }}>Search for the gyms you go to.</Text>
+                <ScrollView contentContainerStyle={{ width, justifyContent: 'center', alignItems: 'center', marginVertical: 15 }} horizontal={true} keyboardShouldPersistTaps='always'>
+                    <GooglePlacesAutocomplete
+                        placeholder='Search'
+                        styles={{
+                            container: { width: '100%' },
+                            textInputContainer: { width: '100%', borderWidth: 1.5, borderRadius: 5, borderColor: 'black' },
+                            textInput: { height: height * .07, width: '100%' },
+                            description: { fontWeight: 'bold' }
+                        }}
+                        onPress={(data, details = null) => {
+                            // 'details' is provided when fetchDetails = true
+                            //console.log(data, details);
+                            setSearchInput(data.description.split(' ').join('%20'))
+                            console.log(searchInput)
+                            findGymFromSearch(details.structured_formatting.main_text);
+                        }}
+                        query={{
+                            key: PLACES_API_KEY,
+                            language: 'en'
+                        }}
+                    />
+                </ScrollView>
+                <View style={{ marginBottom: 15, alignSelf: 'center' }}>
+                    {(selectedGyms.length > 0) && <Text style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 20, color: 'white', fontSize: 16 }}>Selected Gyms:</Text>}
+                    {(selectedGyms.length > 0) && selectedGyms.map((gym, index) => {
+                        return (
+                            <View key={index} style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 10, borderBottomWidth: 1, width: width * .9 }}>
+                                <Text style={{ fontSize: 14, color: 'white' }}>{gym.name}, {gym.address}</Text>
+                                <SmallXCircleBtn style={{ marginLeft: 10, paddingBottom: 7 }} onPress={() => deleteSelectedGym(index)} />
+                            </View>
+                        )
+                    })}
                 </View>
                 <View style={{ marginVertical: 20, width: '80%', alignSelf: 'center' }}>
                     <Text style={styles.bio}>Experience Level</Text>

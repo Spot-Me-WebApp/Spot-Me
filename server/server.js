@@ -155,16 +155,21 @@ app.get('/getUser/:id', async (req, res) => {
 })
 
 app.put('/edituser', async (req, res) => {
-    const { bio, expLevel, methods, imageData, id } = req.body;
+    const { bio, expLevel, methods, imageData, id, gyms } = req.body;
     const user = await User.findById(id)
     await user.updateOne(
         { bio: bio, expLevel: expLevel }
     )
     //add new methods to user's methods array
     await user.updateOne({ $addToSet: { methods: methods } })
+    //add new gyms to user's gyms array
+    await user.updateOne({ $addToSet: { gyms: gyms } })
     //deletedMethods is an array with the user's methods that are not found in the inputted methods array
     const deletedMethods = user.methods.filter(el => !methods.includes(el))
     await user.updateOne({ $pull: { methods: { $in: deletedMethods } } })
+    //deletedGyms is an array with the user's gyms that are not found in the inputted gyms array
+    const deletedGyms = user.gyms.filter(el => !gyms.includes(el))
+    await user.updateOne({ $pull: { gyms: { $in: deletedGyms } } })
     imageData.forEach(i => user.images.push(i))
     await user.save();
     const updatedUser = await User.findById(id)
@@ -204,7 +209,7 @@ app.get('/getQueue', async (req, res) => {
         })
         //all these users initially have 0 points
         results.forEach(res => {
-            if (!userPointsRanking.includes(res) && !res._id.equals(req.user._id)) {
+            if (!userPointsRanking.some(el => el.user._id.equals(res._id)) && !res._id.equals(req.user._id)) {
                 userPointsRanking.push({ user: res, points: 0 })
             }
         })
@@ -213,7 +218,7 @@ app.get('/getQueue', async (req, res) => {
     for (let element of userPointsRanking) {
         //if the user has a gym in common with the current user, add 3 points
         if (element.user.gyms.some(el => currentUserGyms.includes(el))) {
-            element.points += 3;
+            element.points += 6;
         }
         //for each method they have in common, add 1 point
         element.user.methods.forEach(m => {
@@ -226,6 +231,7 @@ app.get('/getQueue', async (req, res) => {
         if (req.user.expLevel === element.user.expLevel) { element.points += 1; }
         cardStack.enqueue(element.user, element.points);
     }
+    console.log(cardStack.print(10))
     res.json(cardStack);
 })
 

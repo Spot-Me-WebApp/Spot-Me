@@ -8,12 +8,13 @@ import { AntDesign } from '@expo/vector-icons'
 import { LeftArrowBtn, RightArrowBtn } from '../Shared/Forms/Buttons/ArrowButtons';
 import * as Google from 'expo-auth-session/providers/google'
 import * as Facebook from 'expo-auth-session/providers/facebook'
-import { LoginContext, CardStackContext } from './Contexts';
+import { LoginContext, CardStackContext, UserDataContext } from './Contexts';
 const { height, width } = Dimensions.get("screen")
 
 const Login = (props) => {
     const { loggedIn, setLoggedIn } = useContext(LoginContext)
     const { cardStack, setCardStack } = useContext(CardStackContext)
+    const { userData, setUserData } = useContext(UserDataContext)
     const [loginUsername, setLoginUsername] = useState('')
     const [loginPassword, setLoginPassword] = useState('')
 
@@ -106,6 +107,7 @@ const Login = (props) => {
 
         }).then((response) => {
             console.log(response.data)
+            setUserData(response.data)
             setLoggedIn(true)
             getCardStack();
         })
@@ -124,6 +126,7 @@ const Login = (props) => {
                 withCredentials: true
             }).then((response) => {
                 console.log(response.data)
+                setUserData(response.data)
                 setLoggedIn(true)
                 getCardStack();
             })

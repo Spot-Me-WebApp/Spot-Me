@@ -1,31 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, StatusBar, Image, SafeAreaView, Dimensions } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { UserDataContext } from './Contexts';
 
 const { height, width } = Dimensions.get("screen")
 
 const Profile = (props) => {
 
-    const [userData, setUserData] = useState(null);
+    const { userData, setUserData } = useContext(UserDataContext);
 
-    useEffect(() => {
-        async function fetchData() {
-            await axios({
-                url: `${SERVER_PORT}/isLoggedIn`,
-                withCredentials: true
-            })
-                .then((response) => {
-                    if (response.data) {
-                        setUserData(response.data)
-                    }
-                })
-                .catch((error) => console.log(error));
-        }
-        fetchData();
-    }, [props.route.params])
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         await axios({
+    //             url: `${SERVER_PORT}/isLoggedIn`,
+    //             withCredentials: true
+    //         })
+    //             .then((response) => {
+    //                 if (response.data) {
+    //                     setUserData(response.data)
+    //                 }
+    //             })
+    //             .catch((error) => console.log(error));
+    //     }
+    //     fetchData();
+    // }, [props.route.params])
 
     const logoutUser = async () => {
         await axios({
@@ -92,10 +93,12 @@ const Profile = (props) => {
                                             <Text style={styles.age}>{calculateAge(userData.dob)}</Text>
                                         </Text>
                                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', width, justifyContent: 'center' }}>
-                                            <Image source={require('../assets/SpotMarker.png')} style={{ width: 30, height: 30 }} />
                                             {userData.gyms.map((gym, index) => {
                                                 return (
-                                                    <Text key={index} style={{ textAlign: 'center', marginTop: 10 }}>{gym.name} <Text style={{ fontWeight: '200', fontSize: 14 }}>{gym.address}</Text></Text>
+                                                    <View key={index} style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                                        <Image source={require('../assets/SpotMarker.png')} style={{ width: 30, height: 30 }} />
+                                                        <Text style={{ textAlign: 'center', marginTop: 10 }}>{gym.name} <Text style={{ fontWeight: '200', fontSize: 14 }}>{gym.address}</Text></Text>
+                                                    </View>
                                                 )
                                             })}
                                         </View>

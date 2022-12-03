@@ -5,12 +5,14 @@ import { SERVER_PORT } from '@env'
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 import RootNavigator from './navigators/RootNavigator';
-import { LoginContext, CardStackContext } from './components/Contexts';
+import { LoginContext, CardStackContext, UserDataContext } from './components/Contexts';
 
 export default function App() {
 
   const [loggedIn, setLoggedIn] = useState(false);
-  const [cardStack, setCardStack] = useState(null);
+  let [cardStack, setCardStack] = useState(null);
+  const [userData, setUserData] = useState(null)
+
 
 
   // if (loggedIn) {
@@ -19,13 +21,15 @@ export default function App() {
 
   return (
     <LoginContext.Provider value={{ loggedIn, setLoggedIn }}>
-      <CardStackContext.Provider value={{ cardStack, setCardStack }}>
-        <NavigationContainer theme={DarkTheme}>
-          <ActionSheetProvider>
-            <RootNavigator></RootNavigator>
-          </ActionSheetProvider>
-        </NavigationContainer>
-      </CardStackContext.Provider>
+      <UserDataContext.Provider value={{ userData, setUserData }}>
+        <CardStackContext.Provider value={{ cardStack, setCardStack }}>
+          <NavigationContainer theme={DarkTheme}>
+            <ActionSheetProvider>
+              <RootNavigator></RootNavigator>
+            </ActionSheetProvider>
+          </NavigationContainer>
+        </CardStackContext.Provider>
+      </UserDataContext.Provider>
     </LoginContext.Provider>
   )
 }

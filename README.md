@@ -7,7 +7,6 @@
 ![image](https://user-images.githubusercontent.com/43146033/205471910-8bb94d8b-2126-4951-aec6-03edafbbafea.png) <br />
 ### Figure out what your IPv4 address is and enter those two lines into your .env file with your IPv4 address inserted into the urls. 
 ### Also, add the following to that same .env file:
-### SOCKET_IO_PORT="http://<your IPv4 Address>:4000"
 ### GOOGLE_CLIENT_ID=865006761383-og9l6n4v08gvo8g6gbg3lu82cs5tjomg.apps.googleusercontent.com
 ### FACEBOOK_APP_ID=5413088448810731
 ### PLACES_API_KEY=AIzaSyB1M3ackzKLCpXn8zvfNKfWXUI8JLO5_Ow

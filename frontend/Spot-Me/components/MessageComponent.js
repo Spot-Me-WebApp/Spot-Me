@@ -1,7 +1,6 @@
-import { View, Text } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../utils/styles";
 
 export default function MessageComponent({ item, user }) {
     const status = item.user !== user;
@@ -19,7 +18,7 @@ export default function MessageComponent({ item, user }) {
                     <Ionicons
                         name='person-circle-outline'
                         size={30}
-                        color='black'
+                        color='white'
                         style={styles.mavatar}
                     />
                     <View
@@ -32,8 +31,26 @@ export default function MessageComponent({ item, user }) {
                         <Text>{item.text}</Text>
                     </View>
                 </View>
-                <Text style={{ marginLeft: 40 }}>{item.time}</Text>
+                <Text style={{ marginLeft: 40, color: 'white' }}>{item.time}</Text>
             </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    mmessageWrapper: {
+        width: "100%",
+        alignItems: "flex-start",
+        marginBottom: 15,
+    },
+    mmessage: {
+        maxWidth: "50%",
+        backgroundColor: "#f5ccc2",
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 2,
+    },
+    mavatar: {
+        marginRight: 5
+    }
+})

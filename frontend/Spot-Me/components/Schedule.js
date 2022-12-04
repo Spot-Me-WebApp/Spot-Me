@@ -6,7 +6,6 @@ const Schedule = (props) => {
     return (
         <View style={styles.container}>
             <Text>Schedule</Text>
-
         </View>
     )
 }

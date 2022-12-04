@@ -1,37 +1,58 @@
-import React, { useEffect, useState, Image } from 'react';
-import { io } from 'socket.io-client';
+import React, { useEffect, useLayoutEffect, useState, useContext } from 'react';
 import { View, Text, Pressable, SafeAreaView, FlatList, StyleSheet } from 'react-native';
 import { Feather } from "@expo/vector-icons";
 import ChatComponent from './ChatComponent';
+import { SERVER_PORT } from '@env'
+import { UserDataContext } from './Contexts';
+import socket from '../utils/socket';
 
 
 
 
+const Chat = (props) => {
+
+    const { userData, setUserData } = useContext(UserDataContext)
+    let [groupName, setGroupName] = useState("")
+    setGroupName = (str) => groupName = str;
 
 
-
-const Chat = () => {
-
-    const socket = io.connect("http://localhost:4000");
+    socket.onAny((event, ...args) => {
+        console.log(event, args);
+    });
 
     const [rooms, setRooms] = useState([]);
 
+    useLayoutEffect(() => {
+        function fetchGroups() {
+            fetch(`${SERVER_PORT}/getChatRooms`)
+                .then((res) => res.json())
+                .then((data) => setRooms(data))
+                .catch((err) => console.error(err));
+        }
+        fetchGroups();
+    }, []);
 
-// useLayoutEffect(() => {
-//     function fetchGroups() {
-//         fetch("http://localhost:4000/api")
-//             .then((res) => res.json())
-//             .then((data) => setRooms(data))
-//             .catch((err) => console.error(err));
-//     }
-//     fetchGroups();
-// }, []);
+    useEffect(() => {
+        socket.on("connect_error", (e) => {
+            console.log(e, e.message);
+        });
+        socket.on("roomsList", (rooms) => {
+            setRooms(rooms);
+        });
+    }, [socket]);
 
-useEffect(() => {
-    socket.on("roomsList", (rooms) => {
-        setRooms(rooms);
-    });
-}, [socket]);
+    useEffect(() => {
+        if (props.route.params) {
+            const { otherUser } = props.route.params
+            const createRoomWithMatch = () => {
+                setGroupName(`${userData.name} & ${otherUser.name}`)
+                socket.emit("createRoom", groupName)
+            }
+            createRoomWithMatch();
+        }
+    }, [props.route.params])
+
+
 
     return (
         <SafeAreaView style={styles.chatScreen}>
@@ -39,27 +60,30 @@ useEffect(() => {
                 <View style={styles.chatHeader}>
                     <Text style={styles.chatHeading}>Chats</Text>
 
-            {/* 👇🏻 Logs "ButtonPressed" to the console when the icon is clicked */}
+                    {/* 👇🏻 Logs "ButtonPressed" to the console when the icon is clicked */}
                     <Pressable onPress={() => console.log("Button Pressed!")}>
                         <Feather name='edit' size={24} color='green' />
                     </Pressable>
                 </View>
-    
-                
+
+
             </View>
-            
+
 
             <View style={styles.chatListContainer}>
                 {rooms.length > 0 ? (
                     <FlatList
                         data={rooms}
-                        renderItem={({ item }) => <ChatComponent item={item} />}
+                        renderItem={({ item }) => <ChatComponent item={item} onPress={() => props.navigation.navigate("Messaging", {
+                            id: item.id,
+                            name: item.name,
+                        })} />}
                         keyExtractor={(item) => item.id}
                     />
                 ) : (
                     <View style={styles.chatEmptyContainer}>
-                        <Text style={styles.chatEmptyText}>No rooms created!</Text>
-                        <Text>Click the icon above to create a Chat room</Text>
+                        <Text style={styles.chatEmptyText}>No Matches Yet!</Text>
+                        <Text>Swipe to get matches!</Text>
                     </View>
                 )}
             </View>
@@ -87,7 +111,7 @@ const styles = StyleSheet.create({
     user: {
         width: 100,
         height: 10,
-        margin: 8, 
+        margin: 8,
         borderRadius: 50,
         borderWidth: 2,
         padding: 3,
@@ -125,7 +149,7 @@ const styles = StyleSheet.create({
     },
     chatListContainer: {
         paddingHorizontal: 10,
-        
+
     },
     chatEmptyContainer: {
         width: "100%",

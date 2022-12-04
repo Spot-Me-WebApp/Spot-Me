@@ -175,6 +175,10 @@ export default class Meet extends Component {
                                 >
                                     <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
                                         <Text>You Matched With {this.context.cardStack[i - 1].element.name}!</Text>
+                                        <Button title="Send them a message" onPress={() => {
+                                            this.setState({ matchFound: !this.state.matchFound })
+                                            this.props.navigation.navigate("Chat", { otherUser: this.context.cardStack[i - 1].element, matched: true })
+                                        }}></Button>
                                         <Button title="Dismiss" onPress={() => this.setState({ matchFound: !this.state.matchFound })}></Button>
                                     </View>
                                 </Modal>

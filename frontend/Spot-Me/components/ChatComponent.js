@@ -1,11 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+//import { useNavigation } from "@react-navigation/native";
 
 
-const ChatComponent = ({ item }) => {
-    const navigation = useNavigation();
+const ChatComponent = (props) => {
+    const { item } = props;
     const [messages, setMessages] = useState({});
 
     // Retrieves the last message in the array from the item prop
@@ -14,15 +14,15 @@ const ChatComponent = ({ item }) => {
     }, []);
 
     /// Navigates to the Messaging screen
-    const handleNavigation = () => {
-        navigation.navigate("Messaging", {
-            id: item.id,
-            name: item.name,
-        });
-    };
+    // const handleNavigation = () => {
+    //     navigate("Messaging", {
+    //         id: item.id,
+    //         name: item.name,
+    //     });
+    // };
 
     return (
-        <Pressable style={styles.cchat} onPress={handleNavigation}>
+        <Pressable style={styles.cchat} onPress={props.onPress}>
             <Ionicons
                 name='person-circle-outline'
                 size={45}
@@ -48,7 +48,7 @@ const ChatComponent = ({ item }) => {
     );
 };
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
     cchat: {
         width: "100%",
         flexDirection: "row",

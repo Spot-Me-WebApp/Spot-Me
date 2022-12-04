@@ -8,6 +8,7 @@ import Chat from "../components/Chat";
 import Profile from "../components/Profile";
 import EditProfile from "../components/EditProfile"
 import OtherProfile from "../components/OtherProfile";
+import Messaging from "../components/Messaging";
 
 const Tab = createBottomTabNavigator();
 
@@ -68,6 +69,12 @@ const BottomTabs = () => {
                 }}
             />
             <Tab.Screen name="OtherProfile" component={OtherProfile} options={
+                {
+                    headerShown: false,
+                    tabBarButton: () => null
+                }}
+            />
+            <Tab.Screen name="Messaging" component={Messaging} options={
                 {
                     headerShown: false,
                     tabBarButton: () => null

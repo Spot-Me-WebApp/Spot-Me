@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState, useContext } from 'react';
-import { View, Text, Pressable, SafeAreaView, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Pressable, SafeAreaView, FlatList, StyleSheet, } from 'react-native';
 import { Feather } from "@expo/vector-icons";
 import ChatComponent from './ChatComponent';
 import { SERVER_PORT } from '@env'

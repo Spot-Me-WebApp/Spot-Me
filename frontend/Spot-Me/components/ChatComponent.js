@@ -1,13 +1,13 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-//import { useNavigation } from "@react-navigation/native";
+import { UserDataContext } from "./Contexts";
 
 
 const ChatComponent = (props) => {
     const { item } = props;
     const [messages, setMessages] = useState({});
-
+    const { userData } = useContext(UserDataContext)
     // Retrieves the last message in the array from the item prop
     useLayoutEffect(() => {
         setMessages(item.messages[item.messages.length - 1]);
@@ -32,7 +32,17 @@ const ChatComponent = (props) => {
 
             <View style={styles.crightContainer}>
                 <View>
-                    <Text style={styles.cusername}>{item.name}</Text>
+                    {item.name.includes(userData.name) ? (
+                        item.name.indexOf(userData.name) < item.name.indexOf('&') ? (
+                            <Text style={styles.cusername}>{item.name.replace(`${userData.name} & `, "")}</Text>
+                        ) :
+                            (
+                                <Text style={styles.cusername}>{item.name.replace(` & ${userData.name}`, "")}</Text>
+                            )
+                    ) : (
+                        <Text style={styles.cusername}>{item.name}</Text>
+                    )}
+
 
                     <Text style={styles.cmessage}>
                         {messages?.text ? messages.text : "Tap to start chatting"}

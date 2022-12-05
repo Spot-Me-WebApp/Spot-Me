@@ -1,9 +1,9 @@
-import React, { useEffect, useState, Component } from 'react';
+import React, { Component } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity, TouchableHighlight, Modal } from 'react-native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
-import { CardStackContext } from './Contexts';
-import { RightArrowBtn } from '../Shared/Forms/Buttons/ArrowButtons';
+import { CardStackContext, UserDataContext } from './Contexts';
+import socket from '../utils/socket';
 // For cross-device screen compatibility
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const SCREEN_WIDTH = Dimensions.get('window').width
@@ -179,7 +179,10 @@ export default class Meet extends Component {
                                             this.setState({ matchFound: !this.state.matchFound })
                                             this.props.navigation.navigate("Chat", { otherUser: this.context.cardStack[i - 1].element, matched: true })
                                         }}></Button>
-                                        <Button title="Dismiss" onPress={() => this.setState({ matchFound: !this.state.matchFound })}></Button>
+                                        <Button title="Dismiss" onPress={() => {
+                                            //NEED TO CREATE CHAT ROOM WHEN MATCH MODAL IS DISMISSED
+                                            this.setState({ matchFound: !this.state.matchFound })
+                                        }}></Button>
                                     </View>
                                 </Modal>
                             </View>

@@ -76,7 +76,7 @@ const BottomTabs = () => {
             />
             <Tab.Screen name="Messaging" component={Messaging} options={
                 {
-                    headerShown: false,
+                    headerShown: true,
                     tabBarButton: () => null
                 }}
             />

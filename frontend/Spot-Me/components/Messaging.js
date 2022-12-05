@@ -1,13 +1,15 @@
-import React, { useLayoutEffect, useEffect, useState } from "react";
-import { View, TextInput, Text, FlatList, Pressable, StyleSheet, KeyboardAvoidingView, Dimensions } from "react-native";
+import React, { useLayoutEffect, useEffect, useState, useContext } from "react";
+import { View, TextInput, Text, FlatList, Pressable, StyleSheet, KeyboardAvoidingView, Dimensions, TouchableWithoutFeedback, Keyboard } from "react-native";
 import MessageComponent from "./MessageComponent";
 import socket from "../utils/socket";
+import { UserDataContext } from "./Contexts";
 const { height, width } = Dimensions.get("screen")
 
 const Messaging = (props) => {
+    const { userData } = useContext(UserDataContext)
     const [chatMessages, setChatMessages] = useState([]);
     const [message, setMessage] = useState("");
-    const [user, setUser] = useState("");
+    const [user, setUser] = useState({ username: userData.username, profilePic: userData.images[0].url });
 
     // Access the chatroom's name and id
     const { name, id } = props.route.params;
@@ -15,7 +17,16 @@ const Messaging = (props) => {
 
     // Sets the header title to the name chatroom's name and find messages for this room from backend
     useLayoutEffect(() => {
-        props.navigation.setOptions({ title: name });
+        if (name.includes(userData.name)) {
+            if (name.indexOf(userData.name) < name.indexOf('&')) {
+                props.navigation.setOptions({ title: name.replace(`${userData.name} & `, "") })
+            } else {
+                props.navigation.setOptions({ title: name.replace(` & ${userData.name}`, "") })
+            }
+        }
+        else {
+            props.navigation.setOptions({ title: name })
+        }
         socket.emit("findRoom", id);
         socket.on("foundRoom", (roomMessages) => setChatMessages(roomMessages))
     }, []);
@@ -49,7 +60,7 @@ const Messaging = (props) => {
     };
 
     return (
-        <KeyboardAvoidingView style={styles.messagingscreen} behavior='height'>
+        <KeyboardAvoidingView style={[styles.messagingscreen, { paddingTop: height * .025 }]} behavior='height' keyboardVerticalOffset={height * .1}>
             <View
                 style={[
                     styles.messagingscreen,
@@ -83,21 +94,20 @@ const Messaging = (props) => {
                     </View>
                 </Pressable>
             </View>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingView >
     );
 };
 
 const styles = StyleSheet.create({
     messagingscreen: {
         flex: 1,
-        marginTop: height * .025,
         backgroundColor: '#202020'
     },
     messaginginputContainer: {
         width: "100%",
-        minHeight: 100,
+        minHeight: height * .13,
         backgroundColor: "#202020",
-        paddingVertical: 30,
+        paddingVertical: 20,
         paddingHorizontal: 15,
         justifyContent: "center",
         flexDirection: "row",
@@ -105,7 +115,7 @@ const styles = StyleSheet.create({
     },
     messaginginput: {
         borderWidth: 1,
-        padding: 15,
+        padding: 5,
         flex: 1,
         marginRight: 10,
         borderRadius: 20,

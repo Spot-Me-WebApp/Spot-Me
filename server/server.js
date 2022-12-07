@@ -300,6 +300,21 @@ app.post('/handleSwipe', async (req, res) => {
 
 //------------------------------------------------------Match Making-------------------------------------------------------
 
+//-----------------------------------------------------SCHEDDULING---------------------------------------------------------
+
+
+app.post('/sendGymRequest', async (req, res) => {
+    const { requestRecipient } = req.body;
+    const curr = await User.findById(req.user._id);
+    const recipientId = await User.findById(req.user._id);
+
+
+})
+
+app.get('/getGymRequests', async (req, res) => {
+    
+})
+
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
 app.post('/image', async (req, res) => {
     const responses = [];

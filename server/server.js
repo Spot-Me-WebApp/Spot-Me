@@ -8,6 +8,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose')
 const User = require('./models/user')
+const Chat = require('./models/chat')
 const cors = require('cors')
 const session = require('express-session')
 const flash = require('connect-flash')
@@ -34,13 +35,21 @@ io.listen(process.env.SOCKET_PORT)
 io.on("connection", (socket) => {
     console.log(`${socket.id} user just connected!`);
 
-    socket.on("createRoom", (roomName) => {
+    //Create chat room when users match
+    socket.on("createRoom", async (roomName, userId, otherUserId) => {
+        const chat = new Chat({
+            name: roomName,
+            users: [userId, otherUserId],
+            messages: []
+        })
+        await chat.save();
+        //Add this chat room to each user's chats array
+        await User.findByIdAndUpdate(userId, { $push: { chats: chat._id } })
+        await User.findByIdAndUpdate(otherUserId, { $push: { chats: chat._id } })
         socket.join(roomName);
-        console.log(roomName)
-        // Adds the new group name to the chat rooms array
-        chatRooms.unshift({ id: generateID(), name: roomName, messages: [] });
+        console.log(chat)
         //Returns the updated chat rooms via another event
-        socket.emit("roomsList", chatRooms);
+        socket.emit("roomsList", chat);
     });
 
     socket.on("findRoom", (id) => {
@@ -75,35 +84,6 @@ io.on("connection", (socket) => {
         console.log("A user disconnected");
     });
 })
-
-const generateID = () => Math.random().toString(36).substring(2, 10);
-let chatRooms = [
-    {
-        id: generateID(),
-        name: "Novu Hangouts",
-        messages: [
-            {
-                id: generateID(),
-                text: "Hello guys, welcome!",
-                time: "07:50",
-                user: "Tomer",
-            },
-            {
-                id: generateID(),
-                text: "Hi Tomer, thank you! 😇",
-                time: "08:50",
-                user: "David",
-            },
-        ],
-    }
-];
-
-
-
-app.get('/getChatRooms', (req, res) => {
-    res.json(chatRooms)
-})
-
 
 
 
@@ -373,6 +353,23 @@ app.put('/image', async (req, res) => {
     console.log(uploadedImages)
     res.send(uploadedImages)
 })
+
+
+//---------------GET CHAT ROOMS------------
+
+app.get('/getChatRooms', async (req, res) => {
+    if (req.user) {
+        const user = await User.findOne({ username: req.user.username }).populate('chats')
+        res.send(user.chats)
+    }
+
+})
+
+
+
+
+//--------------GET CHAT ROOMS---------------
+
 
 //Routes---------------------------------------------------------------------------------------------------
 

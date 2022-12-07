@@ -59,7 +59,7 @@ const userSchema = new Schema({
         type: [String],
         //Example for now
         enum: ['Powerlifting', 'Calisthenics', 'Cardio', 'Bodybuilding', 'Olympic Lifting', 'CrossFit', 'Yoga', 'Leg Day', 'Arm Day', 'Chest Day', 'Back Day', 'Shoulder Day', 'Filming', 'Running',
-            'Maxing Out', 'Posing', 'Strength Training', 'Fat Loss', 'Muscle Building', 'General Fitness', 'Bulking', 'Cutting'],
+            'Maxing Out', 'Posing', 'Strength Training', 'Fat Loss', 'Muscle Building', 'General Fitness', 'Bulking', 'Cutting', 'Gear', 'Natty'],
         required: false,
         unique: false
     },
@@ -76,6 +76,10 @@ const userSchema = new Schema({
     matches: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
+    }],
+    chats: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Chat'
     }]
 })
 

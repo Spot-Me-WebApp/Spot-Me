@@ -5,7 +5,7 @@ import ChatComponent from './ChatComponent';
 import { SERVER_PORT } from '@env'
 import { UserDataContext } from './Contexts';
 import socket from '../utils/socket';
-
+import axios from 'axios'
 
 
 
@@ -20,13 +20,15 @@ const Chat = (props) => {
         console.log(event, args);
     });
 
-    const [rooms, setRooms] = useState([]);
+    let [rooms, setRooms] = useState([]);
 
     useLayoutEffect(() => {
         function fetchGroups() {
-            fetch(`${SERVER_PORT}/getChatRooms`)
-                .then((res) => res.json())
-                .then((data) => setRooms(data))
+            axios.get(`${SERVER_PORT}/getChatRooms`)
+                .then((res) => {
+                    console.log(res.data)
+                    setRooms(res.data)
+                })
                 .catch((err) => console.error(err));
         }
         fetchGroups();
@@ -46,7 +48,7 @@ const Chat = (props) => {
             const { otherUser } = props.route.params
             const createRoomWithMatch = () => {
                 setGroupName(`${userData.name} & ${otherUser.name}`)
-                socket.emit("createRoom", groupName)
+                socket.emit("createRoom", groupName, userData._id, otherUser._id)
             }
             createRoomWithMatch();
         }
@@ -75,10 +77,10 @@ const Chat = (props) => {
                     <FlatList
                         data={rooms}
                         renderItem={({ item }) => <ChatComponent item={item} onPress={() => props.navigation.navigate("Messaging", {
-                            id: item.id,
+                            id: item._id,
                             name: item.name,
                         })} />}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item._id}
                     />
                 ) : (
                     <View style={styles.chatEmptyContainer}>

@@ -84,7 +84,6 @@ export default function ChooseGym(props) {
             })
             .catch((err) => console.log(err))
     }
-    getCardStack();
 
 
     const loginUser = async () => {

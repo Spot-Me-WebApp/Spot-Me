@@ -6,48 +6,50 @@ import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowBut
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
 
+import { EXP_LVL, METHODS } from '../../Shared/UserDataEnums';
 
-const EXP_LVL = [
-    {
-        item: 'Beginner',
-        id: 'BGN',
-    },
-    {
-        item: 'Intermediate',
-        id: 'INT',
-    },
-    {
-        item: 'Advanced',
-        id: 'ADV',
-    },
-]
 
-const METHODS = [
-    {
-        item: 'Powerlifting',
-        id: 'PWR',
-    },
-    {
-        item: 'Bodybuilding',
-        id: 'BD',
-    },
-    {
-        item: 'Cardio',
-        id: 'CAR',
-    },
-    {
-        item: 'Filming',
-        id: 'FLM',
-    },
-    {
-        item: 'Calisthenics',
-        id: 'CLS',
-    },
-    {
-        item: 'Olympic Lifting',
-        id: 'OLY',
-    },
-]
+// const EXP_LVL = [
+//     {
+//         item: 'Beginner',
+//         id: 'BGN',
+//     },
+//     {
+//         item: 'Intermediate',
+//         id: 'INT',
+//     },
+//     {
+//         item: 'Advanced',
+//         id: 'ADV',
+//     },
+// ]
+
+// const METHODS = [
+//     {
+//         item: 'Powerlifting',
+//         id: 'PWR',
+//     },
+//     {
+//         item: 'Bodybuilding',
+//         id: 'BD',
+//     },
+//     {
+//         item: 'Cardio',
+//         id: 'CAR',
+//     },
+//     {
+//         item: 'Filming',
+//         id: 'FLM',
+//     },
+//     {
+//         item: 'Calisthenics',
+//         id: 'CLS',
+//     },
+//     {
+//         item: 'Olympic Lifting',
+//         id: 'OLY',
+//     },
+// ]
 
 const { width } = Dimensions.get("screen")
 

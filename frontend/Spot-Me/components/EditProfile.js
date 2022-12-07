@@ -20,6 +20,9 @@ const EditProfile = (props) => {
     const { userData, setUserData } = useContext(UserDataContext)
     let { cardStack, setCardStack } = useContext(CardStackContext)
     setCardStack = (arr) => {
+        cardStack = arr;
+    }
+    setCardStack = (arr) => {
         cardStack.length = 0;
         cardStack = arr;
     }
@@ -251,8 +254,7 @@ const EditProfile = (props) => {
     async function getCardStack() {
         await axios.get(`${SERVER_PORT}/getQueue`)
             .then((response) => {
-                setCardStack(response.data.items)
-                console.log(cardStack)
+                setCardStack(response.data.items);
                 props.navigation.navigate("Profile")
             })
             .catch((err) => console.log(err))

@@ -139,8 +139,6 @@ const Profile = (props) => {
                             </View>
                         }
 
-                        <Button title="Logout" onPress={logoutUser}></Button>
-
                     </View>) : (<Text>Profile</Text>)}
             </ScrollView>
         </SafeAreaView>

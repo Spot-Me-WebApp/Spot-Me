@@ -21,6 +21,7 @@ const Chat = (props) => {
     });
 
     let [rooms, setRooms] = useState([]);
+    const [roomCreated, setRoomCreated] = useState(false)
 
     useLayoutEffect(() => {
         function fetchGroups() {
@@ -28,6 +29,7 @@ const Chat = (props) => {
                 .then((res) => {
                     console.log(res.data)
                     setRooms(res.data)
+                    setRoomCreated(!roomCreated)
                 })
                 .catch((err) => console.error(err));
         }
@@ -76,10 +78,7 @@ const Chat = (props) => {
                 {rooms.length > 0 ? (
                     <FlatList
                         data={rooms}
-                        renderItem={({ item }) => <ChatComponent item={item} onPress={() => props.navigation.navigate("Messaging", {
-                            id: item._id,
-                            name: item.name,
-                        })} />}
+                        renderItem={({ item }) => <ChatComponent item={item} onPress={() => props.navigation.navigate("Messaging", { item })} />}
                         keyExtractor={(item) => item._id}
                     />
                 ) : (

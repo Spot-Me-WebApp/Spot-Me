@@ -19,7 +19,7 @@ const { Server } = require('socket.io')
 const { PriorityQueue } = require('./PriorityQueue');
 
 
-//Socket.IO Connection ----------------------------------------------------------------------------
+//Socket.IO Connection & Events----------------------------------------------------------------------------
 
 
 const io = new Server({
@@ -47,36 +47,35 @@ io.on("connection", (socket) => {
         await User.findByIdAndUpdate(userId, { $push: { chats: chat._id } })
         await User.findByIdAndUpdate(otherUserId, { $push: { chats: chat._id } })
         socket.join(roomName);
-        console.log(chat)
+        const currUser = await User.findById(userId).populate({ path: 'chats', populate: { path: 'users' } })
         //Returns the updated chat rooms via another event
-        socket.emit("roomsList", chat);
+        socket.emit("roomsList", currUser.chats);
     });
-
-    socket.on("findRoom", (id) => {
-        const result = chatRooms.filter(room => room.id === id)
-        socket.emit("foundRoom", result[0].messages)
+    //Emmitted when user enters a chat room and this sends the message history of that chat room
+    socket.on("findRoom", async (id) => {
+        const result = await Chat.findById(id).populate({ path: 'messages', populate: { path: 'author' } })
+        socket.emit("foundRoom", result.messages)
     })
-
-    socket.on("newMessage", (data) => {
+    //Emitted when user sends a new message
+    socket.on("newMessage", async (data) => {
         const { room_id, message, user, timestamp } = data;
-
-        //Finds the room where the message was sent
-        const result = chatRooms.filter((room) => room.id === room_id);
-
-        //Create the data structure for the message
         const newMessage = {
-            id: generateID(),
             text: message,
-            user,
-            time: `${timestamp.hour}:${timestamp.mins}`,
-        };
+            //author is user's mongodb ID
+            author: user,
+            time: timestamp
+        }
+        //Finds the room where the message was sent and add new message
+        await Chat.findByIdAndUpdate(room_id, {
+            $push: { messages: newMessage }
+        })
+        const updatedRoom = await Chat.findById(room_id).populate({ path: 'messages', populate: { path: 'author' } });
         //Updates the chatroom messages
-        socket.to(result[0].name).emit("roomMessage", newMessage);
-        result[0].messages.push(newMessage);
-
-        //Trigger the events to reflect the new changes
-        socket.emit("roomsList", chatRooms);
-        socket.emit("foundRoom", result[0].messages);
+        socket.to(updatedRoom.name).emit("roomMessage", newMessage);
+        const currUser = await User.findById(user).populate({ path: 'chats', populate: { path: 'users' } });
+        //Update list of chats screen and individual chat screen with the new message
+        socket.emit("roomsList", currUser.chats);
+        socket.emit("foundRoom", updatedRoom.messages);
     });
 
     socket.on("disconnect", () => {
@@ -88,7 +87,7 @@ io.on("connection", (socket) => {
 
 
 
-//Socket.IO Connection ----------------------------------------------------------------------------
+//Socket.IO Connection & Events----------------------------------------------------------------------------
 
 
 //Database Connection-------------------------------------------------------------------------------
@@ -149,6 +148,23 @@ app.use((req, res, next) => {
 //MIDDLEWARES-------------------------------------------------------------------------------------------------------------------
 
 //Routes-----------------------------------------------------------------------------------------------
+
+
+//---------------GET CHAT ROOMS------------
+
+app.get('/getChatRooms', async (req, res) => {
+    if (req.user) {
+        const user = await User.findOne({ username: req.user.username }).populate({ path: 'chats', populate: { path: 'users' } })
+        return res.send(user.chats)
+    }
+
+})
+
+
+
+
+//--------------GET CHAT ROOMS---------------
+
 //For local authentication
 app.post('/login',
     passport.authenticate('local', { failureFlash: true, keepSessionInfo: true }),
@@ -249,7 +265,8 @@ app.get('/getQueue', async (req, res) => {
         })
         //all these users initially have 0 points
         results.forEach(res => {
-            if (!userPointsRanking.some(el => el.user._id.equals(res._id)) && !res._id.equals(req.user._id)) {
+            //user found in search is added to userPointsRanking unless they are already in it, or it is the current user, or the user is in current user's left swipes or matches
+            if (!userPointsRanking.some(el => el.user._id.equals(res._id)) && !res._id.equals(req.user._id) && !req.user.leftSwipes.includes(res._id) && !req.user.matches.includes(res._id)) {
                 userPointsRanking.push({ user: res, points: 0 })
             }
         })
@@ -312,7 +329,7 @@ app.post('/sendGymRequest', async (req, res) => {
 })
 
 app.get('/getGymRequests', async (req, res) => {
-    
+
 })
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
@@ -368,22 +385,6 @@ app.put('/image', async (req, res) => {
     console.log(uploadedImages)
     res.send(uploadedImages)
 })
-
-
-//---------------GET CHAT ROOMS------------
-
-app.get('/getChatRooms', async (req, res) => {
-    if (req.user) {
-        const user = await User.findOne({ username: req.user.username }).populate('chats')
-        res.send(user.chats)
-    }
-
-})
-
-
-
-
-//--------------GET CHAT ROOMS---------------
 
 
 //Routes---------------------------------------------------------------------------------------------------

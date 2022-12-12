@@ -10,12 +10,14 @@ import EditProfile from "../components/EditProfile"
 import OtherProfile from "../components/OtherProfile";
 import Messaging from "../components/Messaging";
 
+
 const Tab = createBottomTabNavigator();
 
 const BottomTabs = () => {
     return (
         <Tab.Navigator
             initialRouteName="Profile"
+            backBehavior="history"
             screenOptions={{
                 "tabBarHideOnKeyboard": true,
                 "tabBarShowLabel": false,
@@ -68,18 +70,21 @@ const BottomTabs = () => {
                     tabBarButton: () => null
                 }}
             />
-            <Tab.Screen name="OtherProfile" component={OtherProfile} options={
+            {/* <Tab.Screen name="OtherProfile" component={OtherProfile} options={
                 {
                     headerShown: false,
                     tabBarButton: () => null
                 }}
-            />
-            <Tab.Screen name="Messaging" component={Messaging} options={
+            /> */}
+            {/* <Tab.Screen name="Messaging" component={Messaging} options={
                 {
                     headerShown: true,
-                    tabBarButton: () => null
+                    tabBarButton: () => null,
+                    tabBarHideOnKeyboard: false,
+                    tabBarStyle: { display: 'none' },
                 }}
-            />
+                
+            /> */}
         </Tab.Navigator>
     );
 }

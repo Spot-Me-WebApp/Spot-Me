@@ -54,14 +54,6 @@ const Profile = (props) => {
         }
     }
 
-    const getQueue = async () => {
-        await axios({
-            url: `${SERVER_PORT}/getQueue`
-        })
-            .then((response) => console.log(response.data))
-            .catch((err) => console.log(err))
-    }
-
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>

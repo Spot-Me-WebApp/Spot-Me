@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableHighlight } from "react-native";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function MessageComponent({ item, user }) {
-
+export default function MessageComponent(props) {
+    const { item, user, navigation } = props;
     //STATUS IS TRUE IF THE MESSAGE WAS NOT SENT BY THE CURRENT USER
-    const status = item.user.username !== user.username;
+    const status = item.author.username !== user.username;
 
     return (
         //other user has their image to the left of their messages, current user has their image to the right of their messages
@@ -15,7 +15,9 @@ export default function MessageComponent({ item, user }) {
                     style={styles.mmessageWrapper}
                 >
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Image source={{ uri: item.user.profilePic }} style={{ height: 40, width: 40, borderRadius: 40 * 0.5, marginRight: 5 }} />
+                        <TouchableHighlight onPress={() => navigation.navigate("OtherProfile", { userData: item.author })} underlayColor="rgba(0,0,0,0.0)">
+                            <Image source={{ uri: item.author.images[0].url }} style={{ height: 40, width: 40, borderRadius: 40 * 0.5, marginRight: 5 }} />
+                        </TouchableHighlight>
                         <View
                             style={
                                 status
@@ -26,7 +28,7 @@ export default function MessageComponent({ item, user }) {
                             <Text>{item.text}</Text>
                         </View>
                     </View>
-                    <Text style={{ marginLeft: 40, color: 'white' }}>{item.time}</Text>
+                    <Text style={{ marginLeft: 40, color: 'white' }}>{new Date(item.time).toLocaleTimeString()}</Text>
                 </View>
             ) : (
                 <View
@@ -42,9 +44,11 @@ export default function MessageComponent({ item, user }) {
                         >
                             <Text>{item.text}</Text>
                         </View>
-                        <Image source={{ uri: item.user.profilePic }} style={{ height: 40, width: 40, borderRadius: 40 * 0.5, marginLeft: 5 }} />
+                        <TouchableHighlight onPress={() => navigation.navigate("Profile")} underlayColor="rgba(0,0,0,0.0)">
+                            <Image source={{ uri: item.author.images[0].url }} style={{ height: 40, width: 40, borderRadius: 40 * 0.5, marginLeft: 5 }} />
+                        </TouchableHighlight>
                     </View>
-                    <Text style={{ marginRight: 40, color: 'white' }}>{item.time}</Text>
+                    <Text style={{ marginRight: 40, color: 'white' }}>{new Date(item.time).toLocaleTimeString()}</Text>
                 </View>
             )}
 

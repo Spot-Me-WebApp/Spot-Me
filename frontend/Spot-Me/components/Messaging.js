@@ -1,19 +1,19 @@
-import React, { useLayoutEffect, useEffect, useState, useContext } from "react";
+import React, { useLayoutEffect, useEffect, useState, useContext, useRef } from "react";
 import { View, TextInput, Text, FlatList, Pressable, StyleSheet, KeyboardAvoidingView, Dimensions, TouchableWithoutFeedback, Keyboard } from "react-native";
 import MessageComponent from "./MessageComponent";
 import socket from "../utils/socket";
 import { UserDataContext } from "./Contexts";
+import { useNavigation } from "@react-navigation/native";
 const { height, width } = Dimensions.get("screen")
 
 const Messaging = (props) => {
     const { userData } = useContext(UserDataContext)
     const [chatMessages, setChatMessages] = useState([]);
     const [message, setMessage] = useState("");
-    const [user, setUser] = useState({ username: userData.username, profilePic: userData.images[0].url });
 
     // Access the chatroom's name and id
-    const { name, id } = props.route.params;
-
+    const { name, _id } = props.route.params.item;
+    const navigation = useNavigation()
 
     // Sets the header title to the name chatroom's name and find messages for this room from backend
     useLayoutEffect(() => {
@@ -27,7 +27,7 @@ const Messaging = (props) => {
         else {
             props.navigation.setOptions({ title: name })
         }
-        socket.emit("findRoom", id);
+        socket.emit("findRoom", _id);
         socket.on("foundRoom", (roomMessages) => setChatMessages(roomMessages))
     }, []);
 
@@ -36,31 +36,28 @@ const Messaging = (props) => {
         socket.on("foundRoom", (roomMessages) => setChatMessages(roomMessages));
     }, [socket])
 
+
+
+    const flatListRef = useRef(null)
     /* 
         This function gets the time the user sends a message, then 
         logs the username, message, and the timestamp to the console.
      */
     const handleNewMessage = () => {
-        const hour =
-            new Date().getHours() < 10
-                ? `0${new Date().getHours()}`
-                : `${new Date().getHours()}`;
-
-        const mins =
-            new Date().getMinutes() < 10
-                ? `0${new Date().getMinutes()}`
-                : `${new Date().getMinutes()}`;
-
-        socket.emit("newMessage", {
-            message,
-            room_id: id,
-            user,
-            timestamp: { hour, mins }
-        })
+        if (message && message.trim()) {
+            socket.emit("newMessage", {
+                message: message.trim(),
+                room_id: _id,
+                user: userData._id,
+                timestamp: new Date()
+            })
+        }
     };
 
+
+
     return (
-        <KeyboardAvoidingView style={[styles.messagingscreen, { paddingTop: height * .025 }]} behavior='height' keyboardVerticalOffset={height * .1}>
+        <KeyboardAvoidingView style={[styles.messagingscreen]} behavior='padding' keyboardVerticalOffset={height * .1}>
             <View
                 style={[
                     styles.messagingscreen,
@@ -69,11 +66,13 @@ const Messaging = (props) => {
             >
                 {chatMessages[0] ? (
                     <FlatList
-                        data={chatMessages}
+                        ref={flatListRef}
+                        inverted={true}
+                        data={[...chatMessages].reverse()}
                         renderItem={({ item }) => (
-                            <MessageComponent item={item} user={user} />
+                            <MessageComponent item={item} user={userData} navigation={navigation} />
                         )}
-                        keyExtractor={(item) => item.id}
+                        keyExtractor={(item) => item._id}
                     />
                 ) : (
                     ""
@@ -84,10 +83,17 @@ const Messaging = (props) => {
                 <TextInput
                     style={styles.messaginginput}
                     onChangeText={(value) => setMessage(value)}
+                    value={message}
                 />
                 <Pressable
                     style={styles.messagingbuttonContainer}
-                    onPress={handleNewMessage}
+                    onPress={() => {
+                        handleNewMessage();
+                        setMessage("")
+                        if (chatMessages.length > 0) {
+                            flatListRef.current.scrollToIndex({ animating: true, index: 0 })
+                        }
+                    }}
                 >
                     <View>
                         <Text style={{ color: "#f2f0f1", fontSize: 20 }}>SEND</Text>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity, TouchableHighlight, Modal } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity, TouchableHighlight } from 'react-native';
+import Modal from "react-native-modal"
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { CardStackContext, UserDataContext } from './Contexts';
@@ -167,25 +168,36 @@ export default class Meet extends Component {
                 return (
                     <TouchableOpacity>
                         {this.state.matchFound &&
-                            <View>
-                                <Modal
-                                    animationType='slide'
-                                    visible={this.state.matchFound}
-                                    onRequestClose={() => this.setState({ matchFound: !this.state.matchFound })}
-                                >
-                                    <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                        <Text>You Matched With {this.context.cardStack[i - 1].element.name}!</Text>
-                                        <Button title="Send them a message" onPress={() => {
-                                            this.setState({ matchFound: !this.state.matchFound })
-                                            this.props.navigation.navigate("Chat", { otherUser: this.context.cardStack[i - 1].element, matched: true })
-                                        }}></Button>
-                                        <Button title="Dismiss" onPress={() => {
-                                            //NEED TO CREATE CHAT ROOM WHEN MATCH MODAL IS DISMISSED
-                                            this.setState({ matchFound: !this.state.matchFound })
-                                        }}></Button>
+                            <UserDataContext.Consumer>
+                                {value =>
+                                    <View>
+                                        <Modal
+                                            animationType='slide'
+                                            visible={this.state.matchFound}
+                                            onRequestClose={() => this.setState({ matchFound: !this.state.matchFound })}
+                                        >
+                                            <View style={{ alignItems: 'center', flex: 1, backgroundColor: '#202020' }}>
+                                                <Text style={{ color: '#f8f9fa', fontSize: 24, fontWeight: 'bold', marginTop: 15 }}>You Matched With {this.context.cardStack[i - 1].element.name}!</Text>
+                                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginVertical: SCREEN_HEIGHT * .1 }}>
+                                                    <Image source={{ uri: this.context.cardStack[i - 1].element.images[0].url }} style={{ height: 72, width: 72, borderRadius: 72 * 0.5 }} />
+                                                    <Image source={require('../assets/spotmemarker.png')} style={{ height: 72, width: 72, borderRadius: 72 * 0.5 }} />
+                                                    <Image source={{ uri: value.userData.images[0].url }} style={{ height: 72, width: 72, borderRadius: 72 * 0.5 }} />
+                                                </View>
+                                                <Button title="Send them a message" onPress={() => {
+                                                    this.setState({ matchFound: !this.state.matchFound })
+                                                    this.props.navigation.navigate("Chat", { otherUser: this.context.cardStack[i - 1].element, matched: true })
+                                                }}></Button>
+                                                <Button title="Dismiss" onPress={() => {
+                                                    //NEED TO CREATE CHAT ROOM WHEN MATCH MODAL IS DISMISSED
+                                                    socket.emit("createRoom", `${value.userData.name} & ${this.context.cardStack[i - 1].element.name}`,
+                                                        value.userData._id, this.context.cardStack[i - 1].element._id);
+                                                    this.setState({ matchFound: !this.state.matchFound });
+                                                }}></Button>
+                                            </View>
+                                        </Modal>
                                     </View>
-                                </Modal>
-                            </View>
+                                }
+                            </UserDataContext.Consumer>
                         }
                         <Animated.View
                             {...this.PanResponder.panHandlers}

@@ -11,7 +11,6 @@ const User = require('./models/user')
 const Chat = require('./models/chat')
 const cors = require('cors')
 const session = require('express-session')
-const flash = require('connect-flash')
 const passport = require('passport');
 const multer = require('multer')
 const { storage, cloudinary } = require('./cloudinary');
@@ -123,7 +122,6 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }))
-app.use(flash());
 
 //Import passport local strategy config
 require('./passportLocalConfig')(passport);

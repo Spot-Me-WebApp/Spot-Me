@@ -13,24 +13,11 @@ const ChatComponent = (props) => {
         setMessages(item.messages[item.messages.length - 1]);
     }, []);
 
-    /// Navigates to the Messaging screen
-    // const handleNavigation = () => {
-    //     navigate("Messaging", {
-    //         id: item.id,
-    //         name: item.name,
-    //     });
-    // };
-
     //Next line Only works for two-person chats. It shows the 1st profile picture of the other user.
     const chatPicture = item.users.filter(user => user._id !== userData._id)[0].images[0].url
     return (
         <Pressable style={styles.cchat} onPress={props.onPress}>
-            {/* <Ionicons
-                name='person-circle-outline'
-                size={45}
-                color='black'
-                style={styles.cavatar}
-            /> */}
+
             <Image source={{ uri: chatPicture }} style={[styles.cavatar, { height: 48, width: 48, borderRadius: 48 * .5 }]} />
 
 

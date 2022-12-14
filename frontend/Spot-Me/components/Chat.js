@@ -17,7 +17,7 @@ const Chat = (props) => {
 
 
     socket.onAny((event, ...args) => {
-        console.log(event, args);
+        console.log(event);
     });
 
     let [rooms, setRooms] = useState([]);
@@ -47,12 +47,18 @@ const Chat = (props) => {
 
     useEffect(() => {
         if (props.route.params) {
-            const { otherUser } = props.route.params
-            const createRoomWithMatch = () => {
-                setGroupName(`${userData.name} & ${otherUser.name}`)
-                socket.emit("createRoom", groupName, userData._id, otherUser._id)
+            if (props.route.params.otherUser) {
+                const { otherUser } = props.route.params
+                const createRoomWithMatch = () => {
+                    setGroupName(`${userData.name} & ${otherUser.name}`)
+                    socket.emit("createRoom", groupName, userData._id, otherUser._id)
+                }
+                createRoomWithMatch();
             }
-            createRoomWithMatch();
+            else if (props.route.params.newRoomsList) {
+                setRooms(props.route.params.newRoomsList)
+                setRoomCreated(!roomCreated)
+            }
         }
     }, [props.route.params])
 

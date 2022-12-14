@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, StatusBar, Image, SafeAreaView, Dimensions } from 'react-native';
-import axios from 'axios'
-import { SERVER_PORT } from '@env'
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import calculateAge from '../utils/CalculateAge';
 
 const { height, width } = Dimensions.get("screen")
 
@@ -10,22 +8,6 @@ const OtherProfile = (props) => {
 
     const [userData, setUserData] = useState(props.route.params.userData);
 
-
-    const calculateAge = (dob) => {
-        const currentDate = new Date()
-        const birthday = new Date(dob)
-        switch (true) {
-            case (currentDate.getMonth() > birthday.getMonth()):
-                return (currentDate.getFullYear() - birthday.getFullYear())
-            case (currentDate.getMonth() < birthday.getMonth()):
-                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
-            default:
-                if (currentDate.getDate() >= birthday.getDate()) {
-                    return (currentDate.getFullYear() - birthday.getFullYear())
-                }
-                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
-        }
-    }
 
     return (
         <SafeAreaView style={styles.container}>

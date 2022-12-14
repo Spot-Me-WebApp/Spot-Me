@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, ScrollView, Button, StatusBar, Image, SafeAreaV
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { FormContainer } from '../Shared/Forms/FormContainer';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { UserDataContext } from './Contexts';
+import calculateAge from '../utils/CalculateAge';
 
 const { height, width } = Dimensions.get("screen")
 
@@ -38,21 +39,6 @@ const Profile = (props) => {
         }).catch((err) => console.log(err, err.stack))
     }
 
-    const calculateAge = (dob) => {
-        const currentDate = new Date()
-        const birthday = new Date(dob)
-        switch (true) {
-            case (currentDate.getMonth() > birthday.getMonth()):
-                return (currentDate.getFullYear() - birthday.getFullYear())
-            case (currentDate.getMonth() < birthday.getMonth()):
-                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
-            default:
-                if (currentDate.getDate() >= birthday.getDate()) {
-                    return (currentDate.getFullYear() - birthday.getFullYear())
-                }
-                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
-        }
-    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -68,7 +54,7 @@ const Profile = (props) => {
                         }}>
                             <View style={{ flexDirection: "row", width: "100%", marginTop: 10 }}>
 
-                                <Ionicons.Button name="settings" size={24} color="black" backgroundColor="white" onPress={() => props.navigation.navigate("Edit Profile", { userData })}></Ionicons.Button>
+                                <MaterialIcons.Button name="edit" size={24} color="black" backgroundColor="white" onPress={() => props.navigation.navigate("Edit Profile", { userData })}></MaterialIcons.Button>
                                 <View style={{
                                     width: "90%", alignItems: "flex-end"
                                 }}>

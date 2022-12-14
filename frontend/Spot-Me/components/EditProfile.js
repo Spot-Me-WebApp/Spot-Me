@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { View, Text, StyleSheet, StatusBar, Image, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Button, Alert } from 'react-native'
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
@@ -7,6 +7,13 @@ import { XCircleBtn } from '../Shared/Forms/Buttons/XCircleBtn'
 import { useActionSheet } from '@expo/react-native-action-sheet';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync } from 'expo-image-manipulator';
+import RangeSlider from 'rn-range-slider'
+import Rail from '../utils/RangeSlider/Rail'
+import Thumb from '../utils/RangeSlider/Thumb'
+import Notch from '../utils/RangeSlider/Notch'
+import RailSelected from '../utils/RangeSlider/RailSelected'
+import Label from '../utils/RangeSlider/Label'
+import calculateAge from '../utils/CalculateAge'
 import axios from 'axios'
 import { SERVER_PORT, PLACES_API_KEY } from '@env'
 import { EXP_LVL, METHODS } from '../Shared/UserDataEnums'
@@ -77,6 +84,23 @@ const EditProfile = (props) => {
     function onChange() {
         return (val) => setExp(val)
     }
+
+
+    const [distSliderValue, setDistSliderValue] = useState(userData.distancePref || 10)
+
+
+    const userAge = calculateAge(userData.dob)
+    const [low, setLow] = useState(userData.agePref ? userAge + userData.agePref.min : userAge - 5)
+    const [high, setHigh] = useState(userData.agePref ? userAge + userData.agePref.max : userAge + 5)
+    const renderThumb = useCallback((name) => <Thumb />, []);
+    const renderRail = useCallback(() => <Rail />, []);
+    const renderRailSelected = useCallback(() => <RailSelected />, []);
+    const renderLabel = useCallback(value => <Label text={value} />, []);
+    const renderNotch = useCallback(() => <Notch />, []);
+    const handleValueChange = useCallback((low, high) => {
+        setLow(low);
+        setHigh(high);
+    }, []);
 
     const { showActionSheetWithOptions } = useActionSheet();
 
@@ -192,6 +216,7 @@ const EditProfile = (props) => {
                 setPhotoDeleted(false)
                 setUploadedImages(null)
                 selectedGyms = userData.gyms;
+                setDistSliderValue(userData.distPref || 10)
                 props.navigation.navigate("Profile")
             }
         }])
@@ -206,6 +231,7 @@ const EditProfile = (props) => {
             setPhotoDeleted(false)
             setUploadedImages(null)
             selectedGyms = userData.gyms;
+            setDistSliderValue(userData.distPref || 10)
         })
         return discardAlert
     }, [props.navigation])
@@ -239,7 +265,12 @@ const EditProfile = (props) => {
                     methods: methods,
                     imageData: uploadedImages,
                     id: userData._id,
-                    gyms: selectedGyms
+                    gyms: selectedGyms,
+                    distancePref: distSliderValue,
+                    agePref: {
+                        min: low - userAge,
+                        max: high - userAge
+                    }
                 },
                 withCredentials: true
             }).then((response) => {
@@ -429,6 +460,42 @@ const EditProfile = (props) => {
                         />)}
                 </View>
                 <View style={{ marginLeft: 25, marginTop: 15 }}></View>
+                <View style={{ marginTop: 15, marginBottom: 30, alignItems: 'center' }}>
+                    <Text style={{ textAlign: 'center', color: 'white', fontSize: 16 }}>Search Distance <Text style={{ fontSize: 12, fontWeight: '300' }}>(in miles)</Text></Text>
+                    <RangeSlider
+                        style={{ backgroundColor: '#202020', width: width * .85, height: 40 }}
+                        min={1}
+                        max={50}
+                        low={distSliderValue}
+                        disableRange={true}
+                        step={1}
+                        floatingLabel={true}
+                        renderThumb={renderThumb}
+                        renderRail={renderRail}
+                        renderRailSelected={renderRailSelected}
+                        renderLabel={renderLabel}
+                        renderNotch={renderNotch}
+                        onValueChanged={(val) => { setDistSliderValue(val); console.log(distSliderValue) }}
+                    />
+                    <Text style={{ textAlign: 'center', color: 'white', fontSize: 16 }}>{distSliderValue}</Text>
+                    <Text style={{ textAlign: 'center', color: 'white', fontSize: 16, marginVertical: 15 }}>Show Ages: </Text>
+                    <RangeSlider
+                        style={{ backgroundColor: '#202020', width: width * .85, height: 40 }}
+                        min={14}
+                        max={80}
+                        low={low}
+                        high={high}
+                        step={1}
+                        floatingLabel={true}
+                        renderThumb={renderThumb}
+                        renderRail={renderRail}
+                        renderRailSelected={renderRailSelected}
+                        renderLabel={renderLabel}
+                        renderNotch={renderNotch}
+                        onValueChanged={handleValueChange}
+                    />
+                    <Text style={{ textAlign: 'center', color: 'white', fontSize: 14 }}>{low} - {high}</Text>
+                </View>
                 <Text style={styles.bio}>Username: {userData.username}</Text>
                 <Text style={styles.bio}>Date of Birth: {userData.dob.substr(0, 10)}</Text>
                 <Text style={styles.bio}>Bio</Text>

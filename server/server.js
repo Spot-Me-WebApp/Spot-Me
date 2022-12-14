@@ -130,7 +130,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Used to parse incoming requests
-app.use(express.urlencoded({ extended: true, limit: '50mb' }))
+app.use(express.urlencoded({ extended: true, limit: '50mb', parameterLimit: 15000 }))
 app.use(express.json({ limit: '50mb' }))
 
 //Set response headers for CORS
@@ -187,13 +187,13 @@ app.post('/register', async (req, res) => {
     console.log(req.body)
     const { username, password, name, dob, bio, expLevel, methods, imageData, provider, uri, gyms } = req.body;
     if (provider && uri) {
-        const newUser = new User({ username, name, dob, bio, expLevel, methods, provider, uri });
+        const newUser = new User({ username, name, dob, bio, expLevel, methods, provider, uri, distancePref: 10, agePref: { min: -5, max: 5 } });
         imageData.forEach(i => newUser.images.push(i))
         gyms.forEach(g => newUser.gyms.push(g))
         await newUser.save();
         return res.send(newUser)
     } else {
-        const newUser = new User({ username, name, dob, bio, expLevel, methods });
+        const newUser = new User({ username, name, dob, bio, expLevel, methods, distancePref: 10, agePref: { min: -5, max: 5 } });
         imageData.forEach(i => newUser.images.push(i))
         gyms.forEach(g => newUser.gyms.push(g))
         const registeredUser = await User.register(newUser, password);
@@ -208,20 +208,22 @@ app.get('/getUser/:id', async (req, res) => {
 })
 
 app.put('/edituser', async (req, res) => {
-    const { bio, expLevel, methods, imageData, id, gyms } = req.body;
+    console.log(req.body)
+    const { bio, expLevel, methods, imageData, id, gyms, distancePref, agePref } = req.body;
     const user = await User.findById(id)
     await user.updateOne(
         { bio: bio, expLevel: expLevel }
     )
     //add new methods to user's methods array
-    await user.updateOne({ $addToSet: { methods: methods } })
+    await user.updateOne({ $addToSet: { methods: methods }, $set: { agePref: agePref } })
+    user.distancePref = distancePref
     //add new gyms to user's gyms array
     await user.updateOne({ $addToSet: { gyms: gyms } })
     //deletedMethods is an array with the user's methods that are not found in the inputted methods array
     const deletedMethods = user.methods.filter(el => !methods.includes(el))
     await user.updateOne({ $pull: { methods: { $in: deletedMethods } } })
     //deletedGyms is an array with the user's gyms that are not found in the inputted gyms array
-    const deletedGyms = user.gyms.filter(el => !gyms.includes(el))
+    const deletedGyms = user.gyms.filter(el => !gyms.some(gym => gym._id && gym._id === el._id))
     await user.updateOne({ $pull: { gyms: { $in: deletedGyms } } })
     imageData.forEach(i => user.images.push(i))
     await user.save();
@@ -256,15 +258,24 @@ app.get('/getQueue', async (req, res) => {
     const currentUserGyms = req.user.gyms;
     const cardStack = new PriorityQueue();
     let userPointsRanking = [];
+    let latDiff; let longDiff;
+    if (req.user.distancePref) {
+        latDiff = req.user.distancePref / 69;
+        longDiff = req.user.distancePref / 54.6
+    } else {
+        latDiff = 0.144928;
+        longDiff = 0.18315;
+    }
     //Find users who goes to a gym within a 10 mile radius of one of the gyms that the current user goes to 
     for (let gym of currentUserGyms) {
         const results = await User.find({
-            gyms: { $elemMatch: { latitude: { $gte: gym.latitude - 0.1429, $lte: gym.latitude + 0.1429 }, longitude: { $gte: gym.longitude - 0.1429, $lte: gym.longitude + 0.1429 } } }
+            gyms: { $elemMatch: { latitude: { $gte: gym.latitude - latDiff, $lte: gym.latitude + latDiff }, longitude: { $gte: gym.longitude - longDiff, $lte: gym.longitude + longDiff } } }
         })
         //all these users initially have 0 points
         results.forEach(res => {
-            //user found in search is added to userPointsRanking unless they are already in it, or it is the current user, or the user is in current user's left swipes or matches
-            if (!userPointsRanking.some(el => el.user._id.equals(res._id)) && !res._id.equals(req.user._id) && !req.user.leftSwipes.includes(res._id) && !req.user.matches.includes(res._id)) {
+            //user found in search is added to userPointsRanking unless they are already in it, or it is the current user, or the user is in current user's left swipes or right swipes or matches
+            if (!userPointsRanking.some(el => el.user._id.equals(res._id)) && !res._id.equals(req.user._id) && !req.user.leftSwipes.includes(res._id) && !req.user.rightSwipes.includes(res._id) &&
+                !req.user.matches.includes(res._id)) {
                 userPointsRanking.push({ user: res, points: 0 })
             }
         })
@@ -279,9 +290,17 @@ app.get('/getQueue', async (req, res) => {
         element.user.methods.forEach(m => {
             if (req.user.methods.includes(m)) { element.points += 1; }
         })
-        const ageDifference = Math.abs(req.user.dob.getFullYear() - element.user.dob.getFullYear())
-        if (ageDifference <= 4) {
-            element.points += -0.2 * ageDifference + 1;
+        if (req.user.agePref) {
+            const ageDifference = Math.abs(req.user.dob.getFullYear() - element.user.dob.getFullYear());
+            const range = req.user.agePref.max - req.user.agePref.min
+            if (ageDifference <= Math.abs(req.user.agePref.min) || ageDifference <= req.user.agePref.max) {
+                element.points += (-3 / range + 1) * ageDifference + 3;
+            }
+        } else {
+            const ageDifference = Math.abs(req.user.dob.getFullYear() - element.user.dob.getFullYear())
+            if (ageDifference <= 5) {
+                element.points += -0.5 * ageDifference + 3;
+            }
         }
         if (req.user.expLevel === element.user.expLevel) { element.points += 1; }
         cardStack.enqueue(element.user, element.points);
@@ -309,6 +328,22 @@ app.post('/handleSwipe', async (req, res) => {
         await currUser.updateOne({ $addToSet: { leftSwipes: swipedUser._id } })
         return res.send(`${swipedUser.name} added to left swipes`)
     }
+})
+
+
+app.post('/unmatch', async (req, res) => {
+    const { chatRoomId, users } = req.body;
+    await Chat.findByIdAndDelete(chatRoomId);
+    const currUserId = users.filter(user => user.username === req.user.username)[0]._id;
+    const otherUserId = users.filter(user => user.username !== (req.user.username))[0]._id;
+    const currUser = await User.findById(currUserId).populate({ path: 'chats', populate: { path: 'users' } });
+    //remove other user from current user's matches and add them to the left swipes
+    await currUser.updateOne({ $pull: { chats: chatRoomId, matches: otherUserId }, $push: { leftSwipes: otherUserId } })
+    // await currUser.updateOne({$pull: {matches: otherUserId}})
+    //remove current user from other user's matches
+    await User.findByIdAndUpdate(otherUserId, { $pull: { matches: currUserId, chats: chatRoomId } })
+    console.log(currUser.chats)
+    return res.send(currUser.chats)
 })
 
 

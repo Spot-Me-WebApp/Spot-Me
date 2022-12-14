@@ -5,6 +5,7 @@ import axios from 'axios'
 import { SERVER_PORT } from '@env'
 import { CardStackContext, UserDataContext } from './Contexts';
 import socket from '../utils/socket';
+import calculateAge from '../utils/CalculateAge';
 // For cross-device screen compatibility
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const SCREEN_WIDTH = Dimensions.get('window').width
@@ -140,22 +141,6 @@ export default class Meet extends Component {
             .catch((err) => console.log(err))
     }
 
-    calculateAge = (dob) => {
-        const currentDate = new Date()
-        const birthday = new Date(dob)
-        switch (true) {
-            case (currentDate.getMonth() > birthday.getMonth()):
-                return (currentDate.getFullYear() - birthday.getFullYear())
-            case (currentDate.getMonth() < birthday.getMonth()):
-                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
-            default:
-                if (currentDate.getDate() >= birthday.getDate()) {
-                    return (currentDate.getFullYear() - birthday.getFullYear())
-                }
-                return (currentDate.getFullYear() - birthday.getFullYear() - 1)
-        }
-    }
-
     // Shows users in profile cards by using key value pairs
     renderUsers = () => {
         return this.context.cardStack.map((item, i) => {
@@ -209,7 +194,7 @@ export default class Meet extends Component {
                                 <TouchableHighlight onPress={() => this.props.navigation.navigate("OtherProfile", { userData: item.element })} underlayColor="rgba(0,0,0,0.0)">
                                     <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> {item.element.name} </Text>
                                 </TouchableHighlight>
-                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {this.calculateAge(item.element.dob)}</Text>
+                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {calculateAge(item.element.dob)}</Text>
                             </Animated.View>
                             <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
                                 {/* <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text> */}
@@ -221,11 +206,11 @@ export default class Meet extends Component {
                                 })}
                                 <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Interests: </Text>
                                 <Animated.View style={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'flex-start', SCREEN_WIDTH, marginTop: 10, }}>
-                                    {(item.element.methods.slice(0, 6).map((method, index) => {
-                                        if (index > 4) {
+                                    {(item.element.methods.slice(0, 5).map((method, index) => {
+                                        if (index > 3) {
                                             return (
                                                 <View style={{ borderWidth: 1, borderRadius: 20, backgroundColor: '#202020', marginHorizontal: 1.5, justifyContent: 'center' }} key={index}>
-                                                    <Text style={{ color: 'white', padding: 10 }}>+ {item.element.methods.length - 5} more...</Text>
+                                                    <Text style={{ color: 'white', padding: 10 }}>+ {item.element.methods.length - 4} more...</Text>
                                                 </View>
                                             )
                                         }
@@ -275,7 +260,7 @@ export default class Meet extends Component {
                             {/* User name and age*/}
                             <Animated.View style={{ flexDirection: 'row', position: 'absolute', bottom: 160, left: 35, zIndex: 1000 }}>
                                 <Text style={{ color: 'white', fontSize: 34, fontFamily: 'Bodoni 72', fontWeight: 'bold' }}> {item.element.name} </Text>
-                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {this.calculateAge(item.element.dob)}</Text>
+                                <Text style={{ color: 'white', fontSize: 18, marginTop: 13, fontFamily: 'Bodoni 72', fontWeight: '300' }}> {calculateAge(item.element.dob)}</Text>
                             </Animated.View>
                             <Animated.View style={{ position: 'absolute', bottom: 31, left: 35, zIndex: 1000 }}>
                                 {/* <Text style={{ color: 'white', fontSize: 18, fontFamily: 'Bodoni 72', fontWeight: '300' }}> Gym</Text> */}

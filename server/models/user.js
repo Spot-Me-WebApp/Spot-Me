@@ -57,7 +57,6 @@ const userSchema = new Schema({
     },
     methods: {
         type: [String],
-        //Example for now
         enum: ['Powerlifting', 'Calisthenics', 'Cardio', 'Bodybuilding', 'Olympic Lifting', 'CrossFit', 'Yoga', 'Leg Day', 'Arm Day', 'Chest Day', 'Back Day', 'Shoulder Day', 'Filming', 'Running',
             'Maxing Out', 'Posing', 'Strength Training', 'Fat Loss', 'Muscle Building', 'General Fitness', 'Bulking', 'Cutting', 'Gear', 'Natty'],
         required: false,
@@ -80,7 +79,16 @@ const userSchema = new Schema({
     chats: [{
         type: Schema.Types.ObjectId,
         ref: 'Chat'
-    }]
+    }],
+    //Radius in miles to search for other users, if not specified defaults to 10 miles
+    distancePref: Number,
+    //Age range to search for other users, if not specified defaults to +/- 5 years
+    agePref: {
+        //min will be int <=0 indicating how many years under the current user's age
+        min: Number,
+        //max will be int >=0 indicating how many years over the current user's age
+        max: Number
+    }
 })
 
 //adds username and password fields to userSchema

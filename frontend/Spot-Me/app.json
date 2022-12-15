@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "Spot-Me",
+    "name": "Spot Me",
     "slug": "Spot-Me",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/spotmemarker.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/Spot_Me_Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

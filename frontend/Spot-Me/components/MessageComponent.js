@@ -28,7 +28,7 @@ export default function MessageComponent(props) {
                             <Text>{item.text}</Text>
                         </View>
                     </View>
-                    <Text style={{ marginLeft: 40, color: 'white' }}>{new Date(item.time).toLocaleTimeString()}</Text>
+                    <Text style={{ marginLeft: 40, color: 'white' }}>{new Date(item.time).toLocaleTimeString().split(':').map((val, i) => i === 2 ? val.substring(3, 6) : val).join(':')}</Text>
                 </View>
             ) : (
                 <View
@@ -48,7 +48,7 @@ export default function MessageComponent(props) {
                             <Image source={{ uri: item.author.images[0].url }} style={{ height: 40, width: 40, borderRadius: 40 * 0.5, marginLeft: 5 }} />
                         </TouchableHighlight>
                     </View>
-                    <Text style={{ marginRight: 40, color: 'white' }}>{new Date(item.time).toLocaleTimeString()}</Text>
+                    <Text style={{ marginRight: 40, color: 'white' }}>{new Date(item.time).toLocaleTimeString().split(':').map((val, i) => i === 2 ? val.substring(3, 6) : val).join(':')}</Text>
                 </View>
             )}
 

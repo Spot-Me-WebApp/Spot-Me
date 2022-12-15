@@ -20,6 +20,8 @@ export const Input = (props) => {
                 multiline={props.multiline}
                 numberOfLines={props.numberOfLines}
                 keyboardType={props.keyboardType}
+                editable={props.editable}
+                style={props.style}
             >
             </TextInput>
         </View>

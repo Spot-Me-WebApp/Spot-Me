@@ -41,7 +41,7 @@ const ChatComponent = (props) => {
                 </View>
                 <View>
                     <Text style={styles.ctime}>
-                        {messages?.time ? new Date(messages.time).toLocaleTimeString() : "now"}
+                        {messages?.time ? new Date(messages.time).toLocaleTimeString().split(':').map((val, i) => i === 2 ? val.substring(3, 6) : val).join(':') : "now"}
                     </Text>
                 </View>
             </View>

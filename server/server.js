@@ -354,15 +354,61 @@ app.post('/unmatch', async (req, res) => {
 
 
 app.post('/sendGymRequest', async (req, res) => {
-    const { requestRecipient } = req.body;
-    const curr = await User.findById(req.user._id);
-    const recipientId = await User.findById(req.user._id);
+    console.log(req.body)
+    const { date, time, recipients, location, description } = req.body;
+    const currUser = await User.findById(req.user._id);
 
+    const newDate = new Date(date.substring(0, date.indexOf('T')) + time.substring(time.indexOf('T'), time.length))
+    if (recipients.length === 0) {
+        const event = {
+            location: location,
+            date: newDate,
+            description: description,
+            pending: false
+        }
+        await currUser.updateOne({ $push: { events: event } })
+        return res.send(currUser);
+    }
+    else {
+        recipients.forEach(async (r) => {
+            await User.findByIdAndUpdate(r.id, {
+                $push: {
+                    events: {
+                        location: location,
+                        date: newDate,
+                        description: description,
+                        pending: true,
+                        sender: req.user._id,
+                        recipients: recipients.map(r => r.id),
 
+                    }
+                }
+            })
+        })
+        await currUser.updateOne({
+            $push: {
+                events: {
+                    location: location,
+                    date: newDate,
+                    description: description,
+                    pending: true,
+                    sender: req.user._id,
+                    recipients: recipients.map(r => r.id),
+
+                }
+            }
+        })
+        return res.send(currUser)
+    }
 })
 
 app.get('/getGymRequests', async (req, res) => {
 
+})
+
+app.get('/getMatchesData', async (req, res) => {
+    const user = await User.findById(req.user._id).populate('matches');
+    res.json(user.matches)
 })
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------

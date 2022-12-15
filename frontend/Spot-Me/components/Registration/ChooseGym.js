@@ -7,7 +7,6 @@ import axios from 'axios'
 
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { SmallXCircleBtn } from '../../Shared/Forms/Buttons/XCircleBtn';
-import Slider from '@react-native-community/slider'
 import { LoginContext, CardStackContext, UserDataContext } from '../Contexts';
 const { height, width } = Dimensions.get('screen')
 export default function ChooseGym(props) {

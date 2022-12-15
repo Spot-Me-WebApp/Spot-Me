@@ -16,6 +16,23 @@ const gymSchema = {
     address: String
 }
 
+const eventSchema = {
+    sender: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+    },
+    location: String,
+    date: Date,
+    description: String,
+    recipients: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: false
+    }],
+    pending: Boolean
+}
+
 const userSchema = new Schema({
 
     //This will only exist for users who register with google or facebook. uri is a unique id associated with a user's google/facebook account
@@ -88,7 +105,9 @@ const userSchema = new Schema({
         min: Number,
         //max will be int >=0 indicating how many years over the current user's age
         max: Number
-    }
+    },
+    events: [eventSchema]
+
 })
 
 //adds username and password fields to userSchema

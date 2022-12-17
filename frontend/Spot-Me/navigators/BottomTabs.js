@@ -11,6 +11,7 @@ import OtherProfile from "../components/OtherProfile";
 import Messaging from "../components/Messaging";
 
 
+
 const Tab = createBottomTabNavigator();
 
 const BottomTabs = () => {

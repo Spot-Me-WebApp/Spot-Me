@@ -6,6 +6,7 @@ import { FormContainer } from '../../Shared/Forms/FormContainer';
 import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowButtons';
 
 
+
 const { height, width } = Dimensions.get('window')
 
 const Bio = (props) => {

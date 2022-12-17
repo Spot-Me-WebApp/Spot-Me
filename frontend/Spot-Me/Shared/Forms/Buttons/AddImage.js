@@ -24,7 +24,7 @@ const AddImage = ({
             }}
             onPress={onPress}>
             {/* aspectRatio for Mitchell: .8 & Dennies: .66 */}
-            {imageSource ? <Image source={imageSource} style={{ width: '100%', height: '100%', aspectRatio: 0.8, borderRadius: 10 }} />
+            {imageSource ? <Image source={imageSource} style={{ width: '100%', height: '100%', aspectRatio: 0.66, borderRadius: 10 }} />
                 :
                 <Text
                     style={{ ...styles.title, ...textStyle, color: titleColor || '#fff' }}>

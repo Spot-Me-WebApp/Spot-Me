@@ -9,6 +9,8 @@ const OtherProfile = (props) => {
     const [userData, setUserData] = useState(props.route.params.userData);
 
 
+
+    
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>

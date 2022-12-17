@@ -12,6 +12,7 @@ export const RightArrowBtn = (props) => {
     )
 }
 
+
 export const LeftArrowBtn = (props) => {
     return (
         <Pressable onPress={props.onPress} style={props.style}>

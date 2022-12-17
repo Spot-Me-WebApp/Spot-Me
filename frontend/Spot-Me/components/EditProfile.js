@@ -128,6 +128,10 @@ const EditProfile = (props) => {
         changeBox(num);
     }
 
+
+
+    
+
     const resizePhoto = async (imageUri, num) => {
         const manipResult = await manipulateAsync(
             imageUri,

@@ -14,17 +14,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
 
+
+
 const Schedule = (props) => {
 
     const { userData, setUserData } = useContext(UserDataContext)
     let [selectedDate, setDate] = useState(new Date())
     const [modalVisible, setModalVisible] = useState(false);
     const [requestModalVisible, setRequestModalVisible] = useState(false);
+    const [eventModalVisible, setEventModalVisibile] = useState(false);
     const [eventTime, setEventTime] = useState(new Date())
     const [matches, setMatches] = useState([])
     const [recipients, setRecipients] = useState([])
+    const [requests, setRequests] = useState([])
     const [location, setLocation] = useState("")
     const [description, setDescription] = useState("")
+    const [requestIndex, setRequestIndex] = useState(0)
     const setTime = (event, date) => {
         if (event.type === 'set' || event.type === 'dismissed') {
             setEventTime(date)
@@ -77,18 +82,22 @@ const Schedule = (props) => {
     }
 
 
-    const _renderRequests = ({ item, index }) => {
+    const _renderRequests = ({ item, index}) => {
         return (
+
+            
+            
             <View style={{
                 marginLeft: index === 0 ? 30 : 20,
-                marginRight: index === Requests.length - 1 ? 30 : 0
+                marginRight: index === requests.length - 1 ? 30 : 0
             }}>
                 <TouchableWithoutFeedback
                     onPress={() => {
                         setRequestModalVisible(true)
+                        setRequestIndex(index)
                     }}
                 >
-                    <ImageBackground source={item.image}
+                    <ImageBackground source={{uri: item.sender.images[0].url}}
                         resizeMode='cover'
                         borderRadius={20}
                         style={{
@@ -104,8 +113,8 @@ const Schedule = (props) => {
                         }}>
 
                             <View style={styles.dateBox}>
-                                <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 18, }}>{item.date.getDate()}</Text>
-                                <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 10, }}>{item.date.toDateString().substr(4, 3)}</Text>
+                                <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 18, }}>{new Date(item.date).getDate()}</Text>
+                                <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 10, }}>{new Date(item.date).toDateString().substr(4, 3)}</Text>
 
 
                             </View>
@@ -117,7 +126,7 @@ const Schedule = (props) => {
                             marginBottom: 15,
                         }}>
                             <Text style={{ color: 'white', opacity: .85, fontSize: 8, }}>{item.location} </Text>
-                            <Text style={{ color: 'white', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 12, }}>{item.sender} </Text>
+                            <Text style={{ color: 'white', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 12, }}>{item.sender.name} </Text>
 
                         </View>
 
@@ -139,6 +148,17 @@ const Schedule = (props) => {
         }
         fetchData();
     }, [])
+
+    useEffect(() => {
+        async function fetchData() {
+            await axios({
+                url: `${SERVER_PORT}/getGymRequests`
+            })
+                .then((res) => { console.log(res.data); setRequests(res.data) })
+                .catch((err) => console.log(err))
+        }
+        fetchData();
+    }, [matches])
 
     useEffect(() => {
         selectedDateCopy = selectedDate
@@ -163,51 +183,77 @@ const Schedule = (props) => {
             .catch((err) => console.log(err))
     }
 
+    const handleRequest = async (accepted) => {
+        await axios({
+            url: `${SERVER_PORT}/handleRequest`,
+            method: 'post',
+            data: {
+                accepted,
+                eventRequest: requests[requestIndex]
+            }
+        })
+        .then(console.log('success'))
+        .catch((err) => console.log(err))
+    }
+
     return (
         <View style={styles.container}>
             <View style={{ marginTop: 20, flex: 1, justifyContent: 'flex-start' }}>
-                <Text style={{ fontSize: 26, fontFamily: 'Bodoni 72', color: 'white', textAlign: 'center' }}>Workout Requests</Text>
+                <Text style={{ marginTop: 20, fontSize: 26, fontFamily: 'Bodoni 72', color: 'white', textAlign: 'center' }}>Workout Requests</Text>
             </View>
 
 
 
             <View style={{
-                marginBottom: 15, alignItems: 'center'
+                marginBottom: 8, alignItems: 'center'
             }}>
                 <FlatList
                     horizontal
                     keyExtractor={(item) => item.id}
-                    data={Requests}
+                     // data={Requests}
+                     // renderItem={_renderRequests}
+                    data = {requests}
                     renderItem={_renderRequests}
                     showsHorizontalScrollIndicator={false}
 
                 ></FlatList>
             </View>
-
+            {requests.length > 0 &&
             <View>
                 <Modal
                     isVisible={requestModalVisible}
                 >
                     <View style={{
-                        flex: 1,
-                        backgroundColor: 'black'
+                        //flex:1,
+                        borderRadius:20,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        //backgroundColor: 'black'
                     }}>
                         <ImageBackground
                             resizeMode='cover'
-                            source={Requests[0].image}
+                            borderRadius={25}
+                            source={{uri:requests[requestIndex].sender.images[0].url}}
                             style={{
-                                width: '100%',
-                                height: HEIGHT * .8
+                                width: WIDTH,
+                                height: HEIGHT * .66,
+                                borderRadius: 20,
                             }}
-                        >
-                            <View style={{ flex: 1 }}>
 
-                                <View style={styles.modalHeader}>
+                        >
+                            <View style={{ flex: 1, justifyContent: 'center' }}>
+                                
+                                {/* <View style={styles.modalHeader}> */}
+                                <View style={{
+                                    marginHorizontal: 15,
+                                    marginVertical: 15,
+                                }}>
                                     <View style={styles.modalDateBox}>
-                                        <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 36, }}>{Requests[0].date.getDate()}</Text>
-                                        <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 20, }}>{Requests[0].date.toDateString().substr(4, 3)}</Text>
+                                        <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 36, }}>{new Date(requests[requestIndex].date).getDate()}</Text>
+                                        <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 20, }}>{new Date(requests[requestIndex].date).toDateString().substr(4, 3)}</Text>
                                     </View>
-                                </View>
+                                    </View>
+                                {/* </View> */}
 
 
                                 <View style={styles.modalGradient}>
@@ -217,21 +263,59 @@ const Schedule = (props) => {
                                         end={{ x: 1, y: 1 }}
                                         style={{
                                             width: '100%',
-                                            height: HEIGHT * .8,
+                                            height: HEIGHT * .9,
                                             justifyContent: 'flex-end'
                                         }}
                                     >
 
                                         <View style={styles.modalInfo}>
-                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{Requests[0].what}</Text>
-                                            <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase' }}>{Requests[0].sender}</Text>
-                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{Requests[0].where}</Text>
 
+                                        <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase' }}>{requests[requestIndex].sender.name}</Text>
+                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{requests[requestIndex].description}</Text>
+                                            
+                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{requests[requestIndex].location}</Text>
+                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{new Date(requests[requestIndex].date).toLocaleTimeString().split(':').map((val, i) => i === 2 ? val.substring(3, 6) : val).join(':')}</Text>
+                                            
                                             {/* <View style={styles.dateBox}>
                                                 <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 18, }}>{Requests[0].date.getDate()}</Text>
                                                 <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 10, }}>{Requests[0].date.toDateString().substr(4, 3)}</Text>
                                             </View> */}
                                         </View>
+
+                                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-evenly',
+                            marginBottom: 10,
+                        }}>
+                            <TouchableOpacity
+                                style={{
+                                    width: 75,
+                                    height: 35,
+                                    borderRadius: 10,
+                                    justifyContent: 'center',
+                                    backgroundColor: 'white',
+                                    alignItems: 'center'
+                                }}
+                                onPress={() => handleRequest(false)}
+                            >
+                                <Text style={{ color: 'black' }}>DECLINE</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={{
+                                    width: 75,
+                                    height: 35,
+                                    borderRadius: 10,
+                                    justifyContent: 'center',
+                                    backgroundColor: 'white',
+                                    alignItems: 'center'
+                                }}
+                                onPress={() => handleRequest(true)}
+                            >
+                                <Text style={{ color: 'black' }}>ACCEPT</Text>
+                            </TouchableOpacity>
+                        </View>
+
 
                                     </LinearGradient>
                                 </View>
@@ -243,9 +327,10 @@ const Schedule = (props) => {
 
                         </ImageBackground>
 
-                        <View style={{
+                        {/* <View style={{
                             flexDirection: 'row',
-                            justifyContent: 'space-evenly'
+                            justifyContent: 'space-between',
+                            
                         }}>
                             <TouchableOpacity
                                 style={{
@@ -273,7 +358,7 @@ const Schedule = (props) => {
                             >
                                 <Text style={{ color: 'black' }}>ACCEPT</Text>
                             </TouchableOpacity>
-                        </View>
+                        </View> */}
 
 
                         <Button title="Dismiss" onPress={() => setRequestModalVisible(false)}></Button>
@@ -281,12 +366,12 @@ const Schedule = (props) => {
                 </Modal>
 
             </View>
-
+        }
             <View>
                 <Modal
                     isVisible={modalVisible}
                 >
-                    <View style={{ alignItems: 'center', flex: 1, backgroundColor: '#202020' }}>
+                    <SafeAreaView style={{ alignItems: 'center', flex: .7, backgroundColor: '#202020', borderRadius: 30 }}>
                         <Text style={{ color: '#f8f9fa', fontSize: 24, fontWeight: 'bold', marginTop: 15 }}>Schedule Event</Text>
                         <Text style={{ color: 'white', alignSelf: 'flex-start', marginLeft: 5, marginTop: 30, fontWeight: 'bold' }}>When</Text>
                         <Input value={`${new Date(selectedDateCopy.setDate(selectedDate.getDate() + 1)).toDateString()} 
@@ -317,7 +402,30 @@ const Schedule = (props) => {
                         <Input style={{ color: 'white', marginTop: -10 }} onChangeText={e => setDescription(e)}></Input>
                         <Button title="Confirm" onPress={submitEventForm}></Button>
                         <Button title="Dismiss" onPress={() => { setModalVisible(false); setEventTime(new Date()) }}></Button>
-                    </View>
+                    </SafeAreaView>
+                </Modal>
+            </View>
+
+            <View>
+                <Modal
+                    isVisible={eventModalVisible}
+                >
+                    <SafeAreaView style={{ alignItems: 'center', flex: .75, backgroundColor: '#202020', overflow: 'hidden', borderRadius:20 }}>
+                        <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase', letterSpacing:2 }}>WORKOUT SCHEDULED ON DATE</Text>
+                        <View style={{ flexDirection: 'column',}}>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>WITH: </Text>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>USER </Text>
+                        </View>
+                        <View style={{ flexDirection: 'column',}}>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>WHERE: </Text>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>LOCATION </Text>
+                        </View>
+                        <View style={{ flexDirection: 'column',}}>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>TIME: </Text>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>TIME</Text>
+                        </View>
+                    </SafeAreaView>
+
                 </Modal>
             </View>
 
@@ -326,16 +434,17 @@ const Schedule = (props) => {
                 style={{
                     borderWidth: 5,
                     borderColor: 'gray',
-                    height: HEIGHT * .6,
+                    height: HEIGHT * .58,
                     width: WIDTH * .95,
                     marginBottom: 0,
                     backgroundColor: '#fff',
-                    alignSelf: 'center'
+                    alignSelf: 'center',
+                    marginBottom: 5,
                 }}
                 // Specify theme properties to override specific styles for calendar parts. Default = {}
                 theme={{
-                    backgroundColor: '#ffffff',
-                    calendarBackground: '#ffffff',
+                    backgroundColor: 'black',
+                    calendarBackground: 'black',
                     textSectionTitleColor: '#b6c1cd',
                     textSectionTitleDisabledColor: '#d9e1e8',
                     selectedDayBackgroundColor: '#00adf5',
@@ -347,8 +456,8 @@ const Schedule = (props) => {
                     selectedDotColor: '#ffffff',
                     arrowColor: 'orange',
                     disabledArrowColor: '#d9e1e8',
-                    monthTextColor: 'blue',
-                    indicatorColor: 'blue',
+                    monthTextColor: 'black',
+                    indicatorColor: 'red',
                     // textDayFontFamily: 'monospace',
                     // textMonthFontFamily: 'monospace',
                     // textDayHeaderFontFamily: 'monospace',
@@ -407,9 +516,11 @@ const styles = StyleSheet.create({
 
     },
     modalInfo: {
-        flexDirection: 'column',
+        marginBottom: 25,
+        flexDirection: '',
         justifyContent: 'space-evenly',
         alignItems: 'center',
+        alignContent: 'center'
     }
 
 

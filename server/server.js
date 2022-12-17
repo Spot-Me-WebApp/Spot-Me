@@ -402,14 +402,37 @@ app.post('/sendGymRequest', async (req, res) => {
     }
 })
 
-app.get('/getGymRequests', async (req, res) => {
+app.post('/handleRequest', async (req, res) => {
+    //console.log(req.body)
+    //this eventRequest _id only works for the current user's version of that event
+    const {accepted, eventRequest} = req.body;
+    const user = await User.findById(req.user._id)
+    const sender = await User.findById(eventRequest.sender._id)
+    //make event pending = false for current user and sender
+    if(accepted) {
+        await user.updateOne({"events._id": eventRequest._id}, {$set: {"events.$.pending": false}})
+    }
+    //delete event from current user and sender
+    else if(!accepted && eventRequest.recipients.length === 1) {
+        
+    }
 
+})
+
+app.get('/getGymRequests', async (req, res) => {
+    const user = await User.findById(req.user._id).populate({ path: 'events', populate: { path: 'sender' }})
+    const requests = user.events.filter((e) => e.recipients.includes(user._id))
+    res.json(requests)
 })
 
 app.get('/getMatchesData', async (req, res) => {
     const user = await User.findById(req.user._id).populate('matches');
     res.json(user.matches)
 })
+
+//-----------------------------------------------------SCHEDDULING---------------------------------------------------------
+
+
 
 //------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
 app.post('/image', async (req, res) => {

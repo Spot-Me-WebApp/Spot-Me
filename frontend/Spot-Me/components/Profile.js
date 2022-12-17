@@ -13,6 +13,10 @@ const Profile = (props) => {
 
     const { userData, setUserData } = useContext(UserDataContext);
 
+
+
+
+
     // useEffect(() => {
     //     async function fetchData() {
     //         await axios({
@@ -41,7 +45,7 @@ const Profile = (props) => {
 
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
 
                 {userData ? (
@@ -52,7 +56,7 @@ const Profile = (props) => {
                             borderBottomLeftRadius: 40,
                             borderBottomRightRadius: 40
                         }}>
-                            <View style={{ flexDirection: "row", width: "100%", marginTop: 10 }}>
+                            <View style={{ flexDirection: "row", width: "100%", marginTop: 35 }}>
 
                                 <MaterialIcons.Button name="edit" size={24} color="black" backgroundColor="white" onPress={() => props.navigation.navigate("Edit Profile", { userData })}></MaterialIcons.Button>
                                 <View style={{
@@ -119,7 +123,7 @@ const Profile = (props) => {
 
                     </View>) : (<Text>Profile</Text>)}
             </ScrollView>
-        </SafeAreaView>
+        </View>
     )
 }
 const styles = StyleSheet.create({
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
         marginVertical: 10
     },
     header: {
-        paddingTop: height * .05,
+        paddingTop: height * .02,
         flexDirection: 'column'
     }
 });

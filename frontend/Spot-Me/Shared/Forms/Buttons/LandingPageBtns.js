@@ -12,6 +12,7 @@ export const LandingPageBtn = (props) => {
     );
 }
 
+
 const styles = StyleSheet.create({
     container: {
         marginBottom: 8

@@ -9,6 +9,9 @@ import axios from 'axios'
 
 
 
+
+
+
 const Chat = (props) => {
 
     const { userData, setUserData } = useContext(UserDataContext)
@@ -70,10 +73,10 @@ const Chat = (props) => {
                 <View style={styles.chatHeader}>
                     <Text style={styles.chatHeading}>Chats</Text>
 
-                    {/* 👇🏻 Logs "ButtonPressed" to the console when the icon is clicked */}
-                    <Pressable onPress={() => console.log("Button Pressed!")}>
+                    
+                    {/* <Pressable onPress={() => console.log("Button Pressed!")}>
                         <Feather name='edit' size={24} color='green' />
-                    </Pressable>
+                    </Pressable> */}
                 </View>
 
 

@@ -12,6 +12,7 @@ export const XCircleBtn = (props) => {
     )
 }
 
+
 export const SmallXCircleBtn = (props) => {
     return (
         <Pressable onPress={props.onPress} style={props.style}>

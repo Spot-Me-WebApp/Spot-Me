@@ -7,6 +7,7 @@ const { height, width } = Dimensions.get("screen")
 //First page a user sees when launching the app
 const LandingPage = (props) => {
 
+    
     return (
         <View style={styles.container}>
             <Image style={{ width, height }}

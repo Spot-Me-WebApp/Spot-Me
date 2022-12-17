@@ -1,6 +1,7 @@
 import { SvgXml } from 'react-native-svg';
 import * as React from 'react';
 
+
 const googleXml =
     `<svg xmlns="http://www.w3.org/2000/svg"  
 viewBox="0 0 48 48" width="48px" height="48px">

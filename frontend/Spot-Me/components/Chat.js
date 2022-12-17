@@ -78,11 +78,7 @@ const Chat = (props) => {
                         <Feather name='edit' size={24} color='green' />
                     </Pressable> */}
                 </View>
-
-
             </View>
-
-
             <View style={styles.chatListContainer}>
                 {rooms.length > 0 ? (
                     <FlatList

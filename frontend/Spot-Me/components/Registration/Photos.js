@@ -13,6 +13,7 @@ import { useActionSheet } from '@expo/react-native-action-sheet';
 
 
 
+
 const Photos = (props) => {
 
     let [boxes, changeBox] = useState([false, false, false, false, false, false])

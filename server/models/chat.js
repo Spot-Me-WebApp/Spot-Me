@@ -11,6 +11,7 @@ const messageSchema = new Schema({
     time: Date
 })
 
+
 const chatSchema = new Schema({
     name: {
         type: String,

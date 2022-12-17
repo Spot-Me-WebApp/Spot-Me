@@ -402,6 +402,7 @@ app.post('/sendGymRequest', async (req, res) => {
     }
 })
 
+
 app.post('/handleRequest', async (req, res) => {
     //console.log(req.body)
     //this eventRequest _id only works for the current user's version of that event
@@ -410,20 +411,23 @@ app.post('/handleRequest', async (req, res) => {
     const sender = await User.findById(eventRequest.sender._id)
     //make event pending = false for current user and sender
     if(accepted) {
-        await user.updateOne({"events._id": eventRequest._id}, {$set: {"events.$.pending": false}})
+        await user.updateOne({$set: {"events.$[event].pending": false}}, {arrayFilters: [{"event._id": {$eq: eventRequest._id}}]});
+         //await sender.updateOne({$set: {"events.$[event].pending": false}}, {arrayFilters: [{"event.date": {}}]})
     }
     //delete event from current user and sender
-    else if(!accepted && eventRequest.recipients.length === 1) {
-        
+      else if(!accepted && eventRequest.recipients.length === 1) {
+        // await user.updateOne({$pull: {}})
     }
-
-})
+    
+}
+)
 
 app.get('/getGymRequests', async (req, res) => {
     const user = await User.findById(req.user._id).populate({ path: 'events', populate: { path: 'sender' }})
     const requests = user.events.filter((e) => e.recipients.includes(user._id))
     res.json(requests)
 })
+
 
 app.get('/getMatchesData', async (req, res) => {
     const user = await User.findById(req.user._id).populate('matches');

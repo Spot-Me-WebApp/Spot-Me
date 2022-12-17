@@ -9,6 +9,7 @@ const OtherProfile = (props) => {
     const [userData, setUserData] = useState(props.route.params.userData);
 
 
+    
 
     
     return (

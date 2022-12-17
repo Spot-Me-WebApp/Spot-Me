@@ -9,7 +9,6 @@ import OtherProfile from "../components/OtherProfile";
 
 const Stack = createNativeStackNavigator();
 
-
 const RootNavigator = () => {
     return (
         <Stack.Navigator

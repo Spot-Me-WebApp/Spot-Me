@@ -131,6 +131,7 @@ const EditProfile = (props) => {
 
 
     
+    
 
     const resizePhoto = async (imageUri, num) => {
         const manipResult = await manipulateAsync(

@@ -7,6 +7,7 @@ const Notch = props => {
     );
 };
 
+
 export default memo(Notch);
 
 const styles = StyleSheet.create({

@@ -15,6 +15,7 @@ export const EXP_LVL = [
 ]
 
 
+
 export const METHODS = [
     {
         item: 'Arm Day', 

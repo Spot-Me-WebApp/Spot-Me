@@ -12,3 +12,4 @@ module.exports = function (passport) {
     passport.deserializeUser(User.deserializeUser());
 
 };
+

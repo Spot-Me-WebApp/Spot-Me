@@ -13,6 +13,7 @@ import ChooseGym from "../components/Registration/ChooseGym"
 const Stack = createNativeStackNavigator();
 
 
+
 function OnboardingStack() {
     return (
         <Stack.Navigator initialRouteName="Landing">

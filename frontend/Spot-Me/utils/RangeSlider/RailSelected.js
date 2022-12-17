@@ -7,6 +7,7 @@ const RailSelected = () => {
     );
 };
 
+
 export default memo(RailSelected);
 
 const styles = StyleSheet.create({

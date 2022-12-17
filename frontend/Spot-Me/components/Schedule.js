@@ -25,6 +25,7 @@ const Schedule = (props) => {
     const [eventModalVisible, setEventModalVisibile] = useState(false);
     const [eventTime, setEventTime] = useState(new Date())
     const [matches, setMatches] = useState([])
+    const [sessions, setSessions] = useState([])
     const [recipients, setRecipients] = useState([])
     const [requests, setRequests] = useState([])
     const [location, setLocation] = useState("")
@@ -84,8 +85,6 @@ const Schedule = (props) => {
 
     const _renderRequests = ({ item, index}) => {
         return (
-
-            
             
             <View style={{
                 marginLeft: index === 0 ? 30 : 20,
@@ -194,6 +193,7 @@ const Schedule = (props) => {
         })
         .then(console.log('success'))
         .catch((err) => console.log(err))
+        
     }
 
     return (
@@ -296,7 +296,7 @@ const Schedule = (props) => {
                                     backgroundColor: 'white',
                                     alignItems: 'center'
                                 }}
-                                onPress={() => handleRequest(false)}
+                                onPress={() => {handleRequest(false), setRequestModalVisible(false)}}
                             >
                                 <Text style={{ color: 'black' }}>DECLINE</Text>
                             </TouchableOpacity>
@@ -310,7 +310,7 @@ const Schedule = (props) => {
                                     backgroundColor: 'white',
                                     alignItems: 'center'
                                 }}
-                                onPress={() => handleRequest(true)}
+                                onPress={() => {handleRequest(true), setRequestModalVisible(false)}}
                             >
                                 <Text style={{ color: 'black' }}>ACCEPT</Text>
                             </TouchableOpacity>
@@ -371,7 +371,7 @@ const Schedule = (props) => {
                 <Modal
                     isVisible={modalVisible}
                 >
-                    <SafeAreaView style={{ alignItems: 'center', flex: .7, backgroundColor: '#202020', borderRadius: 30 }}>
+                    <SafeAreaView style={{ alignItems: 'center', flex: .85, backgroundColor: '#202020', borderRadius: 30 }}>
                         <Text style={{ color: '#f8f9fa', fontSize: 24, fontWeight: 'bold', marginTop: 15 }}>Schedule Event</Text>
                         <Text style={{ color: 'white', alignSelf: 'flex-start', marginLeft: 5, marginTop: 30, fontWeight: 'bold' }}>When</Text>
                         <Input value={`${new Date(selectedDateCopy.setDate(selectedDate.getDate() + 1)).toDateString()} 

@@ -16,6 +16,7 @@ const gymSchema = {
     address: String
 }
 
+
 const eventSchema = {
     sender: {
         type: Schema.Types.ObjectId,

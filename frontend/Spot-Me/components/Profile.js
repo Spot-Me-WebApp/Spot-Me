@@ -48,6 +48,8 @@ const Profile = (props) => {
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
 
+
+
                 {userData ? (
                     <View>
                         <View style={{

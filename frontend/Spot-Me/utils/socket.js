@@ -6,6 +6,7 @@ const socket = io(SOCKET_IO_PORT, {
     path: '/socket.io/'
 })
 
+
 export default socket;
 
 

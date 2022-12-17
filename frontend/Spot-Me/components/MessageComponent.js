@@ -8,7 +8,6 @@ export default function MessageComponent(props) {
     const status = item.author.username !== user.username;
 
 
-    
     return (
         //other user has their image to the left of their messages, current user has their image to the right of their messages
         <View>

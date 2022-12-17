@@ -8,6 +8,7 @@ const Thumb = ({ name }) => {
     return <View style={name === 'high' ? styles.rootHigh : styles.rootLow} />;
 };
 
+
 const styles = StyleSheet.create({
     rootLow: {
         width: THUMB_RADIUS_LOW * 2,

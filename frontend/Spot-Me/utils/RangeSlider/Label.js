@@ -9,6 +9,7 @@ const Label = ({ text, ...restProps }) => {
     );
 };
 
+
 const styles = StyleSheet.create({
     root: {
         alignItems: 'center',

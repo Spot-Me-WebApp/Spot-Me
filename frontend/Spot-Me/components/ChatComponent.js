@@ -3,8 +3,6 @@ import React, { useContext, useLayoutEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { UserDataContext } from "./Contexts";
 
-
-
 const ChatComponent = (props) => {
     const { item } = props;
     const [messages, setMessages] = useState({});
@@ -14,6 +12,7 @@ const ChatComponent = (props) => {
         setMessages(item.messages[item.messages.length - 1]);
     }, []);
 
+    
     //Next line Only works for two-person chats. It shows the 1st profile picture of the other user.
     const chatPicture = item.users.filter(user => user._id !== userData._id)[0].images[0].url
     return (

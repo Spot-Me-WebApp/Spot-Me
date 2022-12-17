@@ -7,6 +7,7 @@ import { LeftArrowBtn, RightArrowBtn } from '../../Shared/Forms/Buttons/ArrowBut
 
 
 
+
 const { height, width } = Dimensions.get('window')
 
 const Bio = (props) => {

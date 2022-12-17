@@ -12,6 +12,9 @@ const { height, width } = Dimensions.get('window')
 const NameDOB = (props) => {
 
     
+
+
+
     const { username, password, name, provider, uri } = props.route.params
 
     const [registerName, setRegisterName] = useState(name)

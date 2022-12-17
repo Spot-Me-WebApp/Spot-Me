@@ -10,15 +10,6 @@ import calculateAge from '../utils/CalculateAge';
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const SCREEN_WIDTH = Dimensions.get('window').width
 
-const OtherUsers = [
-    { id: "1", uri: require('../assets/1.jpg') },
-    { id: "2", uri: require('../assets/2.jpg') },
-    { id: "3", uri: require('../assets/3.jpg') },
-    { id: "4", uri: require('../assets/4.jpg') },
-    //          { id: "5", uri: require('./assets/5.jpg') },
-]
-
-
 
 export default class Meet extends Component {
 
@@ -29,9 +20,6 @@ export default class Meet extends Component {
             currentIndex: 0,
             matchFound: false
         }
-
-
-
 
         // Animation for cards to tilt to whichever side is being swiped on
         this.rotate = this.position.x.interpolate({
@@ -76,7 +64,6 @@ export default class Meet extends Component {
 
     static contextType = CardStackContext;
     componentWillMount() {
-
 
         // Animation for swiping
         this.PanResponder = PanResponder.create({

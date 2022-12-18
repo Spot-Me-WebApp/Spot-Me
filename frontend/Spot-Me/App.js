@@ -1,4 +1,5 @@
 import { React, useEffect, useState } from 'react';
+import { LogBox } from 'react-native';
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 import axios from 'axios'
 import { SERVER_PORT } from '@env'
@@ -14,7 +15,7 @@ export default function App() {
   const [userData, setUserData] = useState(null)
 
 
-  
+  LogBox.ignoreAllLogs();
 
   // if (loggedIn) {
   //   console.log(cardStack)

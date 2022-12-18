@@ -23,7 +23,7 @@ const { PriorityQueue } = require('./PriorityQueue');
 const io = new Server({
     path: '/socket.io/',
     cors: {
-        origin: ['http://192.168.1.151:19000'],
+        origin: ['*'],
         credentials: true,
     },
 })
@@ -104,7 +104,7 @@ db.once('open', () => {
 //cors allows the backend to accept requests from frontend domain
 
 app.use(cors({
-    origin: 'http://192.168.1.151:19000',
+    origin: '*',
     credentials: true,
     optionsSuccessStatus: 200 //Some old browsers dont accept default, 204
 }));
@@ -136,7 +136,7 @@ app.use(express.json({ limit: '50mb' }))
 app.use((req, res, next) => {
     res.set({
         'Access-Control-ALlow-Headers': 'true',
-        'Access-Control-Allow-Origin': 'http://192.168.1.151:19000',
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
     })
     next();

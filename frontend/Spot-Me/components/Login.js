@@ -1,3 +1,6 @@
+//Login Page
+//.....
+
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
 import { FormContainer } from '../Shared/Forms/FormContainer';
@@ -9,7 +12,7 @@ import { LeftArrowBtn, RightArrowBtn } from '../Shared/Forms/Buttons/ArrowButton
 import * as Google from 'expo-auth-session/providers/google'
 import * as Facebook from 'expo-auth-session/providers/facebook'
 import { LoginContext, CardStackContext, UserDataContext } from './Contexts';
-//kjfkdsjafk
+
 const { height, width } = Dimensions.get("screen")
 
 const Login = (props) => {

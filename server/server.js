@@ -403,29 +403,42 @@ app.post('/sendGymRequest', async (req, res) => {
 })
 
 
+
 app.post('/handleRequest', async (req, res) => {
     //console.log(req.body)
     //this eventRequest _id only works for the current user's version of that event
-    const {accepted, eventRequest} = req.body;
+    const { accepted, eventRequest } = req.body;
     const user = await User.findById(req.user._id)
     const sender = await User.findById(eventRequest.sender._id)
     //make event pending = false for current user and sender
-    if(accepted) {
-        await user.updateOne({$set: {"events.$[event].pending": false}}, {arrayFilters: [{"event._id": {$eq: eventRequest._id}}]});
-         //await sender.updateOne({$set: {"events.$[event].pending": false}}, {arrayFilters: [{"event.date": {}}]})
+    if (accepted) {
+        await user.updateOne({ $set: { "events.$[event].pending": false } }, { arrayFilters: [{ "event._id": { $eq: eventRequest._id } }] });
+        await sender.updateOne({ $set: { "events.$[event].pending": false } }, { arrayFilters: [{ "event.date": { $eq: eventRequest.date } }] })
     }
     //delete event from current user and sender
-      else if(!accepted && eventRequest.recipients.length === 1) {
-        // await user.updateOne({$pull: {}})
+    else if (!accepted && eventRequest.recipients.length === 1) {
+        await user.updateOne({ $pull: { events: { _id: { $eq: eventRequest._id } } } })
+        await sender.updateOne({ $pull: { events: { date: { $eq: eventRequest.date } } } })
     }
-    
+    //delete event from current user and remove current user's id from recipients array for sender and other recipients
+    else if (!accepted && eventRequest.recipients.length > 1) {
+        await user.updateOne({ $pull: { events: { _id: { $eq: eventRequest._id } } } })
+    }
 }
 )
 
-app.get('/getGymRequests', async (req, res) => {
-    const user = await User.findById(req.user._id).populate({ path: 'events', populate: { path: 'sender' }})
-    const requests = user.events.filter((e) => e.recipients.includes(user._id))
-    res.json(requests)
+
+app.get('/getEvents', async (req, res) => {
+    const user = await User.findById(req.user._id).populate({ path: 'events', populate: { path: 'sender' } })
+    const events = [...user.events];
+    let requests = [];
+    events.forEach(e => {
+        if (e.recipients.includes(user._id) && e.pending) {
+            requests.push(e)
+        }
+    })
+    const confirmedEvents = events.filter((e) => !e.pending);
+    res.json({ requests: requests, confirmedEvents: confirmedEvents })
 })
 
 
@@ -491,6 +504,7 @@ app.put('/image', async (req, res) => {
     console.log(uploadedImages)
     res.send(uploadedImages)
 })
+//------------------------------------------------------IMAGE UPLOAD & DELETE--------------------------------------------------
 
 
 //Routes---------------------------------------------------------------------------------------------------

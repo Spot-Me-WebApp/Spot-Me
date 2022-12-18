@@ -1,3 +1,5 @@
+//Logged in user's profile
+
 import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, StatusBar, Image, SafeAreaView, Dimensions } from 'react-native';
 import axios from 'axios'

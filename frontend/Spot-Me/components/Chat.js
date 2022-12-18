@@ -1,3 +1,5 @@
+//Page where users view their chat rooms
+
 import React, { useEffect, useLayoutEffect, useState, useContext } from 'react';
 import { View, Text, Pressable, SafeAreaView, FlatList, StyleSheet, } from 'react-native';
 import { Feather } from "@expo/vector-icons";
@@ -73,7 +75,7 @@ const Chat = (props) => {
                 <View style={styles.chatHeader}>
                     <Text style={styles.chatHeading}>Chats</Text>
 
-                    
+
                     {/* <Pressable onPress={() => console.log("Button Pressed!")}>
                         <Feather name='edit' size={24} color='green' />
                     </Pressable> */}

@@ -1,3 +1,5 @@
+//Page where users can schedule events, view events, and respond to requests
+
 import React, { useEffect, useState, useContext, } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, SafeAreaView, FlatList, ImageBackground, TouchableWithoutFeedback, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
@@ -28,6 +30,7 @@ const Schedule = (props) => {
     const [sessions, setSessions] = useState([])
     const [recipients, setRecipients] = useState([])
     const [requests, setRequests] = useState([])
+    let [confirmedEvents, setConfirmedEvents] = useState({})
     const [location, setLocation] = useState("")
     const [description, setDescription] = useState("")
     const [requestIndex, setRequestIndex] = useState(0)
@@ -38,10 +41,11 @@ const Schedule = (props) => {
     }
     let selectedDateCopy = new Date();
 
-    // setDate = (date) => {
-    //     // const obj = date.reduce((c, v) => Object.assign(c, { [v]: { selected: true, selectedColor: '#99d98c' } }), {})
-    //     selectedDate = date;
-    // }
+    setConfirmedEvents = (events) => {
+        const obj = events.reduce((c, v) => Object.assign(c, { [v.date.substr(0, 10)]: { marked: true, dotColor: 'purple' } }), {})
+        confirmedEvents = obj;
+        console.log(confirmedEvents)
+    }
 
     const Requests = [
         {
@@ -83,9 +87,9 @@ const Schedule = (props) => {
     }
 
 
-    const _renderRequests = ({ item, index}) => {
+    const _renderRequests = ({ item, index }) => {
         return (
-            
+
             <View style={{
                 marginLeft: index === 0 ? 30 : 20,
                 marginRight: index === requests.length - 1 ? 30 : 0
@@ -96,7 +100,7 @@ const Schedule = (props) => {
                         setRequestIndex(index)
                     }}
                 >
-                    <ImageBackground source={{uri: item.sender.images[0].url}}
+                    <ImageBackground source={{ uri: item.sender.images[0].url }}
                         resizeMode='cover'
                         borderRadius={20}
                         style={{
@@ -151,9 +155,12 @@ const Schedule = (props) => {
     useEffect(() => {
         async function fetchData() {
             await axios({
-                url: `${SERVER_PORT}/getGymRequests`
+                url: `${SERVER_PORT}/getEvents`
             })
-                .then((res) => { console.log(res.data); setRequests(res.data) })
+                .then((res) => {
+                    console.log(res.data); setRequests(res.data.requests)
+                    setConfirmedEvents(res.data.confirmedEvents)
+                })
                 .catch((err) => console.log(err))
         }
         fetchData();
@@ -191,9 +198,9 @@ const Schedule = (props) => {
                 eventRequest: requests[requestIndex]
             }
         })
-        .then(console.log('success'))
-        .catch((err) => console.log(err))
-        
+            .then(console.log('success'))
+            .catch((err) => console.log(err))
+
     }
 
     return (
@@ -205,129 +212,135 @@ const Schedule = (props) => {
 
 
             <View style={{
-                marginBottom: 8, alignItems: 'center'
+                marginBottom: 8, alignItems: 'center',
             }}>
-                <FlatList
-                    horizontal
-                    keyExtractor={(item) => item.id}
-                     // data={Requests}
-                     // renderItem={_renderRequests}
-                    data = {requests}
-                    renderItem={_renderRequests}
-                    showsHorizontalScrollIndicator={false}
+                {requests.length > 0 ? (
+                    <FlatList
+                        horizontal
+                        keyExtractor={(item) => item.id}
+                        // data={Requests}
+                        // renderItem={_renderRequests}
+                        data={requests}
+                        renderItem={_renderRequests}
+                        showsHorizontalScrollIndicator={false}
 
-                ></FlatList>
+                    ></FlatList>
+                ) :
+                    (
+                        <Text style={{ color: 'white', marginBottom: HEIGHT * .1 }}>You don't have any requests.</Text>
+                    )}
+
             </View>
             {requests.length > 0 &&
-            <View>
-                <Modal
-                    isVisible={requestModalVisible}
-                >
-                    <View style={{
-                        //flex:1,
-                        borderRadius:20,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        //backgroundColor: 'black'
-                    }}>
-                        <ImageBackground
-                            resizeMode='cover'
-                            borderRadius={25}
-                            source={{uri:requests[requestIndex].sender.images[0].url}}
-                            style={{
-                                width: WIDTH,
-                                height: HEIGHT * .66,
-                                borderRadius: 20,
-                            }}
+                <View>
+                    <Modal
+                        isVisible={requestModalVisible}
+                    >
+                        <View style={{
+                            //flex:1,
+                            borderRadius: 20,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            //backgroundColor: 'black'
+                        }}>
+                            <ImageBackground
+                                resizeMode='cover'
+                                borderRadius={25}
+                                source={{ uri: requests[requestIndex].sender.images[0].url }}
+                                style={{
+                                    width: WIDTH,
+                                    height: HEIGHT * .66,
+                                    borderRadius: 20,
+                                }}
 
-                        >
-                            <View style={{ flex: 1, justifyContent: 'center' }}>
-                                
-                                {/* <View style={styles.modalHeader}> */}
-                                <View style={{
-                                    marginHorizontal: 15,
-                                    marginVertical: 15,
-                                }}>
-                                    <View style={styles.modalDateBox}>
-                                        <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 36, }}>{new Date(requests[requestIndex].date).getDate()}</Text>
-                                        <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 20, }}>{new Date(requests[requestIndex].date).toDateString().substr(4, 3)}</Text>
+                            >
+                                <View style={{ flex: 1, justifyContent: 'center' }}>
+
+                                    {/* <View style={styles.modalHeader}> */}
+                                    <View style={{
+                                        marginHorizontal: 15,
+                                        marginVertical: 15,
+                                    }}>
+                                        <View style={styles.modalDateBox}>
+                                            <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 36, }}>{new Date(requests[requestIndex].date).getDate()}</Text>
+                                            <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 20, }}>{new Date(requests[requestIndex].date).toDateString().substr(4, 3)}</Text>
+                                        </View>
                                     </View>
-                                    </View>
-                                {/* </View> */}
+                                    {/* </View> */}
 
 
-                                <View style={styles.modalGradient}>
-                                    <LinearGradient
-                                        colors={['transparent', '#000']}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 1 }}
-                                        style={{
-                                            width: '100%',
-                                            height: HEIGHT * .9,
-                                            justifyContent: 'flex-end'
-                                        }}
-                                    >
+                                    <View style={styles.modalGradient}>
+                                        <LinearGradient
+                                            colors={['transparent', '#000']}
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 1 }}
+                                            style={{
+                                                width: '100%',
+                                                height: HEIGHT * .9,
+                                                justifyContent: 'flex-end'
+                                            }}
+                                        >
 
-                                        <View style={styles.modalInfo}>
+                                            <View style={styles.modalInfo}>
 
-                                        <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase' }}>{requests[requestIndex].sender.name}</Text>
-                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{requests[requestIndex].description}</Text>
-                                            
-                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{requests[requestIndex].location}</Text>
-                                            <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{new Date(requests[requestIndex].date).toLocaleTimeString().split(':').map((val, i) => i === 2 ? val.substring(3, 6) : val).join(':')}</Text>
-                                            
-                                            {/* <View style={styles.dateBox}>
+                                                <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase' }}>{requests[requestIndex].sender.name}</Text>
+                                                <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{requests[requestIndex].description}</Text>
+
+                                                <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{requests[requestIndex].location}</Text>
+                                                <Text style={{ color: 'white', opacity: .5, letterSpacing: 2, fontSize: 16 }}>{new Date(requests[requestIndex].date).toLocaleTimeString().split(':').map((val, i) => i === 2 ? val.substring(3, 6) : val).join(':')}</Text>
+
+                                                {/* <View style={styles.dateBox}>
                                                 <Text style={{ alignContent: 'center', justifyContent: 'center', fontSize: 18, }}>{Requests[0].date.getDate()}</Text>
                                                 <Text style={{ alignContent: 'center', justifyContent: 'center', textTransform: 'uppercase', fontWeight: 'bold', fontSize: 10, }}>{Requests[0].date.toDateString().substr(4, 3)}</Text>
                                             </View> */}
-                                        </View>
+                                            </View>
 
-                                        <View style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-evenly',
-                            marginBottom: 10,
-                        }}>
-                            <TouchableOpacity
-                                style={{
-                                    width: 75,
-                                    height: 35,
-                                    borderRadius: 10,
-                                    justifyContent: 'center',
-                                    backgroundColor: 'white',
-                                    alignItems: 'center'
-                                }}
-                                onPress={() => {handleRequest(false), setRequestModalVisible(false)}}
-                            >
-                                <Text style={{ color: 'black' }}>DECLINE</Text>
-                            </TouchableOpacity>
+                                            <View style={{
+                                                flexDirection: 'row',
+                                                justifyContent: 'space-evenly',
+                                                marginBottom: 10,
+                                            }}>
+                                                <TouchableOpacity
+                                                    style={{
+                                                        width: 75,
+                                                        height: 35,
+                                                        borderRadius: 10,
+                                                        justifyContent: 'center',
+                                                        backgroundColor: 'white',
+                                                        alignItems: 'center'
+                                                    }}
+                                                    onPress={() => { handleRequest(false), setRequestModalVisible(false) }}
+                                                >
+                                                    <Text style={{ color: 'black' }}>DECLINE</Text>
+                                                </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={{
-                                    width: 75,
-                                    height: 35,
-                                    borderRadius: 10,
-                                    justifyContent: 'center',
-                                    backgroundColor: 'white',
-                                    alignItems: 'center'
-                                }}
-                                onPress={() => {handleRequest(true), setRequestModalVisible(false)}}
-                            >
-                                <Text style={{ color: 'black' }}>ACCEPT</Text>
-                            </TouchableOpacity>
-                        </View>
+                                                <TouchableOpacity
+                                                    style={{
+                                                        width: 75,
+                                                        height: 35,
+                                                        borderRadius: 10,
+                                                        justifyContent: 'center',
+                                                        backgroundColor: 'white',
+                                                        alignItems: 'center'
+                                                    }}
+                                                    onPress={() => { handleRequest(true), setRequestModalVisible(false) }}
+                                                >
+                                                    <Text style={{ color: 'black' }}>ACCEPT</Text>
+                                                </TouchableOpacity>
+                                            </View>
 
 
-                                    </LinearGradient>
+                                        </LinearGradient>
+                                    </View>
+
+
+
                                 </View>
 
 
+                            </ImageBackground>
 
-                            </View>
-
-
-                        </ImageBackground>
-
-                        {/* <View style={{
+                            {/* <View style={{
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                             
@@ -361,12 +374,12 @@ const Schedule = (props) => {
                         </View> */}
 
 
-                        <Button title="Dismiss" onPress={() => setRequestModalVisible(false)}></Button>
-                    </View>
-                </Modal>
+                            <Button title="Dismiss" onPress={() => setRequestModalVisible(false)}></Button>
+                        </View>
+                    </Modal>
 
-            </View>
-        }
+                </View>
+            }
             <View>
                 <Modal
                     isVisible={modalVisible}
@@ -410,19 +423,19 @@ const Schedule = (props) => {
                 <Modal
                     isVisible={eventModalVisible}
                 >
-                    <SafeAreaView style={{ alignItems: 'center', flex: .75, backgroundColor: '#202020', overflow: 'hidden', borderRadius:20 }}>
-                        <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase', letterSpacing:2 }}>WORKOUT SCHEDULED ON DATE</Text>
-                        <View style={{ flexDirection: 'column',}}>
-                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>WITH: </Text>
-                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>USER </Text>
+                    <SafeAreaView style={{ alignItems: 'center', flex: .75, backgroundColor: '#202020', overflow: 'hidden', borderRadius: 20 }}>
+                        <Text style={{ color: 'white', fontSize: 24, textTransform: 'uppercase', letterSpacing: 2 }}>WORKOUT SCHEDULED ON DATE</Text>
+                        <View style={{ flexDirection: 'column', }}>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>WITH: </Text>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>USER </Text>
                         </View>
-                        <View style={{ flexDirection: 'column',}}>
-                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>WHERE: </Text>
-                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>LOCATION </Text>
+                        <View style={{ flexDirection: 'column', }}>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>WHERE: </Text>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>LOCATION </Text>
                         </View>
-                        <View style={{ flexDirection: 'column',}}>
-                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>TIME: </Text>
-                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing:2 }}>TIME</Text>
+                        <View style={{ flexDirection: 'column', }}>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>TIME: </Text>
+                            <Text style={{ color: 'white', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>TIME</Text>
                         </View>
                     </SafeAreaView>
 
@@ -469,9 +482,9 @@ const Schedule = (props) => {
                     textDayHeaderFontSize: 16
                 }}
                 onDayPress={day => { setDate(new Date(day.dateString)); console.log(selectedDate); setModalVisible(true) }}
-            // markedDates={
-            //     selectedDate
-            // }
+                markedDates={
+                    confirmedEvents
+                }
             />
 
         </View>

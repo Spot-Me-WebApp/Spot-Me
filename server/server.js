@@ -12,7 +12,6 @@ const Chat = require('./models/chat')
 const cors = require('cors')
 const session = require('express-session')
 const passport = require('passport');
-const multer = require('multer')
 const { storage, cloudinary } = require('./cloudinary');
 const { Server } = require('socket.io')
 const { PriorityQueue } = require('./PriorityQueue');

@@ -33,3 +33,4 @@ package-lock.json
 frontend/package-lock.json
 frontend/Spot-Me/package-lock.json
 UserCredentials.txt
+server/.env

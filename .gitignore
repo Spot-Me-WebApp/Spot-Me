@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-server/node_modules/
+/server/node_modules/
 Spot-Me/node_modules/
 client/node_modules/
 /.pnp
@@ -26,11 +26,10 @@ yarn-error.log*
 
 frontend/Spot-Me/.env
 .vscode/settings.json
-server/.env
-server/package-lock.json
-server/node_modules
-.expo/
-package-lock.json
-UserCredentials.txt
-frontend/package-lock.json
-frontend/Spot-Me/package-lock.json
+/server/.env
+/server/package-lock.json
+/.expo/
+/package-lock.json
+/frontend/package-lock.json
+/frontend/Spot-Me/package-lock.json
+/UserCredentials.txt

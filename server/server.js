@@ -23,7 +23,7 @@ const { PriorityQueue } = require('./PriorityQueue');
 const io = new Server({
     path: '/socket.io/',
     cors: {
-        origin: ['*'],
+        origin: '*',
         credentials: true,
     },
 })

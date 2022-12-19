@@ -1,5 +1,5 @@
 //Page where users swipe through profile cards
-
+//afhayfafhafajk
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, Animated, PanResponder, TouchableOpacity, TouchableHighlight } from 'react-native';
 import Modal from "react-native-modal"

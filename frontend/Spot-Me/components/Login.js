@@ -1,5 +1,5 @@
 //Login Page
-//.....
+//....a.a.a.a.a.
 
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, Dimensions, Image, KeyboardAvoidingView } from 'react-native';
@@ -71,6 +71,7 @@ const Login = (props) => {
             })
                 .then((response) => {
                     setGoogleUserUri(response.data.id)
+                    console.log(googleUserUri)
                     loginOauth(googleUserUri)
                 })
                 .catch((err) => console.log(err, err.message))
@@ -94,6 +95,7 @@ const Login = (props) => {
             })
                 .then((response) => {
                     setFbUserUri(response.data.id)
+                    console.log(fbUserUri)
                     loginOauth(fbUserUri)
                 })
                 .catch((err) => console.log(err, err.message))
@@ -115,7 +117,7 @@ const Login = (props) => {
             setLoggedIn(true)
             getCardStack();
         })
-            .catch((error) => console.log(error, error.stack))
+            .catch((error) => console.log(error, error.stack, error.message))
     }
 
 

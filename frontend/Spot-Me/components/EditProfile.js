@@ -1,3 +1,5 @@
+//Page where users can edit their information
+
 import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { View, Text, StyleSheet, StatusBar, Image, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Button, Alert } from 'react-native'
 import SelectBox from 'react-native-multi-selectbox'
@@ -130,8 +132,8 @@ const EditProfile = (props) => {
 
 
 
-    
-    
+
+
 
     const resizePhoto = async (imageUri, num) => {
         const manipResult = await manipulateAsync(
